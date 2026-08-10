@@ -7,8 +7,11 @@
     <script>
     (function() {
         try {
-            // ✅ Fitur dark mode dihilangkan — aplikasi terkunci permanen ke dark theme.
-            document.documentElement.setAttribute('data-theme', 'dark');
+            // ✅ v66 — Fitur dark mode DIKEMBALIKAN. Baca preferensi tersimpan sebelum first
+            // paint (mencegah flash tema salah). Default tetap dark kalau belum pernah diset.
+            var savedDarkMode = localStorage.getItem('si_darkmode');
+            var isDarkPref = savedDarkMode === null ? true : savedDarkMode === 'true';
+            document.documentElement.setAttribute('data-theme', isDarkPref ? 'dark' : 'light');
             // Restore accent color CSS vars before first paint
             var accent = JSON.parse(localStorage.getItem('si_accent_color'));
             if (accent && accent.primary) {
@@ -1221,25 +1224,28 @@ async function saveIDBTelegramConfig(config) {
             animation: flashDn 1.5s ease-out forwards;
         }
 
-        /* ─── FEAR & GREED ─── */
-        .fear-greed-section {
+        /* ─── FEAR & GREED ───
+           v67: fear-greed-section (skor utama) + fgi-index-section (per-pasar) DIGABUNG
+           jadi satu kartu fisik (.fg-master-card) — sebelumnya 2 kartu terpisah dengan
+           border/shadow/header masing-masing, padahal skor IHSG di kartu pertama SAMA
+           dengan kartu IHSG pertama di baris "per pasar". Digabung = 1 border, 1 header,
+           hemat ruang vertikal signifikan, tanpa menghapus data/fitur apa pun. */
+        .fg-master-card {
             background: var(--card-bg);
             border: 1px solid var(--border-light);
             border-radius: var(--radius-xl);
-            padding: 14px 16px;
-            margin-bottom: 16px;
+            padding: 12px 14px;
+            margin-bottom: 12px;
             box-shadow: var(--shadow-sm);
-            cursor: pointer;
             transition: all 0.3s;
             position: relative;
             overflow: hidden;
         }
-        .fear-greed-section:hover {
+        .fg-master-card:hover {
             border-color: var(--primary);
             box-shadow: var(--shadow-md);
-            transform: translateY(-2px);
         }
-        .fear-greed-section::before {
+        .fg-master-card::before {
             content: '';
             position: absolute;
             top: 0;
@@ -1249,6 +1255,17 @@ async function saveIDBTelegramConfig(config) {
             background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.06), transparent);
             animation: dopamineShine 4s linear infinite;
             pointer-events: none;
+        }
+        .fear-greed-section {
+            cursor: pointer;
+            position: relative;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+            border-bottom: 1px dashed var(--border-light);
+            transition: opacity 0.2s;
+        }
+        .fear-greed-section:active {
+            opacity: 0.75;
         }
         .fg-header {
             display: flex;
@@ -1438,49 +1455,30 @@ async function saveIDBTelegramConfig(config) {
             display: none;
         }
 
-        /* ─── FGI PER INDEX ─── */
+        /* ─── FGI PER INDEX ───
+           v67: chrome kartu (background/border/shadow) dipindah ke .fg-master-card
+           yang membungkus section ini + .fear-greed-section jadi satu kartu. */
         .fgi-index-section {
-            background: var(--card-bg);
-            border: 1px solid var(--border-light);
-            border-radius: var(--radius-xl);
-            padding: 14px 16px;
-            margin-bottom: 16px;
-            box-shadow: var(--shadow-sm);
-            transition: all 0.3s;
             position: relative;
-            overflow: hidden;
         }
-        .fgi-index-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
-            animation: dopamineShine 4s linear infinite;
-            pointer-events: none;
-        }
-        .fgi-index-section:hover {
-            border-color: var(--primary);
-            box-shadow: var(--shadow-md);
-        }
-        .fgi-index-header {
+        .fgi-mini-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
+            margin-bottom: 7px;
             position: relative;
             z-index: 1;
         }
-        .fgi-index-title {
-            font-family: 'Barlow Condensed', sans-serif;
-            font-size: 17px;
-            font-weight: 900;
-            color: var(--t-hi);
+        .fgi-mini-label {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 9.5px;
+            font-weight: 800;
+            color: var(--t-med);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
             display: flex;
             align-items: center;
-            gap: 7px;
+            gap: 5px;
         }
         .fgi-cards-scroll {
             display: flex;
@@ -1951,6 +1949,36 @@ async function saveIDBTelegramConfig(config) {
             border-radius: 5px;
             font-family: 'IBM Plex Mono', monospace;
             text-transform: uppercase;
+        }
+
+        /* ─── MARKET STATUS CARD (v67) — gabungan sync + koneksi + rezim, hemat ruang ───
+           Sebelumnya 3 box terpisah (masing2 punya border+shadow+margin sendiri).
+           Sekarang 1 card dengan garis pemisah tipis antar baris. */
+        .market-status-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 12px;
+            overflow: hidden;
+        }
+        .market-status-card .sync-status-row,
+        .market-status-card .status-bar,
+        .market-status-card .regime-strip {
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            border-radius: 0;
+            margin-bottom: 0;
+            padding: 9px 14px;
+        }
+        .market-status-card .status-bar,
+        .market-status-card .regime-strip {
+            border-top: 1px solid var(--border-light);
+        }
+        .market-status-card .regime-strip:hover {
+            background: var(--bg-elevated);
+            box-shadow: none;
         }
 
         /* ─── TOP MOVERS ─── */
@@ -2524,6 +2552,133 @@ async function saveIDBTelegramConfig(config) {
             color: var(--t-med);
             font-weight: 700;
         }
+
+        /* ─── BREADTH — compact gauge card (v67 fix: classes below were
+             referenced in markup but never styled, causing the SVG gauge
+             to render at native/oversized dimensions and break layout) ─── */
+        .breadth-header-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        .breadth-sentiment-pill {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 9px;
+            font-weight: 800;
+            padding: 3px 9px;
+            border-radius: 20px;
+            background: var(--bg-elevated);
+            color: var(--t-med);
+            border: 1px solid var(--border-light);
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            white-space: nowrap;
+        }
+        .breadth-live-tag {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 9px;
+            font-weight: 800;
+            color: var(--up);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+        .breadth-gauge-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 4px 16px 8px;
+        }
+        .breadth-gauge-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 112px;
+            flex-shrink: 0;
+        }
+        .breadth-gauge-svg {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .breadth-gauge-needle {
+            transition: transform 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+            transform-origin: 65px 65px;
+        }
+        .breadth-gauge-caption {
+            font-size: 9.5px;
+            font-weight: 800;
+            letter-spacing: 0.4px;
+            color: var(--t-med);
+            margin-top: 2px;
+            text-transform: uppercase;
+            background: var(--bg-elevated);
+            padding: 2px 10px;
+            border-radius: 20px;
+            white-space: nowrap;
+        }
+        .breadth-stats-col {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 8px;
+        }
+        /* ✅ v68 FIX — ROOT CAUSE lama: angka besar "282 : 329" dulu satu blok teks
+           (.breadth-ratio-big) yang lebarnya mengikuti jumlah digit, sedangkan label
+           "Saham Naik"/"Saham Turun" di baris bawah disebar pakai justify-content:
+           space-between di lebar PENUH kolom. Dua sistem lebar yang berbeda ini
+           membuat angka & labelnya gampang tidak sejajar (terutama di layar kecil
+           atau saat jumlah digit kedua sisi beda, mis. "5 : 329"). Fix permanen:
+           angka & label sekarang SATU unit (breadth-ratio-item) yang sama-sama
+           di-flex:1 & center — jadi "329" akan SELALU tepat di atas "SAHAM TURUN"
+           berapapun jumlah digitnya, di layar sekecil apapun. */
+        .breadth-ratio-flex {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 2px;
+        }
+        .breadth-ratio-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            min-width: 0;
+        }
+        .breadth-ratio-num {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 28px;
+            font-weight: 800;
+            line-height: 1;
+            white-space: nowrap;
+            /* efek "kilometer" — angka juga transisi halus saat berganti nilai */
+            transition: color 0.3s;
+        }
+        .breadth-ratio-colon {
+            color: var(--t-low);
+            font-weight: 700;
+            font-size: 22px;
+            flex-shrink: 0;
+            padding-top: 2px;
+        }
+        .breadth-lbl-up, .breadth-lbl-dn {
+            display: block;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            margin-top: 4px;
+            white-space: nowrap;
+            text-align: center;
+        }
+        .breadth-lbl-up { color: var(--up); }
+        .breadth-lbl-dn { color: var(--dn); }
         .breadth-counters {
             display: grid;
             grid-template-columns: 1fr auto 1fr;
@@ -2875,6 +3030,82 @@ async function saveIDBTelegramConfig(config) {
             font-weight: 700;
         }
 
+        /* ─── STOCK LIST LAYOUT SWITCHER (v67) — list / grid 2 kolom / geser (slide) ─── */
+        .sl-layout-group {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-light);
+            border-radius: 10px;
+            padding: 3px;
+            flex-shrink: 0;
+        }
+        .sl-layout-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 26px;
+            border: none;
+            border-radius: 7px;
+            background: transparent;
+            color: var(--t-med);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .sl-layout-btn:active { transform: scale(0.92); }
+        .sl-layout-btn.active {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Grid 2 kolom — kartu tetap lengkap, hanya dipadatkan agar muat 2 per baris */
+        .stock-list.layout-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+        .stock-list.layout-grid .stock-card { padding: 10px 9px 9px; }
+        .stock-list.layout-grid .sc-card-top { padding-left: 8px; margin-bottom: 6px; }
+        .stock-list.layout-grid .sc-row1 { padding-left: 8px; }
+        .stock-list.layout-grid .sc-ticker { font-size: 15px; gap: 4px; }
+        .stock-list.layout-grid .sc-name { font-size: 9px; max-width: 100px; margin-top: 2px; }
+        .stock-list.layout-grid .sc-price { font-size: 12.5px; }
+        .stock-list.layout-grid .sc-chg { font-size: 10px; padding: 2px 5px; margin-top: 2px; }
+        .stock-list.layout-grid .dopamine-badge { font-size: 7px; padding: 2px 5px; margin-left: 8px; }
+        .stock-list.layout-grid .sc-badges { gap: 4px; margin-bottom: 8px; padding-left: 8px; }
+        .stock-list.layout-grid .sc-badges .pill { font-size: 8px; padding: 2px 5px; }
+        .stock-list.layout-grid .sc-mini-row { gap: 5px; row-gap: 6px; }
+        .stock-list.layout-grid .sc-mini-stat { min-width: 26px; }
+        .stock-list.layout-grid .sc-mini-lbl { font-size: 7px; }
+        .stock-list.layout-grid .sc-mini-val { font-size: 9.5px; }
+        .stock-list.layout-grid .sc-mini-div { height: 18px; }
+        .stock-list.layout-grid .sparkline-wrap { width: 46px; height: 22px; top: 9px; right: 8px; opacity: 0.5; }
+
+        /* Geser (slide) — satu baris horizontal, kartu ukuran penuh, snap per kartu */
+        .stock-list.layout-carousel {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            gap: 10px;
+            padding: 2px 2px 10px;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .stock-list.layout-carousel::-webkit-scrollbar { display: none; }
+        .stock-list.layout-carousel .stock-card {
+            flex: 0 0 84%;
+            max-width: 340px;
+            scroll-snap-align: start;
+        }
+        @media (min-width: 480px) {
+            .stock-list.layout-carousel .stock-card { flex-basis: 62%; }
+        }
+
         /* ─── BOTTOM NAV ─── */
         .bottom-nav {
             position: fixed;
@@ -3119,6 +3350,10 @@ async function saveIDBTelegramConfig(config) {
             background: var(--dn-bg);
             color: var(--dn);
         }
+        .idx-card-chg.neu {
+            background: var(--warn-bg);
+            color: var(--warn);
+        }
         .idx-card-bar {
             height: 2px;
             border-radius: 1px;
@@ -3136,6 +3371,9 @@ async function saveIDBTelegramConfig(config) {
         }
         .idx-card-bar-fill.dn {
             background: linear-gradient(90deg, var(--dn), #ff8a95);
+        }
+        .idx-card-bar-fill.neu {
+            background: var(--warn);
         }
         .idx-card-mini-chart {
             position: absolute;
@@ -9605,53 +9843,13 @@ async function saveIDBTelegramConfig(config) {
             background: var(--card-bg) !important;
         }
 
-        /* ═══ v35 — CHART INDICATORS ROW ENHANCED ═══ */
-        .chart-ind-row-v35 {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-            align-items: center;
-            padding: 8px 0 10px;
-            border-bottom: 1px solid var(--border-light);
-            margin-bottom: 10px;
-        }
-        .chart-ind-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-family: 'IBM Plex Mono', monospace;
-            font-size: 9px;
-            font-weight: 800;
-            letter-spacing: 0.3px;
-            border: 1px solid;
-        }
-        .chart-ind-pill.rsi {
-            background: rgba(56,139,253,0.12);
-            color: var(--primary);
-            border-color: rgba(56,139,253,0.3);
-        }
-        .chart-ind-pill.macd {
-            background: rgba(252,211,77,0.12);
-            color: var(--warn);
-            border-color: rgba(252,211,77,0.3);
-        }
-        .chart-ind-pill.vol {
-            background: rgba(52,211,153,0.12);
-            color: var(--up);
-            border-color: rgba(52,211,153,0.3);
-        }
-        .chart-ind-pill.candle {
-            background: rgba(125,143,168,0.1);
-            color: var(--t-med);
-            border-color: var(--border-light);
-        }
-        .chart-ind-pill.donchian {
-            background: rgba(168,85,247,0.12);
-            color: #a855f7;
-            border-color: rgba(168,85,247,0.35);
-        }
+        /* ═══ v68 — CATATAN CLEANUP: blok CSS ".chart-ind-row-v35" / ".chart-ind-pill*"
+           (badge dekoratif RSI/MACD/Volume/Donchian yang dulu tampil DI ATAS chart)
+           SUDAH DIHAPUS dari sini. HTML pemakainya sudah dihapus lebih dulu (lihat
+           komentar v66 di loadModalChart), tapi rule CSS-nya waktu itu tertinggal —
+           kode "tersimpan" yang tidak dipakai apapun ini berpotensi membingungkan
+           pengembangan fitur berikutnya (mis. nama class kepakai lagi tanpa sadar
+           sudah collision), jadi dibersihkan total di sini. ═══ */
 
         /* ═══ v40 — MODAL PROFESSIONAL DESIGN ═══ */
         .modal-header-chip {
@@ -9759,20 +9957,8 @@ async function saveIDBTelegramConfig(config) {
         .ind-card-badge-v40.up{background:var(--up-bg);color:var(--up);border-color:var(--up-border);}
         .ind-card-badge-v40.dn{background:var(--dn-bg);color:var(--dn);border-color:var(--dn-border);}
         .ind-card-badge-v40.neu{background:var(--warn-bg);color:var(--warn);border-color:rgba(245,166,35,0.3);}
-        .donchian-bar-wrap {
-            height:8px;border-radius:4px;background:rgba(168,85,247,0.12);
-            margin-top:4px;position:relative;overflow:hidden;
-        }
-        .donchian-bar-fill {
-            height:100%;border-radius:4px;
-            background:linear-gradient(90deg,rgba(52,211,153,0.7),rgba(168,85,247,0.7),rgba(248,113,113,0.7));
-            position:relative;
-        }
-        .donchian-price-dot {
-            position:absolute;top:50%;width:10px;height:10px;
-            border-radius:50%;background:var(--primary);border:2px solid #fff;
-            transform:translate(-50%,-50%);box-shadow:0 0 6px var(--primary-glow);
-        }
+        /* ═══ v68 CLEANUP: ".donchian-bar-wrap/-fill/-price-dot" (mini-bar dekoratif lama,
+           tidak pernah dipakai HTML/JS manapun) dihapus — lihat catatan cleanup di atas. ═══ */
 
         /* ═══ v35 — MODAL TABS IMPROVED ═══ */
         .m-tabs {
@@ -10135,7 +10321,7 @@ async function saveIDBTelegramConfig(config) {
                 <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>
             </svg>
             <div style="font-family:'Outfit',sans-serif;font-weight:800;background:linear-gradient(135deg,var(--primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Sobat<em style="font-style:normal;">Inves</em></div>
-            <span class="logo-badge" style="background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;border:none;">v33</span>
+            <span class="logo-badge" style="background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;border:none;">v59</span>
         </div>
         <div class="header-right" style="display:flex;align-items:center;gap:8px;flex:1;">
             <div class="header-search-wrap" style="position:relative;display:flex;align-items:center;flex:1;max-width:640px;">
@@ -10144,6 +10330,10 @@ async function saveIDBTelegramConfig(config) {
                 <button class="search-clear-btn" id="searchClearBtn" onclick="clearHeaderSearch()" title="Hapus pencarian">✕</button>
                 <div class="search-results-drop" id="searchResultsDrop"></div>
             </div>
+            <button class="header-theme-btn btn-ripple" onclick="toggleDarkModeFromProfile()" title="Ganti Mode Terang / Gelap" aria-label="Ganti mode terang atau gelap">
+                <svg class="dm-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                <svg class="dm-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M20.5 14.5A8.5 8.5 0 1 1 9.5 3.5a7 7 0 0 0 11 11z"/></svg>
+            </button>
             <div id="headerMstatPill" style="display:none;"><span id="headerMstatText">LIVE</span></div>
         </div>
     </header>
@@ -10607,56 +10797,53 @@ async function saveIDBTelegramConfig(config) {
                     <div class="breadth-header">
                         <div class="breadth-title">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-                            Market Breadth BEI
-                            <span id="brdSentimentPill" style="font-size:9px;font-weight:900;padding:3px 8px;border-radius:6px;background:var(--primary-light);color:var(--primary);font-family:'IBM Plex Mono',monospace;letter-spacing:0.5px;">LOADING</span>
+                            <span class="breadth-title-text">Market Breadth BEI</span>
                         </div>
-                        <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--t-med);font-weight:700;display:flex;align-items:center;gap:4px;">
-                            <span class="live-pulse"></span>REAL-TIME
+                        <div class="breadth-header-right">
+                            <span id="brdSentimentPill" class="breadth-sentiment-pill">LOADING</span>
+                            <span class="breadth-live-tag"><span class="live-pulse"></span>REAL-TIME</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="breadth-chart-wrap" id="breadthChart" style="padding:0 16px;">
-                    <svg id="breadthSVG" width="100%" height="70" viewBox="0 0 400 70" preserveAspectRatio="none">
-                        <defs>
-                            <linearGradient id="gradUp" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stop-color="var(--up)" stop-opacity="0.6"/>
-                                <stop offset="100%" stop-color="var(--up)" stop-opacity="0"/>
-                            </linearGradient>
-                            <linearGradient id="gradDn" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stop-color="var(--dn)" stop-opacity="0.6"/>
-                                <stop offset="100%" stop-color="var(--dn)" stop-opacity="0"/>
-                            </linearGradient>
-                        </defs>
-                        <line x1="0" y1="35" x2="400" y2="35" stroke="var(--border-light)" stroke-width="1" stroke-dasharray="4,4"/>
-                        <path id="breadthAreaUp" class="trendline-area-up" d=""/>
-                        <path id="breadthAreaDn" class="trendline-area-dn" d=""/>
-                        <path id="breadthLineUp" class="trendline-path trendline-up" d=""/>
-                        <path id="breadthLineDn" class="trendline-path trendline-dn" d=""/>
-                        <circle id="breadthDotUp" class="trendline-dot" r="4" fill="var(--up)" cx="0" cy="0"/>
-                        <circle id="breadthDotDn" class="trendline-dot" r="4" fill="var(--dn)" cx="0" cy="0"/>
-                        <circle cx="12" cy="10" r="3" fill="var(--up)"/>
-                        <text x="18" y="14" font-size="8" fill="var(--t-med)" font-family="IBM Plex Mono">NAIK</text>
-                        <circle cx="55" cy="10" r="3" fill="var(--dn)"/>
-                        <text x="61" y="14" font-size="8" fill="var(--t-med)" font-family="IBM Plex Mono">TURUN</text>
-                    </svg>
+                <div class="breadth-gauge-row">
+                    <div class="breadth-gauge-wrap">
+                        <svg class="breadth-gauge-svg" viewBox="0 0 130 74" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="brdGaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stop-color="var(--dn)"/>
+                                    <stop offset="48%" stop-color="var(--t-low)"/>
+                                    <stop offset="52%" stop-color="var(--t-low)"/>
+                                    <stop offset="100%" stop-color="var(--up)"/>
+                                </linearGradient>
+                            </defs>
+                            <path d="M 15 65 A 50 50 0 0 1 115 65" fill="none" stroke="var(--bg-elevated)" stroke-width="12" stroke-linecap="round"/>
+                            <path d="M 15 65 A 50 50 0 0 1 115 65" fill="none" stroke="url(#brdGaugeGrad)" stroke-width="9" stroke-linecap="round"/>
+                            <line id="brdGaugeNeedle" class="breadth-gauge-needle" x1="65" y1="65" x2="65" y2="19" stroke="var(--t-hi)" stroke-width="2.5" stroke-linecap="round"/>
+                            <circle cx="65" cy="65" r="5.5" fill="var(--t-hi)"/>
+                            <circle cx="65" cy="65" r="2.3" fill="var(--card-bg)"/>
+                            <text x="15" y="73" font-size="7.5" fill="var(--t-low)" font-family="IBM Plex Mono" font-weight="700">0</text>
+                            <text x="106" y="73" font-size="7.5" fill="var(--t-low)" font-family="IBM Plex Mono" font-weight="700">100</text>
+                        </svg>
+                        <div class="breadth-gauge-caption" id="brdGaugeCaption">NEUTRAL</div>
+                    </div>
+                    <div class="breadth-stats-col">
+                        <div class="breadth-ratio-flex">
+                            <div class="breadth-ratio-item">
+                                <span class="breadth-ratio-num c-up" id="brd-adv">—</span>
+                                <span class="breadth-lbl-up">Saham Naik</span>
+                            </div>
+                            <span class="breadth-ratio-colon">:</span>
+                            <div class="breadth-ratio-item">
+                                <span class="breadth-ratio-num c-dn" id="brd-dcl">—</span>
+                                <span class="breadth-lbl-dn">Saham Turun</span>
+                            </div>
+                        </div>
+                        <div style="display:none;"><span id="brd-net">— : —</span></div>
+                    </div>
                 </div>
 
-                <div style="padding:0 16px 14px;">
-                    <div class="breadth-counters">
-                        <div class="breadth-side left">
-                            <div class="breadth-big-num c-up" id="brd-adv">—</div>
-                            <div class="breadth-lbl">Saham Naik</div>
-                        </div>
-                        <div class="breadth-divider">
-                            <div class="breadth-ratio-badge" id="brd-net">— : —</div>
-                            <div class="breadth-vs">A/D RATIO</div>
-                        </div>
-                        <div class="breadth-side right">
-                            <div class="breadth-big-num c-dn" id="brd-dcl">—</div>
-                            <div class="breadth-lbl">Saham Turun</div>
-                        </div>
-                    </div>
+                <div style="padding:10px 16px 14px;">
                     <div class="breadth-bar-track">
                         <div class="breadth-bar-fill-up" id="brdBarUp" style="width:50%"></div>
                         <div class="breadth-bar-fill-dn" id="brdBarDn" style="width:50%"></div>
@@ -10690,33 +10877,38 @@ async function saveIDBTelegramConfig(config) {
 
             <div id="idxCardsGrid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px;"></div>
 
-            <div class="sync-status-row" id="syncStatusRow" style="display:none;">
-                <div style="display:flex;align-items:center;gap:8px;">
-                    <div class="sync-dot" id="syncDot"></div>
-                    <span id="syncStatusText" style="color:var(--t-med);">Cloud Sync Aktif</span>
+            <!-- ✅ v67 — 3 bar status (sync/koneksi/rezim) digabung jadi 1 card hemat ruang,
+                 dengan garis pemisah tipis antar baris. ID & handler onclick tiap elemen
+                 TIDAK diubah supaya seluruh logic JS (updateSyncStatus, statText, dsb) tetap jalan. -->
+            <div class="market-status-card">
+                <div class="sync-status-row" id="syncStatusRow" style="display:none;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <div class="sync-dot" id="syncDot"></div>
+                        <span id="syncStatusText" style="color:var(--t-med);">Cloud Sync Aktif</span>
+                    </div>
+                    <button onclick="syncToSheet()" style="background:var(--primary-light);border:1px solid var(--primary);color:var(--primary);border-radius:7px;padding:4px 10px;font-size:10px;font-weight:900;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all 0.2s;" onmouseover="this.style.background='var(--primary)';this.style.color='#fff';" onmouseout="this.style.background='var(--primary-light)';this.style.color='var(--primary)';">↑ SYNC</button>
                 </div>
-                <button onclick="syncToSheet()" style="background:var(--primary-light);border:1px solid var(--primary);color:var(--primary);border-radius:7px;padding:4px 10px;font-size:10px;font-weight:900;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all 0.2s;" onmouseover="this.style.background='var(--primary)';this.style.color='#fff';" onmouseout="this.style.background='var(--primary-light)';this.style.color='var(--primary)';">↑ SYNC</button>
-            </div>
 
-            <div class="status-bar" id="statusBar">
-                <div style="display:flex;align-items:center;gap:8px;">
-                    <div class="live-dot" style="color:var(--up);"></div>
-                    <span id="statText" style="font-weight:700;color:var(--t-hi);">Menyambungkan Terminal...</span>
-                    <div class="spin-ring" id="spinRing"></div>
+                <div class="status-bar" id="statusBar">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <div class="live-dot" style="color:var(--up);"></div>
+                        <span id="statText" style="font-weight:700;color:var(--t-hi);">Menyambungkan Terminal...</span>
+                        <div class="spin-ring" id="spinRing"></div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:6px;font-weight:700;">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        <span id="lastUpd">—</span>
+                    </div>
                 </div>
-                <div style="display:flex;align-items:center;gap:6px;font-weight:700;">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                    <span id="lastUpd">—</span>
-                </div>
-            </div>
 
-            <div class="regime-strip btn-ripple" id="regimeStrip" onclick="infoRegime()">
-                <div class="regime-dot" id="regimeDot" style="background:var(--warn);"></div>
-                <div>
-                    <div class="regime-lbl" id="regimeLbl">Mendeteksi Rezim...</div>
-                    <div class="regime-sub" id="regimeSub">Menganalisa kondisi pasar</div>
+                <div class="regime-strip btn-ripple" id="regimeStrip" onclick="infoRegime()">
+                    <div class="regime-dot" id="regimeDot" style="background:var(--warn);"></div>
+                    <div>
+                        <div class="regime-lbl" id="regimeLbl">Mendeteksi Rezim...</div>
+                        <div class="regime-sub" id="regimeSub">Menganalisa kondisi pasar</div>
+                    </div>
+                    <div class="regime-badges" id="regimeBadges"></div>
                 </div>
-                <div class="regime-badges" id="regimeBadges"></div>
             </div>
 
             <div id="cryptoPanelWrap" style="margin-bottom:14px;">
@@ -10765,63 +10957,64 @@ async function saveIDBTelegramConfig(config) {
                     <div id="forexIdrList" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;"></div>
                 </div>
             </div>
-            <div class="fear-greed-section btn-ripple" onclick="infoFearGreed()">
+            <!-- v67: Fear & Greed Index + Per Pasar digabung 1 kartu (skor IHSG sebelumnya
+                 tampil dobel di 2 kartu terpisah). Semua id/fungsi JS tetap sama persis. -->
+            <div class="fg-master-card" id="fgMasterCard">
                 <div class="fg-header">
                     <div class="fg-title">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2z"/></svg>
                         Fear &amp; Greed Index
-                    </div>
-                    <div class="fg-time" id="fgTime">—</div>
-                </div>
-                <div class="fg-main-row">
-                    <div class="fg-val-block">
-                        <div class="fg-big-val" id="fgValue" style="color:var(--primary);">—</div>
-                        <div class="fg-label" id="fgLabel" style="color:var(--primary);">LOADING</div>
-                    </div>
-                    <div class="fg-bar-block">
-                        <div class="fg-bar-track">
-                            <div class="fg-bar-pointer" id="fgPointer" style="left:50%;"></div>
-                        </div>
-                        <div class="fg-bar-labels">
-                            <span>0</span><span>E.Fear</span><span>Fear</span><span>50</span><span>Greed</span><span>E.Greed</span><span>100</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="fg-zones">
-                    <div class="fg-zone fg-zone-extreme-fear" id="fgZone0">E.Fear</div>
-                    <div class="fg-zone fg-zone-fear" id="fgZone1">Fear</div>
-                    <div class="fg-zone fg-zone-neutral" id="fgZone2">Neutral</div>
-                    <div class="fg-zone fg-zone-greed" id="fgZone3">Greed</div>
-                    <div class="fg-zone fg-zone-extreme-greed" id="fgZone4">E.Greed</div>
-                </div>
-                <div class="fg-factors">
-                    <div class="fg-factor"><div class="fg-factor-lbl">Breadth</div><div class="fg-factor-val" id="fgfBreadth">—</div></div>
-                    <div class="fg-factor"><div class="fg-factor-lbl">Momentum</div><div class="fg-factor-val" id="fgfMomentum">—</div></div>
-                    <div class="fg-factor"><div class="fg-factor-lbl">Volatility</div><div class="fg-factor-val" id="fgfVolatility">—</div></div>
-                    <div class="fg-factor"><div class="fg-factor-lbl">Volume</div><div class="fg-factor-val" id="fgfVolume">—</div></div>
-                </div>
-            </div>
-
-            <div class="fgi-index-section" id="fgiIndexSection">
-                <div class="fgi-index-header">
-                    <div class="fgi-index-title">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2z"/></svg>
-                        Fear &amp; Greed Per Pasar
                         <span style="font-size:9px;background:var(--primary);color:#fff;padding:2px 7px;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-weight:900;letter-spacing:0.5px;">8 MARKET</span>
                     </div>
                     <div style="display:flex;align-items:center;gap:6px;">
-                        <div class="data-fetch-indicator" id="fgiLoadingBadge" style="display:none;">
-                            <div class="data-fetch-ring"></div>LIVE
+                        <div class="data-fetch-indicator" id="fgiLoadingBadge" style="display:none;padding:3px 9px;gap:5px;">
+                            <div class="data-fetch-ring" style="width:9px;height:9px;"></div>LIVE
                         </div>
-                        <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--t-med);font-weight:800;" id="fgiLastUpdate">—</div>
+                        <div class="fg-time" id="fgTime">—</div>
                     </div>
                 </div>
-                <div class="fgi-cards-scroll" id="fgiCardsScroll"></div>
-                <div id="fgiSummaryBar" style="display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--border-light);gap:8px;align-items:center;flex-wrap:wrap;position:relative;z-index:1;">
-                    <div style="font-size:10px;color:var(--t-med);font-weight:800;font-family:'IBM Plex Mono',monospace;flex:1;">
-                        <span id="fgiSummaryText">—</span>
+                <div class="fear-greed-section btn-ripple" onclick="infoFearGreed()">
+                    <div class="fg-main-row">
+                        <div class="fg-val-block">
+                            <div class="fg-big-val" id="fgValue" style="color:var(--primary);">—</div>
+                            <div class="fg-label" id="fgLabel" style="color:var(--primary);">LOADING</div>
+                        </div>
+                        <div class="fg-bar-block">
+                            <div class="fg-bar-track">
+                                <div class="fg-bar-pointer" id="fgPointer" style="left:50%;"></div>
+                            </div>
+                            <div class="fg-bar-labels">
+                                <span>0</span><span>E.Fear</span><span>Fear</span><span>50</span><span>Greed</span><span>E.Greed</span><span>100</span>
+                            </div>
+                        </div>
                     </div>
-                    <div style="font-size:9px;color:var(--t-low);font-family:'IBM Plex Mono',monospace;font-weight:700;">Tap kartu untuk detail lengkap</div>
+                    <div class="fg-zones">
+                        <div class="fg-zone fg-zone-extreme-fear" id="fgZone0">E.Fear</div>
+                        <div class="fg-zone fg-zone-fear" id="fgZone1">Fear</div>
+                        <div class="fg-zone fg-zone-neutral" id="fgZone2">Neutral</div>
+                        <div class="fg-zone fg-zone-greed" id="fgZone3">Greed</div>
+                        <div class="fg-zone fg-zone-extreme-greed" id="fgZone4">E.Greed</div>
+                    </div>
+                    <div class="fg-factors">
+                        <div class="fg-factor"><div class="fg-factor-lbl">Breadth</div><div class="fg-factor-val" id="fgfBreadth">—</div></div>
+                        <div class="fg-factor"><div class="fg-factor-lbl">Momentum</div><div class="fg-factor-val" id="fgfMomentum">—</div></div>
+                        <div class="fg-factor"><div class="fg-factor-lbl">Volatility</div><div class="fg-factor-val" id="fgfVolatility">—</div></div>
+                        <div class="fg-factor"><div class="fg-factor-lbl">Volume</div><div class="fg-factor-val" id="fgfVolume">—</div></div>
+                    </div>
+                </div>
+
+                <div class="fgi-index-section" id="fgiIndexSection">
+                    <div class="fgi-mini-row">
+                        <div class="fgi-mini-label">🌐 Per Pasar Global</div>
+                        <span id="fgiLastUpdate" style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--t-low);font-weight:700;">—</span>
+                    </div>
+                    <div class="fgi-cards-scroll" id="fgiCardsScroll"></div>
+                    <div id="fgiSummaryBar" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--border-light);gap:8px;align-items:center;flex-wrap:wrap;position:relative;z-index:1;">
+                        <div style="font-size:10px;color:var(--t-med);font-weight:800;font-family:'IBM Plex Mono',monospace;flex:1;">
+                            <span id="fgiSummaryText">—</span>
+                        </div>
+                        <div style="font-size:9px;color:var(--t-low);font-family:'IBM Plex Mono',monospace;font-weight:700;">Tap kartu untuk detail lengkap</div>
+                    </div>
                 </div>
             </div>
 
@@ -10920,8 +11113,19 @@ async function saveIDBTelegramConfig(config) {
                 <input type="hidden" id="searchInput">
             </div>
 
-            <div style="display:flex;justify-content:space-between;margin-bottom:14px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:8px;">
                 <span style="font-size:13px;color:var(--t-med);font-weight:800;text-transform:uppercase;letter-spacing:0.5px;" id="countLbl">Memuat data...</span>
+                <div class="sl-layout-group" id="slLayoutGroup" role="group" aria-label="Tata letak daftar emiten">
+                    <button class="sl-layout-btn active" data-layout="list" onclick="setStockListLayout('list')" title="Tampilan list">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+                    </button>
+                    <button class="sl-layout-btn" data-layout="grid" onclick="setStockListLayout('grid')" title="Tampilan grid 2 kolom">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg>
+                    </button>
+                    <button class="sl-layout-btn" data-layout="carousel" onclick="setStockListLayout('carousel')" title="Tampilan geser (slide)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><rect x="2" y="6" width="6" height="12" rx="1.2"/><rect x="9" y="4" width="6" height="16" rx="1.2"/><rect x="16" y="6" width="6" height="12" rx="1.2"/></svg>
+                    </button>
+                </div>
             </div>
             <div class="stock-list" id="stockList"><div class="news-loading"><div class="news-loader-spin"></div>Mengambil data market real-time...</div></div>
             <div class="footer-credit">
@@ -11348,24 +11552,47 @@ async function saveIDBTelegramConfig(config) {
         <div class="page" id="page-profil">
 
             <div id="profMainView">
-                <div style="background:linear-gradient(160deg,var(--primary) 0%,#003ECC 60%,#4d8fff 100%);border-radius:var(--radius-xl);padding:24px 20px 18px;margin-bottom:12px;position:relative;overflow:hidden;box-shadow:var(--shadow-lg);">
-                    <div style="position:absolute;top:-40px;right:-30px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,0.07);pointer-events:none;"></div>
-                    <div style="display:flex;align-items:center;gap:14px;position:relative;z-index:1;">
-                        <div id="pageProfileAvatar" onclick="openProfSubPage('subpage-profil')" style="width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,0.2);border:2px solid rgba(255,255,255,0.5);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:900;color:#fff;flex-shrink:0;box-shadow:0 6px 16px rgba(0,0,0,0.2);overflow:hidden;cursor:pointer;"></div>
+                <div style="background:radial-gradient(circle at 15% 0%,rgba(0,214,143,0.16),transparent 55%),radial-gradient(circle at 100% 100%,rgba(0,85,255,0.20),transparent 55%),linear-gradient(160deg,#0a0f1c 0%,#0d1526 55%,#0a1a20 100%);border:1px solid rgba(0,214,143,0.18);border-radius:var(--radius-xl);padding:22px 18px 16px;margin-bottom:12px;position:relative;overflow:hidden;box-shadow:0 12px 30px rgba(0,0,0,0.35);">
+                    <div style="position:absolute;top:-50px;right:-40px;width:180px;height:180px;border-radius:50%;background:rgba(0,214,143,0.08);pointer-events:none;filter:blur(2px);"></div>
+                    <div style="position:absolute;bottom:-60px;left:-30px;width:150px;height:150px;border-radius:50%;background:rgba(0,85,255,0.10);pointer-events:none;"></div>
+
+                    <div style="display:flex;align-items:center;gap:13px;position:relative;z-index:1;">
+                        <div id="pageProfileAvatar" onclick="openProfSubPage('subpage-profil')" style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,rgba(0,214,143,0.25),rgba(0,85,255,0.25));border:2px solid rgba(0,214,143,0.5);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:#fff;flex-shrink:0;box-shadow:0 6px 16px rgba(0,0,0,0.3);overflow:hidden;cursor:pointer;"></div>
                         <div style="flex:1;min-width:0;">
-                            <div id="pageProfileName" style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:#fff;line-height:1;">—</div>
-                            <div id="pageProfileEmail" style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:rgba(255,255,255,0.7);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px;">—</div>
-                            <div style="display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:12px;padding:3px 10px;margin-top:7px;" id="pageProfileBadge">
-                                <svg width="9" height="9" viewBox="0 0 24 24" fill="#fff"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                                <span style="font-size:9px;font-weight:900;color:#fff;font-family:'IBM Plex Mono',monospace;letter-spacing:0.5px;">FREE PLAN</span>
+                            <div id="pageProfileName" style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;color:#fff;line-height:1.1;letter-spacing:0.2px;">—</div>
+                            <div id="pageProfileEmail" style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:rgba(255,255,255,0.55);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px;">—</div>
+                            <div style="display:inline-flex;align-items:center;gap:4px;background:rgba(0,214,143,0.14);border:1px solid rgba(0,214,143,0.35);border-radius:12px;padding:3px 10px;margin-top:6px;" id="pageProfileBadge">
+                                <svg width="9" height="9" viewBox="0 0 24 24" fill="#00D68F"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                <span style="font-size:8.5px;font-weight:900;color:#00D68F;font-family:'IBM Plex Mono',monospace;letter-spacing:0.5px;">FREE PLAN</span>
                             </div>
                         </div>
-                        <div style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:10px;padding:6px 10px;text-align:center;flex-shrink:0;" onclick="syncToSheet()">
-                            <div style="font-size:9px;color:rgba(255,255,255,0.7);font-family:'IBM Plex Mono',monospace;font-weight:700;">SYNC</div>
+                        <div style="background:rgba(255,255,255,0.06);border:1px solid rgba(0,214,143,0.25);border-radius:10px;padding:6px 10px;text-align:center;flex-shrink:0;cursor:pointer;" onclick="syncToSheet()">
+                            <div style="font-size:8.5px;color:rgba(255,255,255,0.55);font-family:'IBM Plex Mono',monospace;font-weight:700;letter-spacing:0.5px;">SYNC</div>
                             <div class="sync-dot" id="pageSyncDot" style="width:8px;height:8px;margin:3px auto;"></div>
-                            <div id="pageSyncText" style="font-size:8px;color:rgba(255,255,255,0.5);font-family:'IBM Plex Mono',monospace;">—</div>
+                            <div id="pageSyncText" style="font-size:7.5px;color:rgba(255,255,255,0.4);font-family:'IBM Plex Mono',monospace;">—</div>
                         </div>
                     </div>
+
+                    <!-- ══ TRADING STATS STRIP — Total Saldo · Winrate · Win · Lost ══ -->
+                    <div style="display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr;gap:8px;margin-top:16px;position:relative;z-index:1;">
+                        <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:9px 10px;">
+                            <div style="font-size:8px;color:rgba(255,255,255,0.5);font-family:'IBM Plex Mono',monospace;font-weight:800;letter-spacing:0.4px;">TOTAL SALDO</div>
+                            <div id="pageProfEquity" style="font-size:13.5px;font-weight:900;color:#fff;font-family:'IBM Plex Mono',monospace;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Rp0</div>
+                        </div>
+                        <div style="background:rgba(0,214,143,0.07);border:1px solid rgba(0,214,143,0.2);border-radius:12px;padding:9px 8px;text-align:center;">
+                            <div style="font-size:8px;color:rgba(255,255,255,0.5);font-family:'IBM Plex Mono',monospace;font-weight:800;letter-spacing:0.4px;">WINRATE</div>
+                            <div id="pageProfWinrate" style="font-size:15px;font-weight:900;color:#00D68F;font-family:'IBM Plex Mono',monospace;margin-top:3px;">0%</div>
+                        </div>
+                        <div style="background:rgba(0,214,143,0.05);border:1px solid rgba(0,214,143,0.15);border-radius:12px;padding:9px 8px;text-align:center;">
+                            <div style="font-size:8px;color:rgba(255,255,255,0.5);font-family:'IBM Plex Mono',monospace;font-weight:800;letter-spacing:0.4px;">WIN</div>
+                            <div id="pageProfWin" style="font-size:15px;font-weight:900;color:#00D68F;font-family:'IBM Plex Mono',monospace;margin-top:3px;">0</div>
+                        </div>
+                        <div style="background:rgba(255,77,94,0.05);border:1px solid rgba(255,77,94,0.15);border-radius:12px;padding:9px 8px;text-align:center;">
+                            <div style="font-size:8px;color:rgba(255,255,255,0.5);font-family:'IBM Plex Mono',monospace;font-weight:800;letter-spacing:0.4px;">LOST</div>
+                            <div id="pageProfLost" style="font-size:15px;font-weight:900;color:#FF4D5E;font-family:'IBM Plex Mono',monospace;margin-top:3px;">0</div>
+                        </div>
+                    </div>
+                    <div id="pageProfEquitySub" style="font-size:8.5px;color:rgba(255,255,255,0.35);font-weight:600;margin-top:8px;position:relative;z-index:1;text-align:right;">Realized + Unrealized P&amp;L · dari Jurnal Trading</div>
                 </div>
 
                 <div style="display:flex;flex-direction:column;gap:8px;padding-bottom:30px;">
@@ -12211,6 +12438,26 @@ async function saveIDBTelegramConfig(config) {
 
                 <div style="display:flex;flex-direction:column;gap:14px;padding-bottom:40px;">
 
+                    <!-- ── SECTION 1: TEMA TAMPILAN (Dark/Light Mode) — v66 dikembalikan ── -->
+                    <div class="prof-sec-block" style="padding:0;overflow:hidden;">
+                        <div style="background:linear-gradient(135deg,rgba(0,85,255,0.08),rgba(0,85,255,0.02));padding:12px 16px;border-bottom:1px solid var(--border-light);display:flex;align-items:center;gap:8px;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg>
+                            <span style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;color:var(--t-hi);text-transform:uppercase;letter-spacing:0.5px;">Tema Tampilan</span>
+                        </div>
+                        <div style="padding:14px;">
+                            <div class="pp-dm-toggle" onclick="toggleDarkModeFromProfile()">
+                                <div class="pp-dm-toggle-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg>
+                                </div>
+                                <div class="pp-dm-toggle-label">
+                                    <div class="pp-dm-toggle-title" id="pageDmTitle">Mode Gelap</div>
+                                    <div class="pp-dm-toggle-sub">Ganti antara tampilan gelap &amp; terang</div>
+                                </div>
+                                <div class="tampilan-toggle-pill" id="darkModeTogglePill"><div class="pp-dm-pill-thumb"></div><span class="toggle-label-text toggle-label-on">ON</span><span class="toggle-label-text toggle-label-off">OFF</span></div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- ── SECTION 2: AUDIO ─────────────────── -->
                     <div class="prof-sec-block" style="padding:0;overflow:hidden;">
                         <div style="background:linear-gradient(135deg,rgba(0,85,255,0.08),rgba(0,85,255,0.02));padding:12px 16px;border-bottom:1px solid var(--border-light);display:flex;align-items:center;gap:8px;">
@@ -12786,16 +13033,31 @@ async function saveIDBTelegramConfig(config) {
                     if (activeHubPane && activeHubPane.id === 'hub-porto') { renderPortfolio(); }
                 } catch(e) { console.warn('[ThemeSwitch]', e); }
             }, 180);
+            if (typeof syncDarkModeToggleUI === 'function') syncDarkModeToggleUI();
         }
 
         function toggleDarkModeFromProfile() {
-            // ✅ Fitur dark mode dihilangkan — aplikasi terkunci permanen ke dark theme.
-            return;
+            // ✅ v66 — Fitur dark mode DIKEMBALIKAN. Balik tema saat ini, lalu simpan.
+            const isDarkNow = document.documentElement.getAttribute('data-theme') === 'dark';
+            toggleDarkMode(!isDarkNow);
+            syncDarkModeToggleUI();
         }
 
         function initDarkMode() {
-            // ✅ Fitur ganti tema dihilangkan — selalu dark, tidak baca localStorage lagi.
-            document.documentElement.setAttribute('data-theme', 'dark');
+            // ✅ v66 — Baca preferensi tersimpan (default dark kalau belum pernah diset).
+            const saved = lsGet('si_darkmode', true);
+            document.documentElement.setAttribute('data-theme', saved ? 'dark' : 'light');
+            syncDarkModeToggleUI();
+        }
+
+        // ✅ v66 — Sinkronkan tampilan toggle pill & label "Mode Gelap/Terang" di halaman
+        // Pengaturan → Tampilan setiap kali tema berubah atau halaman itu dibuka.
+        function syncDarkModeToggleUI() {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            const pill = document.getElementById('darkModeTogglePill');
+            if (pill) pill.classList.toggle('on', isDark);
+            const title = document.getElementById('pageDmTitle');
+            if (title) title.textContent = isDark ? 'Mode Gelap' : 'Mode Terang';
         }
 
         // ═══════════════════════════════════════
@@ -13079,35 +13341,52 @@ async function saveIDBTelegramConfig(config) {
             _fmpCache[url] = { data: data, ts: Date.now() };
             return data;
         }
+        // ✅ v67 FIX — ROOT CAUSE dari "Gagal memuat: FMP HTTP 404 — /stock-screener" (dan
+        // 404 diam-diam di quote/profile/ratios/key-metrics/growth/technical juga, walau
+        // baru kelihatan nyata di Explorer FMP): komentar v63 di atas BILANG sudah pindah ke
+        // skema query-param baru ("/stable/quote?symbol=..."), TAPI kode di bawahnya masih
+        // menyusun path ala API lama ("/quote/" + ticker). FMP /stable/* TIDAK mengenali pola
+        // path-style itu sama sekali → 404 untuk SEMUA endpoint di bawah, bukan cuma screener.
+        // Fix permanen: semua endpoint pakai query param ?symbol=..., dan nama endpoint
+        // screener diperbaiki dari "/stock-screener" (sudah pensiun) ke "/company-screener"
+        // (nama resmi endpoint ini di /stable — dikonfirmasi lewat dokumentasi resmi FMP).
         async function fetchFMPQuote(ticker) {
-            const d = await fmpFetch('/quote/' + fmpTickerOf(ticker));
+            const d = await fmpFetch('/quote', { symbol: fmpTickerOf(ticker) });
             return (Array.isArray(d) && d[0]) ? d[0] : null;
         }
         async function fetchFMPProfile(ticker) {
-            const d = await fmpFetch('/profile/' + fmpTickerOf(ticker), {}, FMP_CACHE_TTL_LONG);
+            const d = await fmpFetch('/profile', { symbol: fmpTickerOf(ticker) }, FMP_CACHE_TTL_LONG);
             return (Array.isArray(d) && d[0]) ? d[0] : null;
         }
         async function fetchFMPRatios(ticker) {
-            const d = await fmpFetch('/ratios-ttm/' + fmpTickerOf(ticker), {}, FMP_CACHE_TTL_LONG);
+            const d = await fmpFetch('/ratios-ttm', { symbol: fmpTickerOf(ticker) }, FMP_CACHE_TTL_LONG);
             return (Array.isArray(d) && d[0]) ? d[0] : null;
         }
         async function fetchFMPKeyMetrics(ticker) {
-            const d = await fmpFetch('/key-metrics-ttm/' + fmpTickerOf(ticker), {}, FMP_CACHE_TTL_LONG);
+            const d = await fmpFetch('/key-metrics-ttm', { symbol: fmpTickerOf(ticker) }, FMP_CACHE_TTL_LONG);
             return (Array.isArray(d) && d[0]) ? d[0] : null;
         }
         async function fetchFMPGrowth(ticker) {
-            const d = await fmpFetch('/financial-growth/' + fmpTickerOf(ticker), { limit: 1 }, FMP_CACHE_TTL_LONG);
+            const d = await fmpFetch('/financial-growth', { symbol: fmpTickerOf(ticker), limit: 1 }, FMP_CACHE_TTL_LONG);
             return (Array.isArray(d) && d[0]) ? d[0] : null;
         }
         async function fetchFMPTechnical(ticker, indicator, period, timeframe) {
             indicator = indicator || 'rsi'; period = period || 14; timeframe = timeframe || '1day';
-            const d = await fmpFetch('/technical_indicator/' + timeframe + '/' + fmpTickerOf(ticker), { period: period, type: indicator });
+            const d = await fmpFetch('/technical-indicators/' + indicator, { symbol: fmpTickerOf(ticker), periodLength: period, timeframe: timeframe });
             return Array.isArray(d) ? d.slice(0, 5) : [];
         }
         async function fetchFMPStockListIDX() {
-            // Daftar seluruh emiten yang FMP kenali di exchange Jakarta (JKT) — dipakai fitur "Screener Emiten"
-            const d = await fmpFetch('/stock-screener', { exchange: 'JKT', limit: 1000 }, FMP_CACHE_TTL_LONG);
-            return Array.isArray(d) ? d : [];
+            // Daftar seluruh emiten yang FMP kenali di Bursa Efek Indonesia — dipakai fitur "Screener Emiten".
+            // ✅ v67: endpoint resmi /stable adalah "company-screener" (bukan "stock-screener" — itu
+            // nama lama yang sudah 404 di /stable). "exchange" TIDAK selalu konsisten filternya di
+            // sisi FMP untuk bursa non-AS, jadi sebagai jaring pengaman kita SELALU filter ulang di
+            // sisi klien memakai suffix ".JK" (format resmi ticker BEI di FMP, sama seperti Yahoo
+            // Finance) — supaya walau parameter "exchange" berubah/berbeda arti di masa depan, hasil
+            // yang ditampilkan tetap benar-benar cuma emiten BEI.
+            const d = await fmpFetch('/company-screener', { exchange: 'JKT', limit: 3000 }, FMP_CACHE_TTL_LONG);
+            const list = Array.isArray(d) ? d : [];
+            const idxOnly = list.filter(x => x && typeof x.symbol === 'string' && x.symbol.toUpperCase().endsWith('.JK'));
+            return idxOnly.length ? idxOnly : list;
         }
 
         // ─── Gemini AI — dipakai untuk narasi analisis tajam gaya "anak saham" ───
@@ -13398,11 +13677,16 @@ async function saveIDBTelegramConfig(config) {
             curIdxGroup = 'asia',
             curFilter = 'all',
             searchQ = '',
-            fetching = false;
+            fetching = false,
+            stockListLayout = 'list'; // v67: 'list' | 'grid' | 'carousel' — lihat setStockListLayout()
         let portfolio = [],
             priceAlerts = [],
             notifications = [];
         let breadthHistory = [];
+        // ✅ v68 — Guard efek animasi "kilometer" gauge Market Breadth: true setelah render
+        // pertama, supaya sapuan jarum dari 0→nilai & angka berlari 0→nilai HANYA terjadi
+        // sekali saat app baru dibuka/di-refresh (bukan tiap auto-refresh 30 detik).
+        let _brdGaugeAnimated = false;
         let stockPriceHistory = {};
         let accFlowHistory = {}; // ✅ v59: histori harian riil skor arus Akumulasi/Distribusi per ticker (fitur Akumulasi)
         let telegramConfig = {};
@@ -13443,6 +13727,7 @@ async function saveIDBTelegramConfig(config) {
         function lsGet(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } }
 
         function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+        stockListLayout = lsGet('si_stocklist_layout', 'list');
         watchlist = lsGet('si_wl', []);
         portfolio = lsGet('si_porto', []);
         priceAlerts = lsGet('si_alerts', []);
@@ -13667,6 +13952,37 @@ async function saveIDBTelegramConfig(config) {
             return found || null;
         }
 
+        /**
+         * 🐛 BUGFIX: tombol "Bagikan" di modal analisa saham memanggil fungsi ini,
+         * tapi sebelumnya tidak pernah didefinisikan (ReferenceError diam-diam).
+         * Pakai Web Share API di device yang mendukung (mobile), fallback ke
+         * salin-ke-clipboard di desktop/browser yang tidak support navigator.share.
+         * @param {string} rawTicker - ticker saham yang sedang dibuka di modal
+         */
+        function shareTickerAnalysis(rawTicker) {
+            const ticker = sanitizeTicker(rawTicker);
+            if (!ticker) return;
+            const s = getStock(ticker);
+            const chg = s ? Number(s.chg) || 0 : 0;
+            const arrow = chg >= 0 ? '▲' : '▼';
+            const priceLine = s ? `Rp${n2(s.price)} (${arrow}${Math.abs(chg).toFixed(2)}%)` : 'data belum tersedia';
+            const rsiLine = s && s.rsi ? `RSI ${Number(s.rsi).toFixed(1)}` : '';
+            const text = `📊 Analisa ${ticker}${s ? ' — ' + s.name : ''}\nHarga: ${priceLine}` +
+                (rsiLine ? `\n${rsiLine}` : '') + `\nVia SobatInves Ultimate Terminal ⚡`;
+            const shareUrl = window.location.href.split('#')[0] + '#' + ticker;
+            if (navigator.share) {
+                navigator.share({ title: `Analisa ${ticker} — SobatInves`, text, url: shareUrl }).catch(() => {});
+            } else if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text + '\n' + shareUrl).then(() => {
+                    showToast('📋 Analisa ' + ticker + ' disalin ke clipboard', 'success');
+                }).catch(() => {
+                    showToast('Gagal menyalin, coba lagi', 'warn');
+                });
+            } else {
+                showToast('Berbagi tidak didukung di browser ini', 'warn');
+            }
+        }
+
         // ═══════════════════════════════════════
         // TRADINGVIEW IFRAME BUILDER — v47
         // Menggunakan srcdoc iframe untuk menghindari masalah dynamic script injection.
@@ -13742,7 +14058,18 @@ async function saveIDBTelegramConfig(config) {
                 // menambah Volume ke semua instrumen berdata volume DI LUAR array studies.
                 // Menambahkannya manual bikin ID-nya dobel dan seluruh array "studies"
                 // ditolak diam-diam oleh widget (efeknya: cuma Volume yang tampil).
-                studies: (opts.studies || ['RSI@tv-basicstudies', 'MACD@tv-basicstudies', 'DONCH@tv-basicstudies']),
+                // ✅ v68 FIX — ROOT CAUSE indikator tidak muncul: parameter "length" Donchian
+                // sebelumnya salah taruh di studies_overrides sebagai key 'DONCH.length' —
+                // key itu TIDAK DIKENALI TradingView (studies_overrides hanya untuk override
+                // warna/style garis yang SUDAH ada, bukan untuk parameter input seperti length).
+                // Parameter input yang benar HARUS lewat properti "inputs" di dalam object
+                // study itu sendiri (format resmi: {id:"STUDY@tv-basicstudies", inputs:{...}}).
+                // Sekarang studies RSI/MACD/DONCH pakai format object eksplisit ini.
+                studies: (opts.studies || [
+                    { id: 'RSI@tv-basicstudies' },
+                    { id: 'MACD@tv-basicstudies' },
+                    { id: 'DONCH@tv-basicstudies', inputs: { length: 20 } }
+                ]),
                 studies_overrides: {
                     'volume.volume.color.0': 'rgba(255,77,94,0.55)',
                     'volume.volume.color.1': 'rgba(0,214,143,0.55)',
@@ -13765,8 +14092,9 @@ async function saveIDBTelegramConfig(config) {
                     'donchian channels.basis.color': 'rgba(155,123,255,0.6)',
                     'donchian channels.basis.linewidth': 1,
                     'donchian channels.plots background.color': 'rgba(155,123,255,0.06)',
-                    'donchian channels.plots background.visible': true,
-                    'DONCH.length': 20
+                    'donchian channels.plots background.visible': true
+                    // ✅ v68: 'DONCH.length' DIHAPUS dari sini — key itu tidak valid & tidak
+                    // pernah benar-benar diterapkan; length=20 sekarang di studies[].inputs di atas.
                 },
                 overrides: {
                     'mainSeriesProperties.candleStyle.upColor': '#00D68F',
@@ -13858,6 +14186,7 @@ async function saveIDBTelegramConfig(config) {
                 'try{parent.postMessage({__tvWidget:"error",url:location.href},"*");}catch(e){}',
                 '}',
                 'function showLoaded(){',
+                'if(loaded)return;',
                 'loaded=true;failed=false;',
                 'var l=document.getElementById("_tvLoading");if(l)l.classList.add("hide");',
                 'var f=document.getElementById("_tvFallback");if(f)f.classList.add("hide");',
@@ -13871,33 +14200,55 @@ async function saveIDBTelegramConfig(config) {
                 'var btn=document.getElementById("_tvRetryBtn");',
                 'if(btn)btn.addEventListener("click",function(){try{failed=false;location.reload();}catch(e){}});',
                 '});',
-                // ✅ v57 FIX — ROOT CAUSE: TradingView (terutama koneksi mobile/4G lambat)
-                // sering butuh >10 detik untuk selesai menyuntikkan iframe chart-nya.
-                // Watchdog lama BERHENTI TOTAL setelah 10 detik (clearInterval + showFallback)
-                // dan TIDAK PERNAH mengecek lagi — jadi walau TradingView akhirnya berhasil
-                // render beberapa detik kemudian, layar "Widget gagal dimuat" milik KITA tetap
-                // menempel SELAMANYA di atas chart yang sebenarnya sudah muncul (persis gejala
-                // di screenshot: pesan asli TradingView "Hanya interval D,W,M..." tampak
-                // TERTUMPUK DI BELAKANG overlay fallback kita yang tidak pernah disembunyikan).
-                // Fix: perpanjang jendela awal jadi ~20 detik, DAN — bahkan setelah fallback
-                // tampil — polling tetap lanjut (lebih jarang, tiap 700ms) selama ~2 menit agar
-                // begitu chart akhirnya muncul, overlay fallback otomatis disembunyikan lagi.
+                // ✅ v68 FIX — ROOT CAUSE overlay "Memuat widget TradingView…" nyangkut PERMANEN
+                // di atas chart yang sebenarnya SUDAH tampil (persis gejala di screenshot report):
+                // deteksi lama HANYA mengandalkan polling children.length dari SATU elemen
+                // spesifik (.tradingview-widget-container__widget) tiap 250ms. Kalau TradingView
+                // merender dengan cara/waktu yang sedikit meleset dari asumsi itu, status
+                // "loaded" bisa TIDAK PERNAH tercapai walau chart & indikator sudah tampil.
+                // Fix 3 lapis:
+                //  1) MutationObserver pada container widget — bereaksi INSTAN begitu
+                //     TradingView menyuntikkan apapun ke DOM (iframe/canvas/dsb), tidak
+                //     menunggu tick polling berikutnya.
+                //  2) Polling tetap jalan sebagai cadangan (jaga-jaga browser lama tanpa
+                //     MutationObserver), sekarang mengecek iframe/canvas di container juga —
+                //     bukan cuma children.length dari satu elemen.
+                //  3) Safety-net TIDAK BERSYARAT: apapun hasil deteksi di atas, overlay
+                //     loading dipaksa disembunyikan setelah 9 detik. Prinsipnya: lebih baik
+                //     overlay hilang lalu menampakkan chart asli (yang hampir selalu memang
+                //     sudah selesai digambar di titik ini) daripada macet menutupi chart
+                //     yang sebenarnya sudah beres — ini yang memperbaiki bug "nyangkut".
+                'function hasRendered(){',
+                'var w=document.querySelector(".tradingview-widget-container__widget");',
+                'if(w && w.children && w.children.length>0) return true;',
+                'var c=document.querySelector(".tradingview-widget-container");',
+                'if(c && c.querySelector("iframe,canvas")) return true;',
+                'return false;',
+                '}',
+                'try{',
+                'var mo=new MutationObserver(function(){ if(hasRendered()) showLoaded(); });',
+                'var target=document.querySelector(".tradingview-widget-container")||document.body;',
+                'mo.observe(target,{childList:true,subtree:true});',
+                '}catch(e){}',
                 'var tries=0,maxTries=80;', // 80 * 250ms = ~20s jendela awal
                 'var slowTries=0,maxSlowTries=170;', // + 170 * 700ms = ~2 menit tambahan recovery
                 'var poll=setInterval(function(){',
                 'tries++;',
-                'var w=document.querySelector(".tradingview-widget-container__widget");',
-                'if(w && w.children && w.children.length>0){clearInterval(poll);showLoaded();return;}',
+                'if(hasRendered()){clearInterval(poll);showLoaded();return;}',
                 'if(tries>=maxTries){clearInterval(poll);showFallback();startSlowRecoveryPoll();}',
                 '},250);',
                 'function startSlowRecoveryPoll(){',
                 'var slow=setInterval(function(){',
                 'slowTries++;',
-                'var w=document.querySelector(".tradingview-widget-container__widget");',
-                'if(w && w.children && w.children.length>0){clearInterval(slow);showLoaded();return;}',
+                'if(hasRendered()){clearInterval(slow);showLoaded();return;}',
                 'if(slowTries>=maxSlowTries){clearInterval(slow);}',
                 '},700);',
                 '}',
+                'setTimeout(function(){',
+                'if(!loaded && !failed){',
+                'var l=document.getElementById("_tvLoading");if(l)l.classList.add("hide");',
+                '}',
+                '},9000);',
                 '})();',
                 '<\/script>',
                 // ✅ v52 FIX — ROOT CAUSE dari "widget selalu menampilkan AAPL / gagal dimuat":
@@ -13918,6 +14269,24 @@ async function saveIDBTelegramConfig(config) {
         // ═══════════════════════════════════════
         // MARKET BREADTH
         // ═══════════════════════════════════════
+        // ✅ v68 — Helper efek "kilometer": angka berlari dari 0 → nilai target dalam
+        // durasi tertentu, dibulatkan ke integer, dengan easing agar terasa halus
+        // (mirip odometer/speedometer digital).
+        function animateCountUp(el, from, to, duration) {
+            if (!el) return;
+            if (el._countUpRAF) cancelAnimationFrame(el._countUpRAF);
+            const start = performance.now();
+            const diff = to - from;
+            if (!diff) { el.textContent = to; return; }
+            function tick(now) {
+                const t = Math.min(1, (now - start) / duration);
+                const eased = 1 - Math.pow(1 - t, 3); // ease-out cubic
+                el.textContent = Math.round(from + diff * eased);
+                if (t < 1) { el._countUpRAF = requestAnimationFrame(tick); }
+                else { el.textContent = to; el._countUpRAF = null; }
+            }
+            el._countUpRAF = requestAnimationFrame(tick);
+        }
         function updateBreadthChart(adv, dcl) {
             const total = adv + dcl || 1;
             const advPct = (adv / total) * 100;
@@ -13930,8 +14299,15 @@ async function saveIDBTelegramConfig(config) {
             const brdPctUp = document.getElementById('brdPctUp');
             const brdPctDn = document.getElementById('brdPctDn');
             const breadthTime = document.getElementById('breadthTime');
-            if (bAdv) bAdv.textContent = adv;
-            if (bDcl) bDcl.textContent = dcl;
+            // ✅ v68 — Efek "kilometer": render PERTAMA (app baru dibuka/di-refresh) →
+            // angka Saham Naik/Turun berlari 0→nilai & jarum gauge menyapu dari posisi 0
+            // (paling kiri) ke posisi nilai saat itu, seperti speedometer dinyalakan.
+            // Refresh berikutnya (auto tiap 30 detik) tetap transisi halus normal saja
+            // supaya tidak "reset" mengganggu saat sedang dilihat live.
+            const isFirstRender = !_brdGaugeAnimated;
+            _brdGaugeAnimated = true;
+            if (bAdv) { if (isFirstRender) animateCountUp(bAdv, 0, adv, 900); else bAdv.textContent = adv; }
+            if (bDcl) { if (isFirstRender) animateCountUp(bDcl, 0, dcl, 900); else bDcl.textContent = dcl; }
             if (bNet) bNet.textContent = adv + ' : ' + dcl;
             if (brdBarUp) brdBarUp.style.width = advPct.toFixed(1) + '%';
             if (brdBarDn) brdBarDn.style.width = dclPct.toFixed(1) + '%';
@@ -13939,6 +14315,35 @@ async function saveIDBTelegramConfig(config) {
             if (brdPctDn) brdPctDn.textContent = dclPct.toFixed(1) + '%';
             if (breadthTime) breadthTime.textContent = new Date().toLocaleTimeString('id-ID', { hour: '2-digit',
                 minute: '2-digit' });
+            const gaugeNeedle = document.getElementById('brdGaugeNeedle');
+            const gaugeCaption = document.getElementById('brdGaugeCaption');
+            if (gaugeNeedle) {
+                const deg = (advPct / 100) * 180 - 90;
+                if (isFirstRender) {
+                    // Sapu dari 0 (paling kiri, -90deg — sejajar tanda "0" di gauge) ke posisi nilai saat ini
+                    gaugeNeedle.style.transition = 'none';
+                    gaugeNeedle.style.transform = 'rotate(-90deg)';
+                    void gaugeNeedle.getBoundingClientRect(); // force reflow — pastikan posisi 0 ter-render dulu
+                    requestAnimationFrame(() => {
+                        gaugeNeedle.style.transition = '';
+                        requestAnimationFrame(() => {
+                            gaugeNeedle.style.transform = 'rotate(' + deg.toFixed(1) + 'deg)';
+                        });
+                    });
+                } else {
+                    gaugeNeedle.style.transform = 'rotate(' + deg.toFixed(1) + 'deg)';
+                }
+            }
+            if (gaugeCaption) {
+                let capText, capColor;
+                if (advPct >= 70) { capText = 'BULLISH KUAT'; capColor = 'var(--up)'; }
+                else if (advPct >= 55) { capText = 'BULLISH'; capColor = 'var(--up)'; }
+                else if (advPct >= 45) { capText = 'NEUTRAL'; capColor = 'var(--t-med)'; }
+                else if (advPct >= 30) { capText = 'BEARISH'; capColor = 'var(--dn)'; }
+                else { capText = 'BEARISH KUAT'; capColor = 'var(--dn)'; }
+                gaugeCaption.textContent = capText;
+                gaugeCaption.style.color = capColor;
+            }
             const now = Date.now();
             breadthHistory.push({ t: now, adv, dcl });
             if (breadthHistory.length > 20) breadthHistory = breadthHistory.slice(-20);
@@ -14175,10 +14580,15 @@ async function saveIDBTelegramConfig(config) {
             }
             el.innerHTML = grp.map(item => {
                 const d = idxCache[item.k] || { price: 0, chg: 0 };
-                const isUp = d.chg >= 0;
-                const cls = d.chg > 0.1 ? 'up' : d.chg < -0.1 ? 'dn' : 'neu';
+                // ✅ FIX: satu sumber kebenaran untuk status naik/turun/netral — dipakai
+                // bareng oleh border kiri, badge %, bar, dan mini-chart di bawah supaya
+                // semuanya SELALU sinkron. Sebelumnya border/badge pakai ambang ±0.1%
+                // (jadi netral/oranye untuk perubahan kecil yang wajar seperti -0.01%)
+                // sementara mini-chart pakai aturan tanda murni — hasilnya saling beda warna.
+                const cls = !d.price ? 'neu' : d.chg > 0 ? 'up' : d.chg < 0 ? 'dn' : 'neu';
+                const isUp = cls !== 'dn';
                 const flag = IDX_FLAGS[item.n] || '🌐';
-                const chgStr = d.price ? (isUp ? '+' : '') + d.chg.toFixed(2) + '%' : '—';
+                const chgStr = d.price ? (d.chg >= 0 ? '+' : '') + d.chg.toFixed(2) + '%' : '—';
                 const isImportant = item.k === 'IDX' || item.k === 'SPX' || item.k === 'BTC';
                 const h = 28,
                     w = 58;
@@ -14191,7 +14601,7 @@ async function saveIDBTelegramConfig(config) {
                 });
                 const miniPath = pts.map((y, i) => (i === 0 ? `M${i*(w/7)},${y}` : `L${i*(w/7)},${y}`)).join(' ');
                 const miniArea = miniPath + ` L${w},${h} L0,${h} Z`;
-                const miniColor = isUp ? 'var(--up)' : 'var(--dn)';
+                const miniColor = cls === 'dn' ? 'var(--dn)' : cls === 'up' ? 'var(--up)' : 'var(--t-low)';
                 return `<div class="idx-card ${cls} btn-ripple ${d.flash||''}" onclick="openIdxModal('${item.s}','${item.n}')">
               <div class="idx-card-flag">${flag}</div>
               <div class="idx-card-name">
@@ -14956,6 +15366,10 @@ async function saveIDBTelegramConfig(config) {
             if (cnt) cnt.textContent = arr.length + ' Emiten Ditemukan';
             const el = document.getElementById('stockList');
             if (!el) return;
+            // v67: terapkan mode tata letak (list/grid/carousel) setiap render — idempotent & selalu sinkron
+            el.className = 'stock-list' + (stockListLayout === 'grid' ? ' layout-grid' : stockListLayout ===
+                'carousel' ? ' layout-carousel' : '');
+            syncStockListLayoutUI();
             if (!arr.length) {
                 el.innerHTML =
                     '<div style="text-align:center;padding:40px;color:var(--t-med);border:1px dashed var(--border-strong);border-radius:var(--radius-lg);font-weight:700;background:var(--card-bg);">Tidak ada emiten yang sesuai filter.</div>';
@@ -15070,6 +15484,20 @@ async function saveIDBTelegramConfig(config) {
               </div>
             </div>`;
             }).join('');
+        }
+
+        // v67 — Ganti tata letak daftar emiten (list / grid 2 kolom / geser horizontal)
+        function setStockListLayout(mode) {
+            if (stockListLayout === mode) return;
+            stockListLayout = mode;
+            lsSet('si_stocklist_layout', mode);
+            renderStocks();
+            if (navigator.vibrate) navigator.vibrate(15);
+        }
+        function syncStockListLayoutUI() {
+            document.querySelectorAll('.sl-layout-btn').forEach(b => {
+                b.classList.toggle('active', b.dataset.layout === stockListLayout);
+            });
         }
 
         function infoBreadth() {
@@ -15520,8 +15948,23 @@ async function saveIDBTelegramConfig(config) {
             return `<svg viewBox="0 0 ${totalW} ${totalH}" style="width:100%;height:auto;display:block;">${svg}</svg>`;
         }
 
+        // ✅ v67 FIX — ROOT CAUSE dari label radar 6-strategi terpotong ("ndamental",
+        // "Momen…", "Mean R…"): viewBox lama (0 0 340 340) cuma menyisakan ±52 unit
+        // margin kiri/kanan untuk teks label yang posisinya text-anchor start/end,
+        // padahal nama panjang seperti "Momentum & Osilator" / "Kualitas Fundamental"
+        // butuh 90-120+ unit. SVG diam-diam meng-clip apapun yang jatuh di luar
+        // viewBox-nya sendiri — makanya kata di ujung terpotong rapi, bukan error.
+        // Fix permanen dua lapis: (1) viewBox diperlebar + margin sisi dihitung ulang
+        // supaya SELALU cukup bahkan untuk label terpanjang, (2) label di grafik
+        // dipendekkan (nama LENGKAP tetap tampil utuh di kartu "RINCIAN 6 STRATEGI"
+        // persis di bawahnya — jadi tidak ada informasi yang hilang).
+        function shortStratLabel(key, fallback) {
+            const map = { trend: 'Trend', momentum: 'Momentum', reversion: 'Reversion',
+                volume: 'Volume', breakout: 'Breakout', fundamental: 'Fundamental' };
+            return map[key] || fallback;
+        }
         function buildStrategyRadarSVG(strategies) {
-            const cx = 170, cy = 168, maxR = 96, n = strategies.length;
+            const cx = 210, cy = 205, maxR = 76, labelR = 108, n = strategies.length;
             const angleFor = i => (-90 + i * (360 / n)) * Math.PI / 180;
             const pt = (i, r) => ({ x: cx + r * Math.cos(angleFor(i)), y: cy + r * Math.sin(angleFor(i)) });
             let grid = '';
@@ -15534,17 +15977,18 @@ async function saveIDBTelegramConfig(config) {
             const dataPts = strategies.map((st, i) => { const frac = (clamp100(st.score) + 100) / 200; const p = pt(i, maxR * frac); return p.x.toFixed(1) + ',' + p.y.toFixed(1); }).join(' ');
             let labels = '', dots = '';
             strategies.forEach((st, i) => {
-                const lp = pt(i, maxR + 40);
+                const lp = pt(i, labelR);
                 const cosv = Math.cos(angleFor(i));
                 const anchor = Math.abs(cosv) < 0.3 ? 'middle' : (cosv > 0 ? 'start' : 'end');
                 const color = st.verdict === 'bullish' ? 'var(--up)' : st.verdict === 'bearish' ? 'var(--dn)' : 'var(--warn)';
-                labels += `<text x="${lp.x.toFixed(1)}" y="${(lp.y-4).toFixed(1)}" text-anchor="${anchor}" font-size="10.5" font-weight="800" fill="var(--t-hi)">${st.icon} ${st.name}</text>`;
+                const shortName = shortStratLabel(st.key, st.name);
+                labels += `<text x="${lp.x.toFixed(1)}" y="${(lp.y-4).toFixed(1)}" text-anchor="${anchor}" font-size="10.5" font-weight="800" fill="var(--t-hi)">${st.icon} ${shortName}</text>`;
                 labels += `<text x="${lp.x.toFixed(1)}" y="${(lp.y+10).toFixed(1)}" text-anchor="${anchor}" font-size="10" font-weight="900" fill="${color}">${st.score>0?'+':''}${st.score}</text>`;
                 const frac = (clamp100(st.score) + 100) / 200;
                 const dp = pt(i, maxR * frac);
                 dots += `<circle cx="${dp.x.toFixed(1)}" cy="${dp.y.toFixed(1)}" r="4.5" fill="${color}" stroke="var(--card-bg)" stroke-width="1.5"/>`;
             });
-            return `<svg viewBox="0 0 340 340" style="width:100%;max-width:440px;height:auto;display:block;margin:0 auto;">
+            return `<svg viewBox="0 0 420 410" style="width:100%;max-width:440px;height:auto;display:block;margin:0 auto;overflow:visible;">
                 ${grid}${spokes}
                 <polygon points="${dataPts}" fill="var(--primary)" fill-opacity="0.22" stroke="var(--primary)" stroke-width="2"/>
                 ${dots}${labels}
@@ -15637,7 +16081,16 @@ async function saveIDBTelegramConfig(config) {
                     `<div class="m-pane" id="mt-etf"><div id="modal-etf" style="min-height:400px;width:100%;overflow:visible;"></div></div>` +
                     `<div class="m-pane" id="mt-profil"><div id="modal-profil-content" style="padding:4px 0;"></div></div>` +
                     `<div class="m-pane" id="mt-ai"><div id="modal-ai-content" style="padding:4px 0;"></div></div>` +
-                    `<button class="run-btn btn-ripple" onclick="toggleWL('${s.ticker}')" style="margin-top:20px;font-size:16px;${watchlist.includes(s.ticker)?'background:var(--card-bg);border:1px solid var(--dn);color:var(--dn);box-shadow:none;':'background:var(--up);border:none;color:#fff;box-shadow:0 5px 18px var(--up-glow);'}">${watchlist.includes(s.ticker)?'Hapus dari Watchlist':'Tambahkan ke Watchlist'}</button>`;
+                    `<div class="modal-split-actions" style="display:flex;gap:10px;margin-top:20px;">
+                        <button class="run-btn btn-ripple" onclick="goToJournalFromModal('${s.ticker}')" style="flex:1;font-size:13.5px;background:var(--card-bg);border:1.5px solid var(--primary);color:var(--primary);box-shadow:none;display:flex;align-items:center;justify-content:center;gap:6px;padding:13px 8px;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
+                            Masuk Jurnal
+                        </button>
+                        <button class="run-btn btn-ripple" onclick="toggleWL('${s.ticker}')" id="modalWlBtn" style="flex:1;font-size:13.5px;${watchlist.includes(s.ticker)?'background:var(--card-bg);border:1.5px solid var(--dn);color:var(--dn);box-shadow:none;':'background:var(--up);border:none;color:#fff;box-shadow:0 5px 18px var(--up-glow);'}display:flex;align-items:center;justify-content:center;gap:6px;padding:13px 8px;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="${watchlist.includes(s.ticker)?'none':'currentColor'}" stroke="currentColor" stroke-width="2.3"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            ${watchlist.includes(s.ticker)?'Hapus Watchlist':'Simpan Watchlist'}
+                        </button>
+                    </div>`;
             }
             const ov = document.getElementById('overlay');
             if (ov) ov.classList.add('open');
@@ -15895,21 +16348,25 @@ async function saveIDBTelegramConfig(config) {
                 </div>`;
                 chartC.appendChild(idLabel);
 
-                // ─── Permanent indicator badges (locked) ────────────────────
-                const indRow = document.createElement('div');
-                indRow.className = 'chart-ind-row-v35';
-                indRow.innerHTML = `
-                    <span class="chart-ind-pill rsi">📊 RSI (14)</span>
-                    <span class="chart-ind-pill macd">⚡ MACD (12,26,9)</span>
-                    <span class="chart-ind-pill vol">📦 Volume + MA</span>
-                    <span class="chart-ind-pill candle">🕯 Candlestick</span>
-                    <span class="chart-ind-pill donchian">🟣 Donchian (20)</span>
-                    <span class="chart-ind-pill" style="color:#5EEAC0;border-color:rgba(94,234,192,0.3);background:rgba(94,234,192,0.08);">✏️ Gambar &amp; Coret Aktif</span>
-                    <span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:8px;color:var(--t-low);font-weight:800;white-space:nowrap;align-self:center;">INDIKATOR PERMANEN 🔒</span>`;
-                chartC.appendChild(indRow);
+                // ✅ v66 — Baris badge indikator dekoratif (RSI/MACD/Volume/Donchian) yang dulu
+                // tampil DI ATAS chart sudah DIHAPUS. Indikator-indikator itu bukan hiasan —
+                // semuanya sudah otomatis TERPASANG LANGSUNG DI DALAM chart TradingView di bawah
+                // ini lewat parameter "studies" resmi (lihat buildStandardChartConfig), jadi
+                // badge terpisah di atas hanya bikin bingung (terlihat seperti tombol yang error
+                // padahal cuma label). Info singkat & akurat cukup satu baris hint di bawah ini.
+                // ✅ v70: Chip status indikator — konfirmasi visual bahwa RSI/MACD/Volume/Donchian
+                // memang aktif terpasang, supaya pengguna tidak ragu "indikator muncul atau tidak"
+                // walau widget TradingView masih memuat pane-nya di bawah.
+                const indChipRow = document.createElement('div');
+                indChipRow.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;margin:0 2px 8px;';
+                indChipRow.innerHTML = ['RSI 14', 'MACD', 'Volume+MA', 'Donchian 20'].map(lbl =>
+                    `<span style="display:inline-flex;align-items:center;gap:4px;font-size:9.5px;font-weight:800;padding:4px 9px;border-radius:20px;background:var(--up-bg);color:var(--up);border:1px solid var(--up-border);font-family:'IBM Plex Mono',monospace;"><span style="width:5px;height:5px;border-radius:50%;background:var(--up);"></span>${lbl}</span>`
+                ).join('');
+                chartC.appendChild(indChipRow);
+
                 const hintRow = document.createElement('div');
-                hintRow.style.cssText = 'font-size:9.5px;color:var(--t-low);font-weight:600;margin:2px 2px 8px;line-height:1.5;';
-                hintRow.innerHTML = '💡 Pakai toolbar di sisi kiri/atas chart untuk menarik <b>Trend Line</b>, <b>Fibonacci</b>, atau <b>Brush</b> (coret bebas). Kalau RSI/MACD tidak langsung terlihat, buka tombol <b>Indicators (fx)</b> di toolbar atas untuk menambahkannya manual — atau tekan ikon kamera untuk menyimpan chart yang sudah dicoret.';
+                hintRow.style.cssText = 'font-size:9.5px;color:var(--t-low);font-weight:600;margin:2px 2px 8px;line-height:1.5;background:var(--bg-elevated);border:1px solid var(--border-light);border-radius:var(--radius-sm);padding:8px 10px;';
+                hintRow.innerHTML = '✏️ <b style="color:var(--t-hi);">Cara mencoret chart:</b> chart ini adalah widget interaktif penuh (bukan gambar mentah) — sentuh &amp; tahan area chart, lalu pilih alat pada toolbar di sisi <b>kiri</b> (di layar sempit, geser/ketuk ikon panah kecil <b>»</b> untuk membukanya) untuk <b>Trend Line</b>, <b>Fibonacci</b>, atau <b>Brush</b> (coret bebas). Semua coretan tersimpan otomatis selama chart ini terbuka — tekan ikon kamera di toolbar atas untuk menyimpan/membagikan hasilnya.';
                 chartC.appendChild(hintRow);
 
                 // ─── TradingView Advanced Chart — srcdoc iframe (v38 FIX) ─────────────
@@ -15920,7 +16377,7 @@ async function saveIDBTelegramConfig(config) {
                 chartFrame.setAttribute('frameborder', '0');
                 chartFrame.setAttribute('scrolling', 'no');
                 chartFrame.setAttribute('allowtransparency', 'true');
-                const chartBuild = buildStandardChartConfig(tvSymbol, { allowSymbolChange: false });
+                const chartBuild = buildStandardChartConfig(tvSymbol, { allowSymbolChange: false, hideSideToolbar: false, hideTopToolbar: false });
                 chartFrame.srcdoc = buildTVIframeSrcdoc(
                     'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js',
                     chartBuild.config,
@@ -16827,6 +17284,25 @@ async function saveIDBTelegramConfig(config) {
 
         }
 
+        // ✅ v66 — PEMETAAN SEKTOR → KOMODITAS RELEVAN, dipakai AI Tajam untuk memutuskan
+        // apakah harga komoditas global perlu dicek untuk emiten ini ("jika mempengaruhi
+        // saham tersebut" — bukan asal ditampilkan untuk semua sektor, mis. Perbankan/Teknologi
+        // tidak punya keterkaitan langsung ke harga komoditas jadi bagian ini dilewati).
+        const SECTOR_COMMODITY_MAP = [
+            { match: ['energy', 'oil', 'gas', 'minyak', 'migas'], commodities: ['OIL', 'NGAS', 'COAL'] },
+            { match: ['mining', 'coal', 'tambang', 'batubara', 'nikel', 'metal', 'logam'], commodities: ['COAL', 'COPP', 'GOLD', 'SILVER'] },
+            { match: ['basic materials', 'material', 'semen', 'cement', 'kimia', 'chemical'], commodities: ['COAL', 'COPP', 'GOLD'] },
+            { match: ['plantation', 'perkebunan', 'sawit', 'agri', 'agriculture', 'pangan', 'food'], commodities: ['CPO'] },
+            { match: ['consumer', 'konsumer'], commodities: ['CPO'] }
+        ];
+        function getRelevantCommodityKeys(sectorRaw) {
+            const sector = (sectorRaw || '').toLowerCase();
+            for (const rule of SECTOR_COMMODITY_MAP) {
+                if (rule.match.some(k => sector.includes(k))) return rule.commodities;
+            }
+            return [];
+        }
+
         // ─── v59: TAB "AI TAJAM" — gabungan data FMP (fundamental+teknikal real) + narasi Gemini AI ───
         const _aiLoadingMsgs = [
             'Lagi ngulik data fundamental dari FMP...', 'Nyari sinyal teknikal tersembunyi...',
@@ -16896,6 +17372,13 @@ async function saveIDBTelegramConfig(config) {
             const tickerNews = rNews.status === 'fulfilled' ? rNews.value : [];
             const fmpOk = !!(fmpQuote || fmpProfile || fmpRatios || fmpMetrics);
             const sectorSnap = getLeadingSectorsSnapshot();
+            // ✅ v66 — Cek harga komoditas HANYA kalau sektor emiten ini relevan (Energi, Tambang,
+            // Material Dasar, Perkebunan/Sawit, dsb). Kalau idxCache komoditas belum pernah ditarik
+            // sebelumnya di sesi ini (user belum buka Hub → Komoditas), tarik sekali di sini.
+            const relevantCommKeys = getRelevantCommodityKeys(s.sector);
+            if (relevantCommKeys.length && !(idxCache['GOLD'] || idxCache['OIL'] || idxCache['CPO'] || idxCache['COAL'])) {
+                try { await fetchIndices('commodities'); } catch (e) {}
+            }
             if (currentModalTicker !== ticker) { clearInterval(msgTimer); return; } // user sudah pindah emiten lain
 
             // ─── 2) Susun konteks data lokal (indikator yang sudah dihitung app) ───
@@ -16939,26 +17422,57 @@ ${tickerNews.map((n, i) => `${i+1}. [${n.date ? new Date(n.date).toLocaleDateStr
 KONDISI SEKTOR BURSA SAAT INI (dihitung real-time dari seluruh data emiten di aplikasi):
 - Sektor paling memimpin hari ini: ${sectorSnap.top.map(r => `${r.sector} (rata² ${r.avgChg>=0?'+':''}${r.avgChg.toFixed(2)}%, breadth ${r.breadth}% saham naik)`).join('; ') || '-'}
 - Sektor paling tertekan hari ini: ${sectorSnap.bottom.map(r => `${r.sector} (rata² ${r.avgChg>=0?'+':''}${r.avgChg.toFixed(2)}%)`).join('; ') || '-'}
-- Sektor emiten ini (${s.sector || '-'}) termasuk yang mana? Sebutkan posisinya relatif ke sektor lain.` : '';
+- Sektor emiten ini (${s.sector || '-'}) termasuk yang mana? Sebutkan posisinya relatif ke sektor lain, dan sektor lain mana yang sedang lebih menarik kalau investor mau rotasi.` : '';
 
-            const prompt = `Kamu adalah analis saham senior yang jago teknikal & fundamental Bursa Efek Indonesia (BEI), dengan kemampuan tambahan: membaca sentimen berita, deteksi pola multi-timeframe, dan mengaitkan posisi emiten dengan rotasi sektor pasar saat ini. Gaya ngomongmu santai dan gaul khas anak saham/trader retail Indonesia di komunitas (boleh pakai istilah seperti "cuan", "sat set", "wait and see", "ARA/ARB", "cutloss", "hold santuy", dsb secukupnya, jangan berlebihan/norak). Meski santai, analisismu HARUS tajam, presisi, jujur, dan hati-hati — jangan hype/pompom, jangan asal optimis, sebutkan risiko dengan jelas.
+            // ✅ v66 — Konteks harga komoditas, HANYA diisi kalau sektor emiten relevan (lihat
+            // getRelevantCommodityKeys). Kalau tidak relevan, string kosong → AI otomatis skip
+            // bagian ini di analisisnya (instruksi ada di prompt utama di bawah).
+            const commodityCtx = (() => {
+                if (!relevantCommKeys.length) return '';
+                const commLabels = { GOLD: 'Emas (Gold)', SILVER: 'Perak (Silver)', OIL: 'Minyak Mentah (Crude Oil)',
+                    NGAS: 'Gas Alam', CPO: 'CPO / Sawit', COAL: 'Batu Bara', COPP: 'Tembaga (Copper)', PLAT: 'Platinum' };
+                const lines = relevantCommKeys.map(k => {
+                    const d = idxCache[k];
+                    if (!d || !d.price) return null;
+                    return `- ${commLabels[k] || k}: ${n2(d.price)} (${d.chg >= 0 ? '+' : ''}${d.chg.toFixed(2)}% hari ini)`;
+                }).filter(Boolean);
+                if (!lines.length) {
+                    return `\nCATATAN KOMODITAS: Sektor emiten ini (${s.sector || '-'}) biasanya sensitif ke harga komoditas global, tapi data harga real-time-nya sedang tidak tersedia saat ini — bahas secara kualitatif seperlunya, JANGAN mengarang angka pasti.`;
+                }
+                return `\nHARGA KOMODITAS GLOBAL RELEVAN (real-time, ikut mempengaruhi sektor ${s.sector || '-'} emiten ini):\n${lines.join('\n')}`;
+            })();
+
+            const prompt = `Kamu adalah analis saham senior yang jago teknikal & fundamental Bursa Efek Indonesia (BEI), dengan kemampuan tambahan: membaca sentimen makro/mikro ekonomi & berita, mengaitkan harga komoditas global ke emiten yang terdampak, deteksi pola multi-timeframe, dan mengaitkan posisi emiten dengan rotasi sektor pasar saat ini. Gaya ngomongmu santai dan gaul khas anak saham/trader retail Indonesia di komunitas (boleh pakai istilah seperti "cuan", "sat set", "wait and see", "ARA/ARB", "cutloss", "hold santuy", dsb secukupnya, jangan berlebihan/norak). Meski santai, analisismu HARUS tajam, presisi, jujur, dan hati-hati — jangan hype/pompom, jangan asal optimis, sebutkan risiko dengan jelas.
 
 ${localCtx}
 ${fmpCtx}
 ${newsCtx}
 ${sectorCtx}
+${commodityCtx}
 
-Tulis analisis dalam Bahasa Indonesia gaul santai dengan struktur berikut (pakai heading "## " untuk tiap bagian, dan "- " untuk poin):
+Tulis analisis dalam Bahasa Indonesia gaul santai dengan ALUR/URUTAN BERPIKIR seorang analis profesional, pakai heading "## " persis seperti daftar berikut, dan "- " untuk poin (JANGAN ubah urutan atau nama heading):
 ## Ringkasan Kilat
-## Analisis Teknikal Multi-Timeframe
-## Sentimen Berita Terkini
-## Posisi vs Sektor & Pasar
-## Analisis Fundamental
-## Arus Dana & Bandarmologi
-## Level Kunci & Risiko
-## Rencana Aksi & Strategi
+## 1️⃣ Analisis Fundamental
+## 2️⃣ Sentimen Makro & Mikro Ekonomi
+## 3️⃣ Pengaruh Harga Komoditas
+## 4️⃣ Analisis Teknikal Lengkap
+## 5️⃣ Arus Dana & Bandarmologi
+## 6️⃣ Strategi & Peluang
+## 7️⃣ Target Take Profit & Stop Loss
+## 8️⃣ Analisa Tambahan & Rekomendasi Sektor
 
-Di bagian "Rencana Aksi & Strategi", kasih sikap SEJELAS mungkin dengan label besar (contoh: 🟢 AKUMULASI / 🟡 TUNGGU KONFIRMASI / 🔴 HINDARI DULU / ⚪ CUTLOSS), sebutkan skenario level entry, target take profit, dan area stop-loss/cutloss KALAU datanya mendukung (pakai level support/resisten/pivot yang sudah ada) — tapi bingkai sebagai SKENARIO EDUKATIF berbasis data, dengan tegas ingatkan ini bukan rekomendasi/ajakan beli-jual resmi, murni pandangan analitis dari data, dan keputusan akhir tetap 100% di tangan investor sendiri. Jangan mengarang angka atau berita yang tidak tersedia di data di atas. Maksimal sekitar 450-550 kata, padat, jangan bertele-tele.`;
+Panduan tiap bagian:
+- "Ringkasan Kilat": 2-3 kalimat TL;DR sikap keseluruhan duluan sebelum masuk detail (biar pembaca yang buru-buru tetap dapat inti).
+- "1️⃣ Analisis Fundamental": bedah dulu kesehatan bisnisnya dari data FMP/lokal di atas (valuasi PE/PBV, ROE, utang, pertumbuhan, Graham Number kalau ada) — INI JADI DASAR PALING AWAL sebelum bicara teknikal.
+- "2️⃣ Sentimen Makro & Mikro Ekonomi": gabungkan sentimen berita terkini soal emiten (mikro) DENGAN kondisi makro yang relevan (suku bunga BI, inflasi, nilai tukar rupiah, kebijakan pemerintah/sektor) kalau datanya mendukung — jangan mengarang data makro yang tidak disebutkan di atas, cukup insight umum yang wajar.
+- "3️⃣ Pengaruh Harga Komoditas": KALAU ada data "HARGA KOMODITAS GLOBAL RELEVAN" di atas, bahas bagaimana pergerakan komoditas itu berpotensi mempengaruhi kinerja emiten ini (margin, pendapatan, biaya produksi). KALAU TIDAK ADA data komoditas sama sekali di konteks (sektor emiten memang tidak berkaitan langsung ke komoditas, misalnya perbankan/teknologi/telko), tulis singkat 1 kalimat bahwa harga komoditas global tidak berdampak signifikan/langsung ke emiten ini — JANGAN mengarang keterkaitan yang tidak masuk akal.
+- "4️⃣ Analisis Teknikal Lengkap": RSI, Stochastic, MACD, Bollinger, tren MA/Golden Cross, konfluensi multi-timeframe (Daily/Weekly/Monthly), pola candle & pola chart otomatis, level Fibonacci — pakai semua data teknikal lokal di atas.
+- "5️⃣ Arus Dana & Bandarmologi": status akumulasi/distribusi, volume vs rata-rata, dan apa artinya untuk pergerakan harga ke depan.
+- "6️⃣ Strategi & Peluang": kasih sikap SEJELAS mungkin dengan label besar (contoh: 🟢 AKUMULASI / 🟡 TUNGGU KONFIRMASI / 🔴 HINDARI DULU / ⚪ CUTLOSS), jelaskan skenario/peluang dan alasannya berdasarkan gabungan fundamental+makro+komoditas+teknikal di atas (bukan cuma teknikal doang).
+- "7️⃣ Target Take Profit & Stop Loss": WAJIB kasih angka KONKRET kalau datanya mendukung (pakai level support/resisten/pivot/Fibonacci yang sudah ada di data) — format jelas misalnya "Entry area: Rp X - Rp Y", "Target TP1: Rp X (+Z%)", "Target TP2: Rp X (+Z%)" kalau relevan, "Stop-Loss/Cutloss: di bawah Rp X (-Z%)". Kalau data pivot/support-resisten tidak cukup mendukung angka presisi, boleh kasih range perkiraan berbasis level yang ada, tapi tetap harus ada angka, jangan cuma "tentukan sendiri". Tegaskan ini SKENARIO EDUKATIF berbasis data, bukan rekomendasi/ajakan beli-jual resmi, keputusan akhir 100% di tangan investor.
+- "8️⃣ Analisa Tambahan & Rekomendasi Sektor": insight penutup — posisi emiten ini dibanding sektornya (pakai data sektor di atas), sektor lain yang sedang lebih kuat kalau investor mau diversifikasi/rotasi, dan satu hal penting lain yang belum kebahas (misal risiko likuiditas, katalis mendatang, dsb) kalau ada.
+
+Jangan mengarang angka, berita, atau data makro/komoditas yang tidak tersedia di konteks di atas. Maksimal sekitar 650-750 kata total, padat dan tajam, jangan bertele-tele.`;
 
             try {
                 const aiText = await callGemini(prompt, { temperature: 0.8, maxTokens: 2200 });
@@ -17126,6 +17640,31 @@ Tulis singkat (maks 200 kata): 1-2 kalimat ringkasan kondisi, poin valuasi, poin
             } catch (err) {
                 target.innerHTML = `<div class="ai-err-box" style="margin-top:10px;font-size:11px;">${(err && err.message) || 'Gagal memuat analisis AI.'}</div>`;
             }
+        }
+
+        function goToJournalFromModal(t) {
+            const ticker = sanitizeTicker(t);
+            const s = getStock(ticker);
+            closeModal();
+            const jBtn = document.querySelector('.nav-btn[onclick*="\'jurnal\'"]');
+            nav('jurnal', jBtn);
+            setTimeout(() => {
+                const tradesBtn = document.querySelector('.journal-tab[onclick*="\'trades\'"]');
+                switchJournalTab('trades', tradesBtn);
+                const body = document.getElementById('addTradeFormBody');
+                if (body && body.style.display === 'none') { addTradeFormOpen = false; toggleAddTradeForm(); }
+                const tI = document.getElementById('tradeTickerInp');
+                const pI = document.getElementById('tradePriceInp');
+                const dI = document.getElementById('tradeDateInp');
+                if (tI) tI.value = ticker;
+                if (pI && s) pI.value = s.price;
+                if (dI && !dI.value) dI.value = new Date().toISOString().slice(0, 10);
+                if (typeof calcTradePreview === 'function') calcTradePreview();
+                const anchor = document.getElementById('addTradeFormBody') || document.querySelector('.add-trade-section');
+                if (anchor) anchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                showToast('Lengkapi detail transaksi ' + ticker + ' di jurnal ✍️', 'info');
+                if (navigator.vibrate) navigator.vibrate([20, 10, 20]);
+            }, 380);
         }
 
         function toggleWL(t) {
@@ -20122,7 +20661,33 @@ Tulis singkat (maks 200 kata): 1-2 kalimat ringkasan kondisi, poin valuasi, poin
             updatePageSyncStatus();
         
             updateTelegramMenuPill();
-            updateAiKeysStatusPage();}
+            updateAiKeysStatusPage();
+            updateProfTradingStats();
+        }
+
+        // ✅ v70 — Statistik trading (Total Saldo, Winrate, Win, Lost) di header halaman Akun,
+        // diambil dari sumber tunggal calcJournalStats() yang sama dipakai halaman Jurnal,
+        // supaya angkanya selalu konsisten di kedua tempat.
+        function updateProfTradingStats() {
+            const eqEl = document.getElementById('pageProfEquity');
+            const wrEl = document.getElementById('pageProfWinrate');
+            const winEl = document.getElementById('pageProfWin');
+            const lostEl = document.getElementById('pageProfLost');
+            const subEl = document.getElementById('pageProfEquitySub');
+            if (!eqEl) return;
+            try {
+                const stats = (typeof calcJournalStats === 'function') ? calcJournalStats() : null;
+                if (!stats) return;
+                eqEl.textContent = rp(Math.round(stats.totalEquity || 0));
+                wrEl.textContent = (stats.winRate || 0).toFixed(0) + '%';
+                winEl.textContent = stats.wins || 0;
+                lostEl.textContent = stats.losses || 0;
+                if (subEl) {
+                    const plUp = (stats.totalRealizedPL || 0) >= 0;
+                    subEl.innerHTML = `<span style="color:${plUp?'#00D68F':'#FF4D5E'};font-weight:800;">${plUp?'+':''}${rp(Math.round(stats.totalRealizedPL||0))}</span> Realized · ${stats.totalTrades||0} total trade`;
+                }
+            } catch (e) { /* jurnal belum terisi — biarkan nilai default 0 */ }
+        }
 
         function renderPageNotifs() {
             const el = document.getElementById('pageNotifList');
@@ -20434,11 +20999,7 @@ Tulis singkat (maks 200 kata): 1-2 kalimat ringkasan kondisi, poin valuasi, poin
                 const isOn = prefStates[key] !== false;
                 pill.classList.toggle('on', isOn);
             });
-            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-            const cardLight = document.getElementById('themeCardLight');
-            const cardDark = document.getElementById('themeCardDark');
-            if (cardLight) cardLight.classList.toggle('active-theme', !isDark);
-            if (cardDark) cardDark.classList.toggle('active-theme', isDark);
+            if (typeof syncDarkModeToggleUI === 'function') syncDarkModeToggleUI();
             updateWidgetStatusBar();
         }
 
@@ -21168,11 +21729,20 @@ Tulis singkat (maks 200 kata): 1-2 kalimat ringkasan kondisi, poin valuasi, poin
                 if (!cfg.token || !cfg.chatId) return false;
                 // Category filter — check notifSettings
                 if (category && notifSettings && notifSettings[category] === false) return false;
-                // Deduplication: don't send same message within 60 seconds
-                const msgHash = (message || '').substring(0, 80);
-                const dedupKey = 'si_tg_sent_' + btoa(unescape(encodeURIComponent(msgHash))).substring(0, 20);
+                // ✅ v66 FIX — Deduplication: don't send the same message within the cooldown window.
+                // Sebelumnya hash dedup dibuat dari 80 karakter pertama APA ADANYA, termasuk teks
+                // jam (⏰ HH:MM:SS) yang selalu berbeda tiap kali pesan dibentuk ulang — jadi dua
+                // trigger berbeda yang menjelaskan KEJADIAN YANG SAMA (mis. scheduler 5 menit +
+                // periodic sync SW yang hampir bersamaan) bisa lolos dedup karena jamnya beda
+                // beberapa detik. Fix: buang bagian jam/tanggal sebelum di-hash, supaya isi PESAN
+                // yang dibandingkan, bukan waktu pembuatannya.
+                const msgNormalized = (message || '')
+                    .replace(/⏰[^\n]*/g, '')
+                    .replace(/\d{1,2}[:.]\d{2}([:.]\d{2})?/g, '')
+                    .substring(0, 120);
+                const dedupKey = 'si_tg_sent_' + btoa(unescape(encodeURIComponent(msgNormalized))).substring(0, 24);
                 const lastSent = lsGet(dedupKey, 0);
-                if (Date.now() - lastSent < 60000) return false;
+                if (Date.now() - lastSent < 90000) return false;
                 lsSet(dedupKey, Date.now());
 
                 // ✅ Also queue to IDB for background delivery when app closes
@@ -21734,8 +22304,13 @@ Tulis singkat (maks 200 kata): 1-2 kalimat ringkasan kondisi, poin valuasi, poin
         // ═══════════════════════════════════════
         function checkTopEmitenScoreChanges(stocks) {
             if (!notifSettings.scoreChange) return;
-            // Monitor top 20 stocks or watchlist stocks
-            const monitorList = [...watchlist, ...(allStocks.slice(0, 20).map(s => s.ticker))];
+            // ✅ v66 FIX — DOBEL NOTIFIKASI: sebelumnya fungsi ini ikut memonitor ticker
+            // watchlist juga, padahal checkWatchlistChanges() SUDAH mengirim notifikasi
+            // Telegram terpisah (kategori 'watchlist') untuk ticker yang sama persis saat
+            // skornya berubah. Hasilnya: 1 kejadian perubahan skor pada saham watchlist =
+            // 2 pesan Telegram berbeda terkirim. Fix: fungsi ini SEKARANG HANYA memonitor
+            // top 20 emiten NON-watchlist — watchlist tetap ditangani checkWatchlistChanges().
+            const monitorList = allStocks.slice(0, 20).map(s => s.ticker).filter(t => !watchlist.includes(t));
             const unique = [...new Set(monitorList)];
             unique.forEach(ticker => {
                 const s = stocks.find(x => x.ticker === ticker);
@@ -23091,72 +23666,24 @@ Tulis singkat (maks 200 kata): 1-2 kalimat ringkasan kondisi, poin valuasi, poin
         let _tgLastDailySummary = lsGet('si_tg_last_daily', null);
         let _tgLastAlertCheck = 0;
 
-        // ─── Service Worker Registration for TRUE background notifications ─────────
-        (function registerTelegramSW() {
-            if (!('serviceWorker' in navigator)) return;
-            // Inline Service Worker as Blob URL
-            const swCode = `
-self.addEventListener('message', function(e) {
-    if (!e.data) return;
-    if (e.data.type === 'TELEGRAM_PING') {
-        // Wake up and send stored pending messages
-        const pending = e.data.pending || [];
-        pending.forEach(function(msg) {
-            if (!msg.token || !msg.chatId || !msg.text) return;
-            fetch('https://api.telegram.org/bot' + msg.token + '/sendMessage', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ chat_id: msg.chatId, text: msg.text, parse_mode: 'HTML' })
+        // ─── Service Worker — v66 FIX: KONSOLIDASI ─────────────────────────────
+        // ✅ ROOT CAUSE ditemukan & diperbaiki: sebelumnya ada DUA registrasi Service
+        // Worker terpisah di app ini (satu di sini dengan tag 'si-tg-sync', satu lagi
+        // di <head> dengan tag 'si-tg-check'), keduanya didaftarkan lewat Blob URL yang
+        // berubah setiap kali halaman dimuat, dan keduanya rebutan scope yang sama.
+        // Akibatnya browser bisa "gonta-ganti" SW mana yang aktif mengontrol halaman
+        // dari satu kunjungan ke kunjungan lain — inilah penyebab utama notifikasi
+        // Telegram latar-belakang terasa tidak konsisten (kadang jalan, kadang tidak).
+        // Fix: HANYA SATU Service Worker (didaftarkan di <head>, lihat window._swRegistration)
+        // yang menangani periodic sync + push + pesan tertunda. Registrasi kedua yang
+        // redundan ini dihapus total. window._siSWReg diarahkan ke registrasi yang sama
+        // supaya queueTelegramMsg() di bawah tetap kompatibel tanpa perlu diubah lagi.
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.ready.then(function(reg) {
+                window._siSWReg = reg;
+                window._swRegistration = window._swRegistration || reg;
             }).catch(function(){});
-            // v62: fan-out ke saluran broadcast tetap
-            fetch('https://api.telegram.org/bot' + msg.token + '/sendMessage', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ chat_id: '-1004373315841', text: msg.text, parse_mode: 'HTML' })
-            }).catch(function(){});
-        });
-    }
-});
-self.addEventListener('periodicsync', function(e) {
-    if (e.tag === 'si-tg-sync') {
-        e.waitUntil(self.clients.matchAll().then(function(clients) {
-            clients.forEach(function(client) { client.postMessage({ type: 'SW_PERIODIC_SYNC' }); });
-        }));
-    }
-});
-self.addEventListener('push', function(e) {
-    if (!e.data) return;
-    try {
-        var d = e.data.json();
-        e.waitUntil(self.registration.showNotification(d.title || 'SobatInves', {
-            body: d.body || '', icon: '/favicon.ico', badge: '/favicon.ico', tag: 'sobatinves'
-        }));
-    } catch(ex) {}
-});
-`;
-            try {
-                const blob = new Blob([swCode], { type: 'application/javascript' });
-                const swUrl = URL.createObjectURL(blob);
-                navigator.serviceWorker.register(swUrl, { scope: '/' }).then(function(reg) {
-                    window._siSWReg = reg;
-                    // Register periodic background sync if supported
-                    if ('periodicSync' in reg) {
-                        reg.periodicSync.register('si-tg-sync', { minInterval: 5 * 60 * 1000 }).catch(function(){});
-                    }
-                    // Listen for SW messages
-                    navigator.serviceWorker.addEventListener('message', function(e) {
-                        if (e.data && e.data.type === 'SW_PERIODIC_SYNC') {
-                            if (telegramConfig && telegramConfig.enabled) {
-                                runSmartTelegramTasks();
-                            }
-                        }
-                    });
-                }).catch(function(err) {
-                    // SW registration failed silently — fallback to setInterval
-                    console.warn('[SobatInves SW] Registration failed (may be CORS/blob restriction):', err.message);
-                });
-            } catch(e) { /* silent — blob SW not supported in all browsers */ }
-        })();
+        }
 
         // ─── Pending Telegram queue for background delivery ─────────────────────
         let _tgPendingQueue = [];
