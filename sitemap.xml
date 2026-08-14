@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  SobatInves Ultimate — sitemap.xml
+  Upload file ini ke root domain Anda, sehingga bisa diakses persis di:
+  https://sobatinves.jangproject.com/sitemap.xml
+
+  Karena aplikasi ini adalah Single Page Application (satu file HTML dengan
+  semua "halaman" dirender oleh JavaScript di URL yang sama), sitemap ini
+  hanya berisi satu entri utama (homepage). Itu sudah cukup dan wajar untuk
+  SPA — yang paling penting bagi Google adalah <lastmod> selalu diperbarui
+  setiap kali Anda mengunggah versi baru, supaya Google tahu halamannya
+  masih aktif dan layak di-crawl ulang.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://sobatinves.jangproject.com/</loc>
+    <lastmod>2026-08-14</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>

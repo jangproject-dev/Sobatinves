@@ -708,6 +708,16 @@ async function saveIDBTelegramConfig(config) {
             -webkit-tap-highlight-color: transparent;
             font-family: 'Outfit', sans-serif;
         }
+        /* ✅ v79 — util "sr-only": teks tetap ADA di DOM (terbaca mesin pencari & screen
+           reader) tapi disembunyikan secara visual (tidak mengubah tampilan sama sekali).
+           Dipakai untuk <h1>/<h2> semantik SEO di dalam <body> — SPA ini sebelumnya sama
+           sekali tidak punya heading HTML asli (logo cuma <div> biasa), padahal heading
+           yang benar membantu Google memahami topik halaman jauh lebih baik daripada
+           meta tag saja. */
+        .sr-only {
+            position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+            overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+        }
         html,
         body {
             background: var(--bg-main);
@@ -3596,6 +3606,25 @@ async function saveIDBTelegramConfig(config) {
         @media (min-width: 1440px) {
             .modal-sheet { max-width: 780px; }
         }
+        /* ✅ v79 — mode "wide-chart": HANYA aktif saat tab Chart yang sedang dibuka
+           (lihat toggleModalWideChart() dipanggil dari mTab()/openModal()/closeModal()).
+           Tab lain (Multi-Strategi, Akumulasi, Profil, dst.) tetap pakai lebar nyaman
+           640-780px di atas — konten teks/kartu di tab-tab itu jadi terlalu panjang &
+           tidak enak dibaca kalau dipaksa selebar chart. Chart TradingView justru
+           sebaliknya: makin lega ruang horizontalnya, makin nyaman dipakai (candle +
+           4 pane indikator butuh ruang, bukan cuma tinggi).*/
+        @media (min-width: 720px) {
+            .modal-sheet.wide-chart { max-width: 880px; }
+        }
+        @media (min-width: 1080px) {
+            .modal-sheet.wide-chart { max-width: 1040px; }
+        }
+        @media (min-width: 1440px) {
+            .modal-sheet.wide-chart { max-width: 1280px; }
+        }
+        @media (min-width: 1920px) {
+            .modal-sheet.wide-chart { max-width: 1520px; }
+        }
         .modal-handle {
             width: 44px;
             height: 5px;
@@ -3872,7 +3901,7 @@ async function saveIDBTelegramConfig(config) {
         .strat-card-bar-track { height: 6px; border-radius: 3px; background: var(--border-light); overflow:hidden; margin: 6px 0 8px; position: relative; }
         .strat-card-bar-fill { position:absolute; top:0; bottom:0; border-radius: 3px; }
         .strat-card-reasons { list-style: none; margin:0; padding:0; }
-        /* ─── v59: AI Tajam — FMP + Gemini ─── */
+        /* ─── v59: SobatInves AI — FMP + Gemini ─── */
         .ai-src-banner { display:flex; align-items:center; gap:10px; padding:12px 14px; border-radius:var(--radius-md); margin-bottom:14px; background:linear-gradient(135deg,rgba(91,155,255,0.10),var(--card-bg)); border:1px solid rgba(91,155,255,0.3); }
         .ai-src-banner .ai-src-icon { font-size:20px; flex-shrink:0; }
         .ai-src-banner .ai-src-title { font-size:12px; font-weight:900; color:var(--t-hi); }
@@ -3898,6 +3927,76 @@ async function saveIDBTelegramConfig(config) {
         .ai-regen-btn { margin-top:6px; width:100%; padding:11px; border-radius:var(--radius-md); background:var(--card-bg); border:1px solid var(--border-light); color:var(--t-hi); font-weight:800; font-size:12px; cursor:pointer; font-family:inherit; transition:all 0.2s; }
         .ai-regen-btn:hover { border-color:var(--primary); color:var(--primary); }
         .ai-mood-pill { display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:20px; font-size:10px; font-weight:900; letter-spacing:0.3px; }
+        /* ─── v70: SobatInves AI — Text-to-Audio (bot bacakan analisis) ─── */
+        .ai-action-row { display:flex; gap:8px; margin-top:6px; }
+        .ai-action-row .ai-regen-btn { margin-top:0; flex:1; }
+        .ai-tts-btn { display:flex; align-items:center; justify-content:center; gap:6px; }
+        .ai-tts-btn.ai-tts-playing { background:rgba(91,155,255,0.12); border-color:var(--primary); color:var(--primary); }
+        .ai-tts-eq { display:inline-flex; align-items:flex-end; gap:2px; height:11px; }
+        .ai-tts-eq span { width:2.5px; background:var(--primary); border-radius:1px; animation:aiTtsBar 0.9s ease-in-out infinite; }
+        .ai-tts-eq span:nth-child(1) { height:40%; animation-delay:0s; }
+        .ai-tts-eq span:nth-child(2) { height:100%; animation-delay:0.15s; }
+        .ai-tts-eq span:nth-child(3) { height:65%; animation-delay:0.3s; }
+        @keyframes aiTtsBar { 0%,100% { transform:scaleY(0.4); } 50% { transform:scaleY(1); } }
+        .ai-tts-speed-row { display:flex; align-items:center; gap:6px; margin-top:8px; justify-content:center; flex-wrap:wrap; }
+        .ai-tts-speed-btn { font-size:9.5px; font-weight:800; padding:4px 9px; border-radius:20px; background:var(--card-bg); border:1px solid var(--border-light); color:var(--t-med); cursor:pointer; font-family:inherit; }
+        .ai-tts-speed-btn.active { border-color:var(--primary); color:var(--primary); background:rgba(91,155,255,0.1); }
+        .ai-tts-speed-btn.ai-tts-stop-btn { color:var(--dn); border-color:var(--dn-border); margin-left:2px; }
+        .ai-tts-speed-btn.ai-tts-stop-btn:hover { background:var(--dn-bg); }
+        /* v73: alur visual "baru sampai mana" pembacaan T2A ------------------ */
+        .ai-tts-prog-wrap { margin-top:9px; padding:9px 11px; border-radius:11px; background:var(--card-bg); border:1px solid var(--border-light); }
+        .ai-tts-progressbar { position:relative; width:100%; height:4px; border-radius:3px; background:var(--border-light); overflow:hidden; }
+        .ai-tts-progressbar-fill { position:absolute; top:0; left:0; height:100%; width:0%; border-radius:3px; background:linear-gradient(90deg,var(--primary),#8ab4ff); transition:width .35s ease; }
+        .ai-tts-caption { margin-top:8px; font-size:11.5px; line-height:1.55; color:var(--t-med); text-align:center; max-height:4.7em; overflow:hidden; transition:opacity .25s ease; }
+        .ai-tts-word { transition:color .12s ease, font-weight .12s ease; }
+        .ai-tts-word.active { color:var(--primary); font-weight:800; }
+        /* ─── v72: SobatInves AI — Kartu Ringkasan Terstruktur ───
+           Dibangun dari data lokal aplikasi yang SUDAH DIHITUNG (skor, pivot, sektor,
+           indeks) — bukan hasil parsing bebas teks Gemini — supaya tampilannya selalu
+           akurat & konsisten strukturnya walau gaya bahasa narasi AI berubah-ubah. */
+        .ai-badge-row { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px; }
+        .ai-badge-pill { display:inline-flex; align-items:center; gap:5px; padding:5px 11px; border-radius:20px; font-size:9.5px; font-weight:800; letter-spacing:0.2px; background:var(--card-bg); border:1px solid var(--border-light); color:var(--t-med); white-space:nowrap; }
+        .ai-badge-pill.ai-badge-on { background:rgba(0,214,143,0.1); border-color:var(--up-border); color:var(--up); }
+        .ai-badge-pill.ai-badge-warn { background:rgba(255,176,32,0.1); border-color:rgba(255,176,32,0.35); color:var(--warn); }
+        .ai-badge-pill.ai-badge-info { background:rgba(77,133,255,0.1); border-color:rgba(77,133,255,0.32); color:var(--primary); }
+        .ai-score-header { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:14px; }
+        .ai-score-header-title { font-family:'Barlow Condensed',sans-serif; font-size:15px; font-weight:900; color:var(--t-hi); letter-spacing:0.2px; display:flex; align-items:center; gap:7px; }
+        .ai-score-gauge-wrap { display:flex; flex-direction:column; align-items:center; flex-shrink:0; }
+        .ai-score-gauge-cap { font-size:9px; font-weight:900; letter-spacing:0.4px; margin-top:-3px; font-family:'IBM Plex Mono',monospace; white-space:nowrap; }
+        .ai-tpsl-box { background:var(--card-bg); border:1px solid var(--border-light); border-radius:var(--radius-lg); padding:16px; margin-bottom:14px; box-shadow:var(--shadow-sm); }
+        .ai-tpsl-line { font-size:12px; font-weight:800; margin-bottom:4px; }
+        .ai-tpsl-track { position:relative; height:7px; border-radius:4px; background:linear-gradient(90deg, var(--dn) 0%, var(--border-strong) 34%, var(--border-strong) 66%, var(--up) 100%); margin:12px 2px 8px; }
+        .ai-tpsl-dot { position:absolute; top:50%; width:13px; height:13px; border-radius:50%; border:2.5px solid var(--card-bg); transform:translate(-50%,-50%); box-shadow:0 1px 4px rgba(0,0,0,0.25); }
+        .ai-tpsl-bullets { list-style:none; margin:10px 0 0; padding:0; }
+        .ai-tpsl-bullets li { font-size:11.5px; color:var(--t-med); line-height:1.6; padding-left:14px; position:relative; margin-bottom:4px; }
+        .ai-tpsl-bullets li::before { content:'•'; position:absolute; left:0; color:var(--primary); font-weight:900; }
+        .ai-twin-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
+        .ai-twin-box { background:var(--card-bg); border:1px solid var(--border-light); border-radius:var(--radius-md); padding:12px; min-width:0; }
+        .ai-twin-box-title { display:flex; align-items:center; gap:6px; font-size:10.8px; font-weight:900; color:var(--t-hi); margin-bottom:8px; }
+        .ai-twin-box ul { list-style:none; margin:0; padding:0; }
+        .ai-twin-box li { font-size:10.2px; color:var(--t-med); line-height:1.6; padding-left:12px; position:relative; margin-bottom:4px; word-break:break-word; }
+        .ai-twin-box li::before { content:'•'; position:absolute; left:0; color:var(--t-low); }
+        .ai-sector-card { background:var(--card-bg); border:1px solid var(--border-light); border-radius:var(--radius-lg); padding:14px 16px; margin-bottom:14px; position:relative; overflow:hidden; box-shadow:var(--shadow-sm); }
+        .ai-sector-card-title { font-size:13px; font-weight:900; color:var(--t-hi); margin-bottom:10px; padding-right:70px; }
+        .ai-sector-bar-row { display:flex; align-items:center; justify-content:space-between; gap:8px; border-radius:10px; padding:9px 12px; margin-bottom:7px; font-size:10.5px; font-weight:800; }
+        .ai-sector-bar-row:last-child { margin-bottom:0; }
+        .ai-sector-bar-row .ai-sector-name { color:#fff; display:flex; align-items:center; gap:6px; }
+        .ai-sector-bar-row .ai-sector-tag { font-size:9.5px; font-weight:800; color:rgba(255,255,255,0.92); white-space:nowrap; }
+        .ai-sector-stay-safe { position:absolute; top:14px; right:16px; font-size:8.5px; font-weight:900; letter-spacing:0.3px; color:var(--t-low); background:var(--bg-surface); border:1px solid var(--border-light); padding:3px 9px; border-radius:10px; }
+        .ai-summary-box { background:var(--card-bg); border:1px solid var(--border-light); border-radius:var(--radius-lg); padding:16px; margin-bottom:14px; box-shadow:var(--shadow-sm); }
+        .ai-summary-box-title { font-size:13px; font-weight:900; color:var(--t-hi); margin-bottom:10px; }
+        .ai-summary-box ul { list-style:none; margin:0; padding:0; }
+        .ai-summary-box li { font-size:11.5px; color:var(--t-med); line-height:1.7; padding-left:14px; position:relative; margin-bottom:5px; }
+        .ai-summary-box li::before { content:'•'; position:absolute; left:0; color:var(--primary); font-weight:900; }
+        .ai-full-toggle { width:100%; padding:10px; border-radius:var(--radius-md); background:transparent; border:1px dashed var(--border-strong); color:var(--t-med); font-weight:800; font-size:11px; cursor:pointer; font-family:inherit; margin-bottom:12px; display:flex; align-items:center; justify-content:center; gap:6px; transition:all 0.2s; }
+        .ai-full-toggle:hover { color:var(--primary); border-color:var(--primary); }
+        /* ─── v75: SobatInves AI — Kartu Ringkasan dipakai penuh (ring skor, TP/SL, dsb) ─── */
+        .ai-score-card { background:var(--card-bg); border:1px solid var(--border-light); border-radius:var(--radius-lg); padding:16px; margin-bottom:14px; box-shadow:var(--shadow-sm); }
+        .ai-score-ring { width:66px; height:66px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        .ai-score-ring-inner { width:52px; height:52px; border-radius:50%; background:var(--card-bg); display:flex; align-items:center; justify-content:center; }
+        .ai-score-ring-val { font-family:'Barlow Condensed',sans-serif; font-size:17px; font-weight:900; color:var(--t-hi); line-height:1; }
+        .ai-full-toggle svg { width:13px; height:13px; transition:transform 0.25s ease; flex-shrink:0; }
+        .ai-full-toggle.open svg { transform:rotate(180deg); }
         /* ─── v59: Explorer FMP (daftar emiten global via FMP) ─── */
         .fmp-exp-row { display:flex; align-items:center; gap:10px; }
         .fmp-exp-ticker-circle { width:38px; height:38px; border-radius:10px; background:var(--primary-light); color:var(--primary); display:flex; align-items:center; justify-content:center; font-family:'Barlow Condensed',sans-serif; font-weight:900; font-size:12px; flex-shrink:0; }
@@ -7060,6 +7159,23 @@ async function saveIDBTelegramConfig(config) {
         .pattern-badge.win { background:var(--up-bg);color:var(--up); }
         .pattern-badge.loss { background:var(--dn-bg);color:var(--dn); }
 
+        /* ─── SMC PATTERN DROPDOWN (di atas chart) — v79 ───
+           Sebelumnya daftar pola SMC selalu tampil TERBUKA PENUH di atas chart,
+           makan banyak ruang vertikal & bikin tab Chart terasa sesak/berantakan.
+           Sekarang jadi dropdown ringkas yang TERTUTUP secara default (cuma judul +
+           jumlah pola + panah) — pengguna tinggal ketuk untuk membuka kalau memang
+           butuh detail, sementara chart di bawahnya langsung dapat ruang lebih lega. */
+        .smc-drop { margin:0 2px 8px;background:var(--bg-elevated);border:1px solid var(--border-light);border-radius:var(--radius-md);overflow:hidden;transition:border-color .2s; }
+        .smc-drop.open { border-color:var(--primary); }
+        .smc-drop-head {
+            display:flex;align-items:center;gap:6px;padding:10px 12px;cursor:pointer;user-select:none;
+        }
+        .smc-drop-head:active { background:var(--card-bg); }
+        .smc-drop-chev { flex-shrink:0;color:var(--t-low);transition:transform .25s; }
+        .smc-drop.open .smc-drop-chev { transform:rotate(180deg);color:var(--primary); }
+        .smc-drop-body { max-height:0;overflow:hidden;transition:max-height .3s ease;padding:0 12px; }
+        .smc-drop.open .smc-drop-body { max-height:2000px;padding:0 12px 12px; }
+
         /* ─── JOURNAL ADVANCED FEATURES ─── */
         .journal-tab-new {
             background: linear-gradient(135deg, rgba(0,85,255,0.08), rgba(0,85,255,0.03));
@@ -8639,6 +8755,9 @@ async function saveIDBTelegramConfig(config) {
            ═══════════════════════════════════════════ */
         #modal-quick-buy { display:none; position:fixed; inset:0; z-index:9999; align-items:flex-end; justify-content:center; background:rgba(0,0,0,0.65); backdrop-filter:blur(6px); }
         #modal-quick-buy.active { display:flex; }
+        /* ✅ v77 — Edit Saldo Jurnal modal, pakai geometri overlay yang sama dengan Quick Buy */
+        #modal-edit-saldo { display:none; position:fixed; inset:0; z-index:9999; align-items:flex-end; justify-content:center; background:rgba(0,0,0,0.65); backdrop-filter:blur(6px); }
+        #modal-edit-saldo.active { display:flex; }
         .qb-sheet {
             background:var(--modal-bg);
             border-radius:28px 28px 0 0;
@@ -10185,6 +10304,31 @@ async function saveIDBTelegramConfig(config) {
 </head>
 <body>
 
+    <!-- ═══ SEO: HEADING SEMANTIK (v79) ═══
+         Halaman ini SPA yang di-render penuh oleh JavaScript — sebelumnya TIDAK ADA
+         satupun elemen <h1>/<h2> asli di seluruh <body> (logo di header cuma <div>
+         biasa), padahal heading yang benar adalah salah satu sinyal SEO paling
+         mendasar untuk mesin pencari memahami topik utama halaman, terlepas dari
+         seberapa lengkap meta tag yang sudah dipasang di <head>. Disembunyikan
+         SECARA VISUAL lewat .sr-only (bukan display:none — mesin pencari cenderung
+         menganggap remeh teks display:none) sehingga tampilan aplikasi tidak berubah
+         sama sekali, tapi tetap terbaca oleh crawler & pembaca layar. -->
+    <h1 class="sr-only">SobatInves Ultimate — Terminal Investasi Saham BEI Real-Time</h1>
+    <h2 class="sr-only">Analisis AI, Bandarmologi, Kalkulator Nilai Wajar Graham, Forex Global, Crypto, Wall Street, Komoditas, dan Alert Telegram 24/7 untuk investor saham Bursa Efek Indonesia</h2>
+
+    <!-- ═══ SEO: FALLBACK NON-JAVASCRIPT (v79) ═══
+         Aplikasi ini 100% dirender lewat JavaScript — pengunjung/bot yang mematikan
+         atau tidak mendukung JS sebelumnya hanya melihat halaman kosong. <noscript>
+         memastikan tetap ada konten bermakna (deskripsi produk + tautan) yang terbaca,
+         sekaligus jadi jaring pengaman SEO tambahan di luar meta tag. -->
+    <noscript>
+        <div style="max-width:640px;margin:40px auto;padding:24px;font-family:sans-serif;line-height:1.7;color:#0C111D;">
+            <h1>SobatInves Ultimate — Terminal Investasi Saham BEI Real-Time</h1>
+            <p>Terminal investasi saham BEI real-time terlengkap: Analisis AI, Bandarmologi, Kalkulator Nilai Wajar (Graham), Forex Global, Crypto, Wall Street, Komoditas, dan Alert Telegram 24/7 — gratis dan tanpa login.</p>
+            <p><strong>Aplikasi ini membutuhkan JavaScript untuk berjalan.</strong> Mohon aktifkan JavaScript di browser Anda, lalu muat ulang halaman ini untuk mulai menggunakan SobatInves.</p>
+            <p>Dibuat oleh Jang — Jang Project. Kunjungi <a href="https://sobatinves.jangproject.com/">sobatinves.jangproject.com</a>.</p>
+        </div>
+    </noscript>
 
     <!-- ══ PREMIUM PROFILE PANEL ══ -->
 
@@ -11575,8 +11719,10 @@ async function saveIDBTelegramConfig(config) {
 
                     <!-- ══ TRADING STATS STRIP — Total Saldo · Winrate · Win · Lost ══ -->
                     <div style="display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr;gap:8px;margin-top:16px;position:relative;z-index:1;">
-                        <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:9px 10px;">
-                            <div style="font-size:8px;color:rgba(255,255,255,0.5);font-family:'IBM Plex Mono',monospace;font-weight:800;letter-spacing:0.4px;">TOTAL SALDO</div>
+                        <div class="btn-ripple" onclick="openEditSaldoModal()" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:9px 10px;cursor:pointer;position:relative;">
+                            <div style="font-size:8px;color:rgba(255,255,255,0.5);font-family:'IBM Plex Mono',monospace;font-weight:800;letter-spacing:0.4px;display:flex;align-items:center;gap:4px;">TOTAL SALDO
+                                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="2.5"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+                            </div>
                             <div id="pageProfEquity" style="font-size:13.5px;font-weight:900;color:#fff;font-family:'IBM Plex Mono',monospace;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Rp0</div>
                         </div>
                         <div style="background:rgba(0,214,143,0.07);border:1px solid rgba(0,214,143,0.2);border-radius:12px;padding:9px 8px;text-align:center;">
@@ -11724,6 +11870,7 @@ async function saveIDBTelegramConfig(config) {
                     <span class="gd-quicklink" onclick="gdJumpTo('gd-teknikal')">📊 Indikator</span>
                     <span class="gd-quicklink" onclick="gdJumpTo('gd-mtf')">🧩 Multi-Timeframe</span>
                     <span class="gd-quicklink" onclick="gdJumpTo('gd-bandar')">🐋 Bandarmologi</span>
+                    <span class="gd-quicklink" onclick="gdJumpTo('gd-sobatai')">🧠 SobatInves AI</span>
                     <span class="gd-quicklink" onclick="gdJumpTo('gd-chart')">🕯 Chart</span>
                     <span class="gd-quicklink" onclick="gdJumpTo('gd-kalkulator')">🧮 Kalkulator</span>
                     <span class="gd-quicklink" onclick="gdJumpTo('gd-alert')">🔔 Alert &amp; Telegram</span>
@@ -11761,8 +11908,8 @@ async function saveIDBTelegramConfig(config) {
                                 </ul>
                             </div>
                             <div class="gd-block">
-                                <div class="gd-block-h">4️⃣ Tombol AI mengambang</div>
-                                <div class="gd-block-p">Ketuk ikon chat biru di pojok kanan bawah untuk bertanya bebas, misalnya <i>"analisis BBCA"</i> atau <i>"rekomendasi hari ini"</i>.</div>
+                                <div class="gd-block-h">4️⃣ Tombol SobatInves AI mengambang</div>
+                                <div class="gd-block-p">Ketuk ikon chat biru di pojok kanan bawah buat ngobrol bebas dengan asisten <b>SobatInves AI</b>, misalnya <i>"analisis BBCA"</i>, <i>"top buy hari ini"</i>, <i>"saham dividen tinggi"</i>, atau <i>"kondisi market"</i>. Kalau nanya soal 1 emiten spesifik, ada tombol <b>🧠 SOBATINVES AI</b> buat langsung loncat ke analisis lengkap (skor, TP/SL, sektor) di modal detailnya.</div>
                             </div>
                         </div>
                     </div>
@@ -11789,6 +11936,31 @@ async function saveIDBTelegramConfig(config) {
                             </div>
                             <div class="gd-block">
                                 <div class="gd-block-p">⚠️ Skor tinggi <b>tidak menjamin</b> harga akan naik. Anggap ini sebagai <b>alat penyaring cepat</b> (screening tool), bukan keputusan final. Selalu cek tab Teknikal &amp; Finansial sebelum memutuskan.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2b. SOBATINVES AI -->
+                    <div class="gd-acc-item" id="gd-sobatai" data-gdkey="sobatinves ai tajam gemini fmp tp sl take profit stop loss rencana trading analisis lengkap fundamental teknikal makro mikro berita sektor">
+                        <div class="gd-acc-head" onclick="gdToggle(this)">
+                            <div class="gd-acc-ico">🧠</div>
+                            <div style="flex:1;min-width:0;"><div class="gd-acc-title">SobatInves AI — Analisis Otomatis Terlengkap</div><div class="gd-acc-sub">Fundamental, teknikal, makro, berita, sektor & TP/SL dalam 1 tab</div></div>
+                            <svg class="gd-acc-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                        </div>
+                        <div class="gd-acc-body">
+                            <div class="gd-block">
+                                <div class="gd-block-p">Buka tab <b>SobatInves AI</b> di modal detail emiten mana pun. Kartu ringkasan di bagian atas (skor konviksi, badge, rencana TP/SL, kekuatan/risiko, rotasi sektor) dihitung <b>langsung dari data real-time aplikasi</b> — jalan penuh walau kamu belum pasang API key apapun.</div>
+                            </div>
+                            <div class="gd-block">
+                                <div class="gd-block-h">🎯 Skor Konviksi & rencana TP/SL</div>
+                                <div class="gd-block-p">Skor konviksi menggabungkan <b>6 lensa strategi independen</b> (Trend Following, Momentum &amp; Osilator, Mean Reversion, Volume &amp; Bandarmology, Breakout &amp; Volatilitas, Kualitas Fundamental) — semakin banyak yang sepakat satu arah, semakin tinggi keyakinannya. Rencana <b>Entry / Target TP1 &amp; TP2 / Stop-Loss</b> dihitung otomatis dari level Pivot Point, Moving Average, dan rentang 52-minggu, lengkap dengan rasio Risk:Reward — bukan angka tebakan.</div>
+                            </div>
+                            <div class="gd-block">
+                                <div class="gd-block-h">✨ Mode AI Canggih (opsional, gratis)</div>
+                                <div class="gd-block-p">Pasang API key <b>Gemini</b> gratis di <b>Akun → Bot AI — FMP &amp; Gemini</b> supaya tab ini naik level: narasi analis lengkap ala Kepala Riset yang membahas 9 lapisan sekaligus — sentimen global/makro, sentimen mikro &amp; berita emiten, fundamental, pengaruh komoditas, teknikal &amp; pola candlestick lengkap, arus dana/bandarmologi, strategi &amp; peluang, target TP/SL, sampai rekomendasi rotasi sektor. Tambahkan juga key <b>FMP</b> (Financial Modeling Prep) buat data fundamental eksternal yang lebih dalam.</div>
+                            </div>
+                            <div class="gd-block">
+                                <div class="gd-block-p">⚠️ Baik kartu ringkasan otomatis maupun narasi AI adalah <b>skenario edukatif berbasis data</b>, bukan rekomendasi/ajakan jual-beli resmi. Selalu lakukan riset mandiri (DYOR).</div>
                             </div>
                         </div>
                     </div>
@@ -12108,7 +12280,7 @@ async function saveIDBTelegramConfig(config) {
                         </div>
                         <div class="tg-guide-step">
                             <div class="tg-step-num">3</div>
-                            <div class="tg-step-text">Tempel di bawah ini → dipakai buat tab <b>AI Tajam</b> &amp; <b>Explorer FMP</b></div>
+                            <div class="tg-step-text">Tempel di bawah ini → dipakai buat tab <b>SobatInves AI</b> &amp; <b>Explorer FMP</b></div>
                         </div>
                     </div>
                     <div style="margin-top:12px;">
@@ -12141,7 +12313,7 @@ async function saveIDBTelegramConfig(config) {
                         </div>
                         <div class="tg-guide-step">
                             <div class="tg-step-num">3</div>
-                            <div class="tg-step-text">Tempel di bawah → kalau berhasil, tab <b>AI Tajam</b> auto upgrade jadi mode canggih: rekomendasi beli/jual, deteksi pola multi-timeframe real-time, sentimen berita real-time, & baca kondisi pasar di halaman ini</div>
+                            <div class="tg-step-text">Tempel di bawah → kalau berhasil, tab <b>SobatInves AI</b> auto upgrade jadi mode canggih: rekomendasi beli/jual, deteksi pola multi-timeframe real-time, sentimen berita real-time, & baca kondisi pasar di halaman ini</div>
                         </div>
                     </div>
                     <div style="margin-top:12px;">
@@ -12158,7 +12330,7 @@ async function saveIDBTelegramConfig(config) {
                 </div>
 
                 <div style="padding:10px 12px;background:var(--bg-surface);border:1px dashed var(--border-light);border-radius:12px;font-size:10px;color:var(--t-low);font-weight:600;line-height:1.6;">
-                    💡 Tanpa key, tab AI Tajam tetap jalan pakai data lokal aplikasi (analisis dasar). Pasang FMP buat data fundamental real, pasang Gemini buat narasi AI plus fitur canggih (rekomendasi, sentimen, deteksi pola).
+                    💡 Tanpa key, tab SobatInves AI tetap jalan pakai data lokal aplikasi (analisis dasar). Pasang FMP buat data fundamental real, pasang Gemini buat narasi AI plus fitur canggih (rekomendasi, sentimen, deteksi pola).
                 </div>
             </div>
 
@@ -13859,15 +14031,28 @@ async function saveIDBTelegramConfig(config) {
                 range = high - low || 1;
             s.candleCode = 'neutral';
             s.candleText = 'Netral/Sideways';
-            if (body <= range * 0.1) { s.candleCode = 'doji';
-                s.candleText = 'Doji (Ragu)'; } else if (lower >= body * 2 && upper <= body * 0.2) { s.candleCode = 'hammer';
-                s.candleText = 'Hammer (Bullish)'; } else if (upper >= body * 2 && lower <= body * 0.2) { s.candleCode =
+            // v71: pola candle diperlengkap — varian Doji (Dragonfly/Gravestone), Spinning Top, dan
+            // konteks tren untuk Hammer/Shooting Star (bentuk sama bisa berarti beda tergantung posisi
+            // tren: Hammer di downtrend vs Hanging Man di uptrend; Shooting Star di uptrend vs Inverted
+            // Hammer di downtrend) — TEKS SAJA yang diperkaya, s.candleCode TETAP nilai lama yang sudah
+            // dipakai scoring/screener/alert (hammer/shooting_star/doji/marubozu_*/neutral) supaya tidak
+            // mengubah perilaku fitur lain yang sudah ada; 'spinning_top' adalah kode baru yang aman
+            // (sebelumnya kasus ini jatuh ke default 'neutral' generik).
+            const upTrendCtx = s.aboveMA20 && s.goldenCross, downTrendCtx = !s.aboveMA20 && !s.goldenCross;
+            if (body <= range * 0.08 && lower >= range * 0.35 && upper <= range * 0.15) { s.candleCode = 'doji';
+                s.candleText = 'Dragonfly Doji (Potensi Reversal Naik)'; } else if (body <= range * 0.08 && upper >= range *
+                0.35 && lower <= range * 0.15) { s.candleCode = 'doji';
+                s.candleText = 'Gravestone Doji (Potensi Reversal Turun)'; } else if (body <= range * 0.1) { s.candleCode = 'doji';
+                s.candleText = 'Doji (Ragu/Indecision)'; } else if (lower >= body * 2 && upper <= body * 0.2) { s.candleCode = 'hammer';
+                s.candleText = upTrendCtx ? 'Hammer-shape di Uptrend (mirip Hanging Man, waspada)' : 'Hammer (Bullish Reversal)'; } else if (upper >= body * 2 && lower <= body * 0.2) { s.candleCode =
                     'shooting_star';
-                s.candleText = 'Shooting Star (Bearish)'; } else if (price > open && body >= range * 0.8 && chg > 1) { s
+                s.candleText = downTrendCtx ? 'Shooting Star-shape di Downtrend (mirip Inverted Hammer)' : 'Shooting Star (Bearish Reversal)'; } else if (price > open && body >= range * 0.8 && chg > 1) { s
                     .candleCode = 'marubozu_bull';
-                s.candleText = 'Bullish Marubozu'; } else if (open > price && body >= range * 0.8 && chg < -1) { s.candleCode =
+                s.candleText = 'Bullish Marubozu (Momentum Kuat)'; } else if (open > price && body >= range * 0.8 && chg < -1) { s.candleCode =
                     'marubozu_bear';
-                s.candleText = 'Bearish Marubozu'; }
+                s.candleText = 'Bearish Marubozu (Tekanan Jual Kuat)'; } else if (body <= range * 0.35 && upper >= range * 0.18 &&
+                lower >= range * 0.18) { s.candleCode = 'spinning_top';
+                s.candleText = 'Spinning Top (Indecision)'; }
             s.trendTxt = (s.goldenCross && s.aboveMA20) ? 'Strong Uptrend' : s.goldenCross ? 'Uptrend' : (!s.aboveMA20 &&
                 !s.goldenCross) ? 'Strong Downtrend' : 'Konsolidasi';
             s.pivot = { p: (high + low + price) / 3 };
@@ -14034,9 +14219,16 @@ async function saveIDBTelegramConfig(config) {
                 gridColor: gridColor,
                 // ✅ v64: Toolbar atas & samping DIBUKA secara default (dulu disembunyikan) —
                 // toolbar samping berisi alat gambar TradingView asli: Trend Line, Fibonacci,
-                // Rectangle, Brush (coret bebas), Text, dsb. Toolbar atas berisi tombol
-                // "Indicators" (fx) sebagai jaring pengaman manual jika studies bawaan gagal
-                // ter-render, plus Undo/Redo dan kamera untuk simpan/bagikan gambar chart.
+                // Rectangle, Brush (coret bebas), Text, dsb. Toolbar atas menampilkan
+                // Undo/Redo dan kamera untuk simpan/bagikan gambar chart.
+                // ✅ v75 FIX: tombol "Indicators" (fx) di toolbar atas DIHILANGKAN PERMANEN —
+                // lihat 'header_indicators' di disabled_features di bawah. Dulu tombol ini
+                // sengaja dibiarkan tampil sebagai jaring pengaman manual kalau studi bawaan
+                // gagal ter-render; sekarang jaring pengamannya dipindah ke sisi JS: fungsi
+                // buildAdvancedChartSrcdoc() menunggu onChartReady() lalu memverifikasi &
+                // memasang ulang RSI/MACD/Volume/Donchian otomatis lewat createStudy() kalau
+                // ada yang belum terpasang — jadi pengguna tidak perlu lagi mengatur indikator
+                // manual sendiri sama sekali.
                 // Tetap bisa dipaksa disembunyikan lewat opts kalau ada tempat yang butuh
                 // versi ringkas (mis. mini widget).
                 hide_top_toolbar: opts.hideTopToolbar !== undefined ? opts.hideTopToolbar : false,
@@ -14053,29 +14245,47 @@ async function saveIDBTelegramConfig(config) {
                 // likuid (lihat histori bug BWPT dkk). "interval" saja sudah cukup.
                 withdateranges: false,
                 range: '12M',
-                // ═══ INDIKATOR PERMANEN: RSI + MACD + Donchian ═══
-                // 'Volume@tv-basicstudies' SENGAJA TIDAK dimasukkan — TradingView otomatis
-                // menambah Volume ke semua instrumen berdata volume DI LUAR array studies.
-                // Menambahkannya manual bikin ID-nya dobel dan seluruh array "studies"
-                // ditolak diam-diam oleh widget (efeknya: cuma Volume yang tampil).
-                // ✅ v68 FIX — ROOT CAUSE indikator tidak muncul: parameter "length" Donchian
-                // sebelumnya salah taruh di studies_overrides sebagai key 'DONCH.length' —
-                // key itu TIDAK DIKENALI TradingView (studies_overrides hanya untuk override
-                // warna/style garis yang SUDAH ada, bukan untuk parameter input seperti length).
-                // Parameter input yang benar HARUS lewat properti "inputs" di dalam object
-                // study itu sendiri (format resmi: {id:"STUDY@tv-basicstudies", inputs:{...}}).
-                // Sekarang studies RSI/MACD/DONCH pakai format object eksplisit ini.
+                // ═══ INDIKATOR PERMANEN: Volume + RSI + MACD + Donchian ═══
+                // ✅ v74 FIX — ROOT CAUSE SEBENARNYA kenapa Volume/RSI/MACD/Donchian bisa
+                // GAGAL MUNCUL BARENGAN: widget TradingView memvalidasi seluruh array
+                // "studies" SEKALIGUS — kalau SATU entri formatnya tidak persis sesuai yang
+                // dia harapkan, seluruh array itu didiamkan/ditolak (bukan cuma entri yang
+                // salah). Entri Donchian sebelumnya pakai format object dengan "inputs" TANPA
+                // field "version" ({id:"DONCH@tv-basicstudies", inputs:{length:20}}) — format
+                // itulah yang dicurigai jadi biang keladinya. Karena default panjang (length)
+                // Donchian Channels di TradingView MEMANG SUDAH 20, override itu sebenarnya
+                // tidak perlu sama sekali. Fix v74: balikkan semua studies ke format STRING
+                // POLOS (persis contoh resmi TradingView & yang paling terbukti stabil di
+                // banyak integrasi publik), dan 'Volume@tv-basicstudies' DIMASUKKAN EKSPLISIT
+                // (bukan mengandalkan auto-attach) supaya pane Volume + garis Volume MA pasti
+                // tampil juga untuk emiten BEI yang datanya kadang tidak otomatis membawa
+                // volume dari provider TradingView.
+                // ✅ v75 FIX — array "studies" ini TETAP dipakai sebagai percobaan pertama
+                // (tidak dihapus, supaya tidak ada risiko mundur dari v74), TAPI sekarang
+                // bukan satu-satunya jaring pengaman. buildAdvancedChartSrcdoc() memuat chart
+                // ini lewat TradingView.widget() (tv.js) alih-alih embed script pasif, lalu
+                // menunggu onChartReady() dan mengecek activeChart().getAllStudies() — apapun
+                // dari 4 indikator ini yang TERNYATA belum masuk akan dipasang ulang satu per
+                // satu lewat createStudy(), dengan pengecekan nama dulu supaya tidak dobel.
+                // Jadi kalaupun SATU entri di array ini gagal (skenario di atas), sisi JS akan
+                // menambal yang hilang tanpa perlu campur tangan pengguna.
                 studies: (opts.studies || [
-                    { id: 'RSI@tv-basicstudies' },
-                    { id: 'MACD@tv-basicstudies' },
-                    { id: 'DONCH@tv-basicstudies', inputs: { length: 20 } }
+                    'Volume@tv-basicstudies',
+                    'RSI@tv-basicstudies',
+                    'MACD@tv-basicstudies',
+                    'DONCH@tv-basicstudies'
                 ]),
                 studies_overrides: {
                     'volume.volume.color.0': 'rgba(255,77,94,0.55)',
                     'volume.volume.color.1': 'rgba(0,214,143,0.55)',
                     'volume.volume ma.color': '#FFB020',
                     'volume.volume ma.linewidth': 1.5,
-                    'volume.show ma': true,
+                    // ✅ v74 FIX: 'volume.show ma' bukan key resmi TradingView (tidak ada di
+                    // VolumeIndicatorOverrides) jadi selama ini diam-diam diabaikan. Key yang
+                    // benar untuk menyalakan garis Volume MA adalah 'volume ma.display' (angka
+                    // bitmask, 15 = tampil di semua timeframe — konsisten dengan display:15
+                    // yang dipakai studi lain di bawah untuk arti "tampil").
+                    'volume.volume ma.display': 15,
                     'relative strength index.plot.color': '#4D85FF',
                     'relative strength index.plot.linewidth': 2,
                     'relative strength index.upperlimit.value': 70,
@@ -14108,10 +14318,16 @@ async function saveIDBTelegramConfig(config) {
                 // daftar disabled — ini yang membuat pengguna sebelumnya tidak bisa menarik
                 // garis/coret di chart sama sekali. Fullscreen diaktifkan lagi supaya ada
                 // ruang lebih lega saat menggambar di layar kecil/mobile.
+                // ✅ v75 FIX: 'header_indicators' DITAMBAHKAN — ini yang menyembunyikan tombol
+                // "Indicators" (fx) permanen dari toolbar atas. Aman dihilangkan karena
+                // pemasangan RSI/MACD/Volume/Donchian sekarang diverifikasi & ditambal
+                // otomatis lewat createStudy() (lihat komentar "studies" & buildAdvancedChartSrcdoc
+                // di atas/bawah) — pengguna tidak lagi butuh cara manual untuk memasang indikator.
                 disabled_features: [
                     'header_symbol_search', 'header_compare', 'symbol_search_hot_key',
                     'use_localstorage_for_settings', 'header_saveload',
-                    'header_resolutions', 'header_chart_type', 'header_settings'
+                    'header_resolutions', 'header_chart_type', 'header_settings',
+                    'header_indicators'
                 ],
                 // 'study_templates' SENGAJA tidak diaktifkan — lihat histori bug: mengaktifkannya
                 // bersamaan dengan "studies" eksplisit membuat widget jatuh ke template bawaan
@@ -14261,6 +14477,228 @@ async function saveIDBTelegramConfig(config) {
                 // Format resmi (lihat dokumentasi tradingview.com/widget-docs/tutorials/build-page/):
                 //   [script type=text/javascript src=embed-widget-x.js async] {...json...} [/script]
                 '<script type="text/javascript" src="' + scriptUrlSafe + '" async>' + cfgJson + '<\/script>',
+                '</div>',
+                '</body></html>'
+            ].join('');
+        }
+
+        // ═══════════════════════════════════════
+        // v76 FIX — INDIKATOR CHART DIJAMIN TERPASANG (TradingView Widget Constructor / tv.js)
+        // ═══════════════════════════════════════
+        // Implementasi NYATA dari rencana yang di v75 baru sebatas komentar (fungsi ini
+        // DISEBUT di komentar buildStandardChartConfig tapi sebelumnya tidak pernah
+        // benar-benar ditulis — itu sebabnya indikator masih sering tidak terpasang).
+        //
+        // Beda dengan buildTVIframeSrcdoc(): fungsi itu memuat widget lewat
+        // <script src=embed-widget-*.js> yang PASIF — begitu dimuat, sisi kita tidak
+        // punya akses JS apapun ke dalam widget, jadi kalau array "studies" gagal
+        // diterapkan tidak ada cara menambalnya dari luar.
+        //
+        // Fungsi ini memuat "TradingView Widget Constructor" (tv.js) — metode resmi &
+        // gratis dari TradingView yang sama persis (BUKAN Charting Library berbayar,
+        // tidak butuh lisensi/datafeed sendiri), tapi memberi akses JS penuh ke chart
+        // yang baru dibuat: onChartReady(), activeChart(), getAllStudies(),
+        // createStudy(). Semuanya dijalankan DI DALAM dokumen srcdoc ini sendiri
+        // (tidak perlu jembatan postMessage ke parent untuk mengontrol chart-nya), jadi
+        // tetap seaman & seisolasi buildTVIframeSrcdoc.
+        //
+        // Alur pemasangan indikator:
+        //  1) array "studies" dari buildStandardChartConfig() tetap dikirim sebagai
+        //     percobaan pertama (cepat & biasanya sudah cukup sendiri).
+        //  2) begitu onChartReady() menyala, activeChart().getAllStudies() dicek.
+        //  3) Volume/RSI/MACD/Donchian yang TERNYATA belum masuk dipasang satu per satu
+        //     lewat createStudy(nama_resmi, false, false) — dipanggil independen per
+        //     indikator (beda dari array "studies" yang bisa gagal SEKALIGUS kalau satu
+        //     entri salah format), masing-masing dibungkus try/catch sendiri supaya satu
+        //     gagal tidak menggagalkan yang lain.
+        //  4) dicek ulang sekali lagi 1.5 detik kemudian untuk menangkap race condition
+        //     (createStudy bisa sedikit asinkron).
+        // Hasilnya: indikator dijamin tampil LANGSUNG di badan chart itu sendiri (pane
+        // RSI, pane MACD, pane Volume, band Donchian di atas candlestick) — tanpa perlu
+        // tombol/badge manual apapun di luar chart.
+        function buildAdvancedChartSrcdoc(tvSymbol, opts) {
+            const built = buildStandardChartConfig(tvSymbol, opts || {});
+            const bg = built.bgColor || 'transparent';
+            const config = Object.assign({}, built.config, { container_id: 'tv_chart_root' });
+
+            let isDark = true;
+            const hexMatch = /^#([0-9a-f]{6})$/i.exec(bg);
+            if (hexMatch) {
+                const n = parseInt(hexMatch[1], 16);
+                const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+                isDark = (0.299 * r + 0.587 * g + 0.114 * b) / 255 < 0.5;
+            }
+            const fg = isDark ? '#8a94a6' : '#5c6470';
+            const border = isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)';
+            const accent = '#4d8fff';
+            const cfgJson = JSON.stringify(config).replace(/<\/script/gi, '<\\/script');
+            let tvSymbolRaw = '';
+            try { if (config && typeof config.symbol === 'string') tvSymbolRaw = config.symbol; } catch (e) {}
+            const tvLink = tvSymbolRaw ?
+                '<a href="https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(tvSymbolRaw) +
+                '" target="_top" rel="noopener">Buka di TradingView →</a>' : '';
+
+            return [
+                '<!DOCTYPE html><html><head>',
+                '<meta charset="UTF-8">',
+                '<meta name="viewport" content="width=device-width,initial-scale=1">',
+                '<style>',
+                '*{margin:0;padding:0;box-sizing:border-box;}',
+                'html,body{width:100%;height:100%;overflow:hidden;background:' + bg + ';font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;}',
+                '.tradingview-widget-container{width:100%;height:100%;position:relative;}',
+                '#tv_chart_root{width:100%;height:100%;}',
+                '.tv-status{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:18px;text-align:center;color:' + fg + ';font-size:11.5px;line-height:1.6;pointer-events:none;transition:opacity .25s;}',
+                '.tv-status.hide{opacity:0;visibility:hidden;pointer-events:none;}',
+                // ✅ v78: kartu error diberi background + border + shadow sendiri (dulu teks
+                // polos tanpa latar) — supaya KALAUPUN overlay ini masih perlu tampil (mis.
+                // benar-benar tidak ada koneksi), ia terlihat jelas sebagai satu kartu pesan
+                // di tengah, bukan teks yang seolah "mengambang"/tumpang-tindih di atas chart.
+                '.tv-status.tv-fallback{pointer-events:auto;background:' + bg + ';}',
+                '.tv-fallback-card{max-width:320px;padding:16px 18px;border-radius:14px;background:' + (isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)') + ';border:1px solid ' + border + ';box-shadow:0 8px 24px rgba(0,0,0,0.18);}',
+                '.tv-dot{width:7px;height:7px;border-radius:50%;background:' + accent + ';animation:tvPulse 1s ease-in-out infinite;}',
+                '@keyframes tvPulse{0%,100%{opacity:.3;transform:scale(.85);}50%{opacity:1;transform:scale(1.15);}}',
+                '.tv-fallback button{cursor:pointer;border:1px solid ' + border + ';background:transparent;color:' + fg + ';padding:6px 14px;border-radius:8px;font-size:11px;font-weight:700;font-family:inherit;}',
+                '.tv-fallback a{color:' + accent + ';text-decoration:none;font-weight:700;font-size:11px;}',
+                '.tv-fallback-actions{display:flex;gap:8px;align-items:center;justify-content:center;margin-top:10px;}',
+                '</style></head><body>',
+                '<div class="tradingview-widget-container">',
+                '<div id="tv_chart_root"></div>',
+                '<div class="tv-status" id="_tvLoading"><span class="tv-dot"></span><span>Memuat chart &amp; memasang indikator…</span></div>',
+                '<div class="tv-status tv-fallback hide" id="_tvFallback">',
+                '<div class="tv-fallback-card">',
+                '<span>⚠️ Widget gagal dimuat. Periksa koneksi internet atau nonaktifkan ad-blocker untuk domain TradingView.</span>',
+                '<span class="tv-fallback-actions"><button type="button" id="_tvRetryBtn">↻ Coba Lagi</button>' + tvLink + '</span>',
+                '</div>',
+                '</div>',
+                '<script type="text/javascript" src="https://s3.tradingview.com/tv.js"><\/script>',
+                '<script>',
+                '(function(){',
+                'var failed=false, loaded=false;',
+                'var _mo=null,_renderPoll=null;',
+                'function showFallback(){',
+                'if(failed||loaded)return;failed=true;',
+                'var l=document.getElementById("_tvLoading");if(l)l.classList.add("hide");',
+                'var f=document.getElementById("_tvFallback");if(f)f.classList.remove("hide");',
+                'try{parent.postMessage({__tvWidget:"error",url:location.href},"*");}catch(e){}',
+                '}',
+                'function showLoaded(){',
+                'if(loaded)return;loaded=true;failed=false;',
+                'var l=document.getElementById("_tvLoading");if(l)l.classList.add("hide");',
+                'var f=document.getElementById("_tvFallback");if(f)f.classList.add("hide");',
+                'try{if(_mo)_mo.disconnect();}catch(e){}',
+                'try{if(_renderPoll)clearInterval(_renderPoll);}catch(e){}',
+                'try{parent.postMessage({__tvWidget:"loaded"},"*");}catch(e){}',
+                '}',
+                'var _rtb=document.getElementById("_tvRetryBtn");',
+                'if(_rtb)_rtb.addEventListener("click",function(){try{failed=false;location.reload();}catch(e){}});',
+                // ✅ v78 FIX — ROOT CAUSE overlay "Widget gagal dimuat" nyangkut PERMANEN di
+                // atas chart yang sebenarnya SUDAH tampil (persis gejala di laporan pengguna:
+                // candle/RSI/MACD kelihatan jelas, tapi pesan error tetap menutupi sebagian
+                // chart). Sebelumnya di sini overlay HANYA disembunyikan lewat callback
+                // onChartReady() dari TradingView.widget() — padahal chart TERBUKTI bisa
+                // sudah tergambar (canvas/iframe muncul di DOM) lebih dulu, telat, atau bahkan
+                // TANPA onChartReady() pernah menyala sama sekali (terutama saat 4 indikator +
+                // data emiten yang lebih berat dimuat). Kalau itu makan waktu >15 detik,
+                // showFallback() sudah kadung terpasang & tidak pernah tertutup lagi walau
+                // chart aslinya baik-baik saja. Fix: tambahkan deteksi render NYATA
+                // (MutationObserver + polling) yang independen dari onChartReady — begitu ada
+                // canvas/iframe/svg muncul di dalam #tv_chart_root, overlay langsung
+                // disembunyikan — pola yang sama persis dengan yang sudah lama terbukti stabil
+                // di buildTVIframeSrcdoc().
+                'function hasRendered(){',
+                'var w=document.getElementById("tv_chart_root");',
+                'if(!w)return false;',
+                'return !!w.querySelector("iframe,canvas,svg");',
+                '}',
+                'try{',
+                '_mo=new MutationObserver(function(){ if(hasRendered()) showLoaded(); });',
+                'var _target=document.getElementById("tv_chart_root")||document.body;',
+                '_mo.observe(_target,{childList:true,subtree:true});',
+                '}catch(e){}',
+                'var _renderTries=0;',
+                '_renderPoll=setInterval(function(){',
+                '_renderTries++;',
+                'if(hasRendered()){clearInterval(_renderPoll);showLoaded();return;}',
+                'if(_renderTries>=100)clearInterval(_renderPoll);', // 100*250ms ≈ 25 detik jendela polling render
+                '},250);',
+                // Daftar 4 indikator wajib. "match" dicocokkan case-insensitive terhadap
+                // nama study hasil getAllStudies() supaya tidak pernah dipasang dobel kalau
+                // study itu ternyata sudah berhasil masuk lewat array "studies" di config.
+                'var REQUIRED_STUDIES=[',
+                '{name:"Volume",match:"volume"},',
+                '{name:"Relative Strength Index",match:"relative strength"},',
+                '{name:"MACD",match:"macd"},',
+                '{name:"Donchian Channels",match:"donchian"}',
+                '];',
+                // ✅ v79 ROOT-CAUSE FIX — INDIKATOR DOBEL (mis. 2x pane Volume): ensureAllStudies()
+                // dipanggil BERULANG KALI (sekali di onChartReady, lalu tiap 1.5 detik lewat
+                // _studyPoll selama ~21 detik). createStudy() bersifat SEDIKIT ASINKRON — study
+                // yang baru saja diminta belum tentu langsung muncul di getAllStudies() pada
+                // siklus berikutnya. Sebelumnya, tiap siklus yang MASIH melihat study itu "belum
+                // ada" akan memanggil createStudy() LAGI — walau permintaan sebelumnya sebenarnya
+                // sudah berhasil, cuma belum sempat tercermin. Hasilnya: 2 (atau lebih) instance
+                // indikator yang sama terpasang sekaligus. Fix: simpan status "sudah pernah
+                // diminta" per-indikator (_requested) — begitu createStudy() dipanggil SATU KALI
+                // untuk suatu indikator, siklus berikutnya tidak akan pernah memintanya lagi
+                // walau belum kelihatan di getAllStudies(), sehingga setiap indikator dijamin
+                // maksimal 1x diminta sepanjang umur chart ini. Begitu ke-4 indikator sudah
+                // terverifikasi ADA, _allStudiesReady dikunci true agar seluruh fungsi ini jadi
+                // no-op permanen (jaring pengaman ekstra, bukan cuma optimisasi).
+                'var _requested={};',
+                'var _allStudiesReady=false;',
+                'function ensureAllStudies(chart){',
+                'if(_allStudiesReady)return;',
+                'try{',
+                'var existing=chart.getAllStudies()||[];',
+                'var names=existing.map(function(s){return (s.name||"").toLowerCase();});',
+                'var stillMissing=false;',
+                'REQUIRED_STUDIES.forEach(function(req){',
+                'var has=names.some(function(n){return n.indexOf(req.match)>-1;});',
+                'if(has)return;',
+                'stillMissing=true;',
+                'if(_requested[req.match])return;', // ✅ sudah pernah diminta — JANGAN diminta lagi (cegah dobel)
+                '_requested[req.match]=true;',
+                'try{chart.createStudy(req.name,false,false);}catch(e){}',
+                '});',
+                'if(!stillMissing)_allStudiesReady=true;',
+                '}catch(e){}',
+                '}',
+                // ✅ v78 FIX — indikator dulu HANYA ditambal di dalam onChartReady() (sekali +
+                // 1x retry 1.5 detik kemudian). Kalau onChartReady() telat/tidak pernah nyala
+                // (lihat catatan hasRendered di atas), studies TIDAK PERNAH ditambal sama
+                // sekali walau chart-nya sendiri akhirnya tampil. Fix: polling independen yang
+                // berulang kali mencoba widget.activeChart() — begitu berhasil didapat, studies
+                // ditempel & terus dicek ulang beberapa kali (createStudy bisa sedikit
+                // asinkron) selama ~20 detik, TIDAK bergantung pada onChartReady sama sekali.
+                // (v79: poll ini sekarang aman dipanggil berkali-kali — lihat _requested/
+                // _allStudiesReady di atas — jadi tidak lagi berisiko memasang studi dobel.)
+                'var widget=null,cfg=' + cfgJson + ';',
+                'var _chartRef=null,_studyTries=0;',
+                'var _studyPoll=setInterval(function(){',
+                '_studyTries++;',
+                'try{',
+                'if(!_chartRef&&widget&&typeof widget.activeChart==="function")_chartRef=widget.activeChart();',
+                'if(_chartRef)ensureAllStudies(_chartRef);',
+                '}catch(e){}',
+                'if(_allStudiesReady||_studyTries>=14)clearInterval(_studyPoll);', // 14*1500ms ≈ 21 detik, atau lebih cepat kalau sudah lengkap
+                '},1500);',
+                'try{',
+                'if(typeof TradingView==="undefined"||!TradingView.widget){',
+                'showFallback();',
+                '}else{',
+                'widget=new TradingView.widget(cfg);',
+                'widget.onChartReady(function(){',
+                'showLoaded();',
+                'try{',
+                '_chartRef=widget.activeChart();',
+                'ensureAllStudies(_chartRef);',
+                '}catch(e){}',
+                '});',
+                '}',
+                '}catch(e){showFallback();}',
+                'setTimeout(function(){if(!loaded)showFallback();},18000);',
+                '})();',
+                '<\/script>',
                 '</div>',
                 '</body></html>'
             ].join('');
@@ -15258,24 +15696,26 @@ async function saveIDBTelegramConfig(config) {
             const chartC = document.getElementById('chart-adv-container');
             if (chartC) {
                 chartC.innerHTML = '';
+                // ✅ v77 FIX: tinggi dinaikkan dari 520px tetap → min(82vh,880px) dengan
+                // min-height 640px. 520px terlalu sempit untuk 4 pane sekaligus (Harga+
+                // Donchian, Volume, RSI, MACD) — di layar sempit pane-pane itu jadi gepeng &
+                // berhimpitan satu sama lain. Pola ukuran ini disamakan dengan chart modal
+                // per-emiten (loadModalChart) yang sudah terbukti lega.
                 const wrap2 = document.createElement('div');
-                wrap2.style.cssText = 'height:520px;width:100%;';
+                wrap2.style.cssText = 'height:min(82vh,880px);min-height:640px;width:100%;';
                 const frame2 = document.createElement('iframe');
                 frame2.style.cssText = 'width:100%;height:100%;border:none;display:block;';
                 frame2.setAttribute('frameborder', '0');
                 frame2.setAttribute('scrolling', 'no');
                 frame2.setAttribute('allowtransparency', 'true');
-                // ✅ v61: pakai builder tunggal — sama persis dengan chart modal emiten,
-                // jadi RSI/MACD/Volume/Donchian selalu konsisten muncul di semua tempat.
-                const chartBuild2 = buildStandardChartConfig(sym, {
-                    allowSymbolChange: true, hideTopToolbar: false, hideSideToolbar: false, height: 520
+                // ✅ v76: pakai buildAdvancedChartSrcdoc() (tv.js Widget Constructor +
+                // onChartReady + createStudy) — sama persis dengan chart modal emiten (v77:
+                // ini sekarang BENAR, lihat fix di loadModalChart), jadi RSI/MACD/Volume/
+                // Donchian dijamin terpasang lewat JS di semua tempat, bukan cuma bergantung
+                // pada array "studies" yang bisa gagal diam-diam.
+                frame2.srcdoc = buildAdvancedChartSrcdoc(sym, {
+                    allowSymbolChange: true, hideTopToolbar: false, hideSideToolbar: false
                 });
-                const bgColor = chartBuild2.bgColor;
-                frame2.srcdoc = buildTVIframeSrcdoc(
-                    'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js',
-                    chartBuild2.config,
-                    bgColor
-                );
                 wrap2.appendChild(frame2);
                 chartC.appendChild(wrap2);
             }
@@ -15566,6 +16006,13 @@ async function saveIDBTelegramConfig(config) {
                 return { code: 'head_shoulders', name: 'Head & Shoulders (Top)', type: 'bearish',
                     desc: 'Indikasi pembalikan turun di area overbought, distribusi bandar terlihat pada arus dana.' };
             }
+            // v71: Double Top (M) — mirror dari Double Bottom, reversal bearish di area jenuh beli
+            // dengan penutupan lemah (closePos rendah = harga ditutup dekat area low hari ini)
+            if (s.rsi > 58 && s.stochK < s.stochD && (s.candleCode === 'shooting_star' || closePos < 0.4) && s.bandarStatus ===
+                'dist') {
+                return { code: 'double_top', name: 'Double Top (M)', type: 'bearish',
+                    desc: 'Reversal turun terdeteksi setelah momentum melemah di area jenuh beli, tekanan jual terlihat dari penutupan lemah dan distribusi bandar.' };
+            }
             // Triangle Pattern — konsolidasi ketat (Bollinger Band menyempit + volume rendah)
             if (bbWidthPct < 0.05 && s.volRatio < 1.1) {
                 const bias = s.aboveMA20 && s.goldenCross ? 'bullish' : (!s.aboveMA20 && !s.goldenCross) ? 'bearish' :
@@ -15577,6 +16024,140 @@ async function saveIDBTelegramConfig(config) {
             }
             return { code: 'none', name: 'Belum Ada Pola Signifikan', type: 'neutral',
                 desc: 'Pergerakan harga saat ini belum membentuk pola chart klasik yang jelas terdeteksi.' };
+        }
+
+        // ═══════════════════════════════════════
+        // v77 — POLA SMART MONEY CONCEPT (SMC/ICT)
+        // ═══════════════════════════════════════
+        // 10 konsep populer ala Smart Money Concept / ICT — Break of Structure (BoS),
+        // Change of Character (CHoCH), Fair Value Gap (FVG), Order Block (OB), Liquidity
+        // Sweep, Market Structure Shift (MSS), Equal High/Low (EQH/EQL), Breakout, Fake
+        // Breakout, dan konfluensi Higher/Lower Timeframe (HTF/LTF) — dihitung sebagai
+        // HEURISTIK dari indikator real yang SUDAH tersedia per emiten (RSI/Stoch/MACD,
+        // Pivot, rentang 52-Minggu, Bollinger, arus dana bandar, candle, & data multi-
+        // timeframe s.mtf). Sama seperti detectChartPattern() di atas, ini BUKAN pembacaan
+        // struktur candle-per-candle asli (app tidak menyimpan riwayat OHLC penuh per bar),
+        // melainkan proxy yang secara konsisten mendekati definisi masing-masing konsep,
+        // supaya tetap jujur dengan gaya "rule-based scoring" yang dipakai seluruh app ini
+        // (bukan pura-pura baca chart pixel-by-pixel).
+        //
+        // Beda dari detectChartPattern() yang cuma mengembalikan SATU pola (return pertama
+        // yang cocok), fungsi ini mengembalikan ARRAY — karena di dunia nyata beberapa
+        // konsep SMC memang sering muncul BERSAMAAN pada emiten yang sama (mis. Breakout +
+        // Order Block + HTF/LTF selaras sekaligus).
+        function detectSmcPatterns(s) {
+            const out = [];
+            const price = Number(s.price) || 0;
+            const pivot = s.pivot || {};
+            const range = (s.high - s.low) || 1;
+            const closePos = (price - s.low) / range; // 0 = ditutup di low hari ini, 1 = ditutup di high hari ini
+
+            // 1) BoS — Break of Structure: kelanjutan tren, harga menembus level
+            // resisten/support struktural terakhir (proxy: Pivot R1/S1) SEARAH tren yang
+            // sedang berjalan (MA20 & Golden/Death Cross).
+            if (s.aboveMA20 && s.goldenCross && pivot.r1 && price > pivot.r1) {
+                out.push({ code: 'bos_bull', icon: '🧱', name: 'BoS — Break of Structure', type: 'bullish',
+                    desc: 'Harga menembus resisten struktural (Pivot R1) searah tren naik yang sedang berjalan — struktur higher-high baru terbentuk.' });
+            } else if (!s.aboveMA20 && !s.goldenCross && pivot.s1 && price < pivot.s1) {
+                out.push({ code: 'bos_bear', icon: '🧱', name: 'BoS — Break of Structure', type: 'bearish',
+                    desc: 'Harga menembus support struktural (Pivot S1) searah tren turun yang sedang berjalan — struktur lower-low baru terbentuk.' });
+            }
+
+            // 2) CHoCH — Change of Character: sinyal AWAL pembalikan, struktur Harian mulai
+            // melawan tren Mingguan (belum konfirmasi penuh, baru indikasi awal).
+            if (s.mtf && s.mtf.W && !s.mtf.W.trendUp && s.aboveMA20 && s.stochK > s.stochD && s.rsi > 45 && s.rsi < 65) {
+                out.push({ code: 'choch_bull', icon: '🔀', name: 'CHoCH — Change of Character', type: 'bullish',
+                    desc: 'Tren Mingguan masih turun, tapi struktur Harian mulai melawan arah (di atas MA20, stochastic golden cross) — sinyal awal potensi pembalikan naik, belum konfirmasi penuh.' });
+            } else if (s.mtf && s.mtf.W && s.mtf.W.trendUp && !s.aboveMA20 && s.stochK < s.stochD && s.rsi < 55 && s.rsi > 35) {
+                out.push({ code: 'choch_bear', icon: '🔀', name: 'CHoCH — Change of Character', type: 'bearish',
+                    desc: 'Tren Mingguan masih naik, tapi struktur Harian mulai melawan arah (di bawah MA20, stochastic dead cross) — sinyal awal potensi pembalikan turun, belum konfirmasi penuh.' });
+            }
+
+            // 3) FVG — Fair Value Gap: imbalance harga akibat candle impulsif kuat (badan
+            // besar + volume melonjak) yang berpotensi meninggalkan "gap" untuk ditarik ulang.
+            if ((s.candleCode === 'marubozu_bull' || s.candleCode === 'marubozu_bear') && s.volRatio >= 1.5) {
+                const bull = s.candleCode === 'marubozu_bull';
+                out.push({ code: bull ? 'fvg_bull' : 'fvg_bear', icon: '📦', name: 'FVG — Fair Value Gap',
+                    type: bull ? 'bullish' : 'bearish',
+                    desc: `Candle ${bull ? 'bullish' : 'bearish'} impulsif dengan volume ${s.volRatio.toFixed(1)}x rata-rata berpotensi meninggalkan imbalance harga — area ini sering ditarik ulang (mitigasi) sebelum lanjut ${bull ? 'naik' : 'turun'}.` });
+            }
+
+            // 4) OB — Order Block: candle "ragu" (body kecil) tepat sebelum arus dana bandar
+            // terlihat akumulasi/distribusi — jejak area entry pemain besar.
+            if (s.bandarStatus === 'acc' && (s.candleCode === 'doji' || s.candleCode === 'spinning_top') && s.stochK > s.stochD) {
+                out.push({ code: 'ob_bull', icon: '🔲', name: 'OB — Order Block', type: 'bullish',
+                    desc: 'Candle ragu-ragu diikuti akumulasi bandar & stochastic golden cross — area ini berpotensi jadi Order Block (zona demand) yang dipakai bandar untuk entry.' });
+            } else if (s.bandarStatus === 'dist' && (s.candleCode === 'doji' || s.candleCode === 'spinning_top') && s.stochK < s.stochD) {
+                out.push({ code: 'ob_bear', icon: '🔲', name: 'OB — Order Block', type: 'bearish',
+                    desc: 'Candle ragu-ragu diikuti distribusi bandar & stochastic dead cross — area ini berpotensi jadi Order Block (zona supply) yang dipakai bandar untuk keluar.' });
+            }
+
+            // 5) Liquidity Sweep: harga menembus sebentar (wick) area high/low kunci untuk
+            // "berburu stop-loss" lalu berbalik & ditutup jauh dari titik ekstremnya.
+            if (s.distFromLow52w != null && s.distFromLow52w <= 5 && closePos >= 0.6) {
+                out.push({ code: 'liq_bull', icon: '💧', name: 'Liquidity Sweep', type: 'bullish',
+                    desc: 'Harga sempat mendekati/menembus area Low 52-Minggu (memburu stop-loss jual) lalu ditutup jauh di atas titik terendah hari ini — indikasi liquidity grab sebelum pembalikan naik.' });
+            } else if (s.distFromHigh52w != null && s.distFromHigh52w >= -5 && closePos <= 0.4) {
+                out.push({ code: 'liq_bear', icon: '💧', name: 'Liquidity Sweep', type: 'bearish',
+                    desc: 'Harga sempat mendekati/menembus area High 52-Minggu (memburu stop-loss beli) lalu ditutup jauh di bawah titik tertinggi hari ini — indikasi liquidity grab sebelum pembalikan turun.' });
+            }
+
+            // 6) MSS — Market Structure Shift: pergeseran struktur di timeframe lebih besar,
+            // bias Mingguan mulai berbeda arah dari bias Bulanan.
+            if (s.mtf && s.mtf.W && s.mtf.M && s.mtf.W.trendUp !== s.mtf.M.trendUp) {
+                const toBull = s.mtf.W.trendUp;
+                out.push({ code: toBull ? 'mss_bull' : 'mss_bear', icon: '🔁', name: 'MSS — Market Structure Shift',
+                    type: toBull ? 'bullish' : 'bearish',
+                    desc: `Struktur tren Mingguan (${toBull ? 'naik' : 'turun'}) sudah berbeda arah dari Bulanan (${toBull ? 'turun' : 'naik'}) — pergeseran struktur di timeframe lebih besar sedang berlangsung.` });
+            }
+
+            // 7) EQH/EQL — Equal High / Equal Low: harga berulang kali menguji level yang
+            // nyaris sama tanpa breakout meyakinkan — zona likuiditas yang "dijaga" pasar.
+            if (s.distFromHigh52w != null && s.distFromHigh52w >= -1.5 && s.distFromHigh52w <= 0.3 && Math.abs(s.chg) < 2) {
+                out.push({ code: 'eqh', icon: '📏', name: 'EQH — Equal High', type: 'neutral',
+                    desc: 'Harga berulang kali menguji area High 52-Minggu tanpa breakout meyakinkan — zona likuiditas EQH yang berpotensi jadi target sweep sebelum arah baru.' });
+            }
+            if (s.distFromLow52w != null && s.distFromLow52w >= 0 && s.distFromLow52w <= 1.5 && Math.abs(s.chg) < 2) {
+                out.push({ code: 'eql', icon: '📏', name: 'EQL — Equal Low', type: 'neutral',
+                    desc: 'Harga berulang kali menguji area Low 52-Minggu tanpa breakdown meyakinkan — zona likuiditas EQL yang berpotensi jadi target sweep sebelum arah baru.' });
+            }
+
+            // 8) Breakout — penembusan resisten/support terkonfirmasi volume & momentum
+            // (beda dari BoS yang murni struktural: di sini disyaratkan volume & MACD ikut).
+            if (pivot.r1 && price > pivot.r1 && s.volRatio >= 1.5 && s.macdBull && s.rsi >= 55 && s.rsi <= 78) {
+                out.push({ code: 'breakout_bull', icon: '🚀', name: 'Breakout', type: 'bullish',
+                    desc: `Harga menembus resisten Pivot R1 dengan volume ${s.volRatio.toFixed(1)}x rata-rata & MACD bullish — breakout terkonfirmasi, bukan sekadar tembus tanpa tenaga.` });
+            } else if (pivot.s1 && price < pivot.s1 && s.volRatio >= 1.5 && !s.macdBull && s.rsi <= 45 && s.rsi >= 22) {
+                out.push({ code: 'breakdown_bear', icon: '🚀', name: 'Breakdown', type: 'bearish',
+                    desc: `Harga menembus support Pivot S1 dengan volume ${s.volRatio.toFixed(1)}x rata-rata & MACD bearish — breakdown terkonfirmasi, bukan sekadar tembus tanpa tenaga.` });
+            }
+
+            // 9) Fake Breakout — harga sempat menembus level kunci INTRADAY (wick) tapi
+            // gagal bertahan & ditutup kembali di dalam range — jebakan bagi yang FOMO.
+            if (pivot.r1 && s.high > pivot.r1 && price < pivot.r1) {
+                out.push({ code: 'fakeout_bear', icon: '🪤', name: 'Fake Breakout', type: 'bearish',
+                    desc: 'Harga sempat menembus resisten Pivot R1 secara intraday tapi gagal bertahan & ditutup kembali di bawahnya — jebakan breakout bagi pembeli yang FOMO di harga tinggi.' });
+            } else if (pivot.s1 && s.low < pivot.s1 && price > pivot.s1) {
+                out.push({ code: 'fakeout_bull', icon: '🪤', name: 'Fake Breakdown', type: 'bullish',
+                    desc: 'Harga sempat menembus support Pivot S1 secara intraday tapi gagal bertahan & ditutup kembali di atasnya — jebakan breakdown bagi penjual yang panic-sell di harga rendah.' });
+            }
+
+            // 10) HTF/LTF — konfluensi bias timeframe besar (Mingguan/Bulanan = HTF) vs
+            // timeframe kecil (Harian = LTF), pakai computeMTFConfluence() yang sudah ada
+            // supaya angkanya konsisten dengan tab Multi-Strategi.
+            try {
+                const conf = computeMTFConfluence(s);
+                if (conf.aligned && conf.direction) {
+                    out.push({ code: 'htf_ltf_aligned', icon: '🔭', name: 'HTF/LTF Selaras',
+                        type: conf.direction === 'bull' ? 'bullish' : 'bearish',
+                        desc: `Bias Harian (LTF), Mingguan & Bulanan (HTF) kompak searah ${conf.direction === 'bull' ? 'naik' : 'turun'} — kekuatan konfluensi ${conf.strength}%, sinyal lebih dipercaya.` });
+                } else {
+                    out.push({ code: 'htf_ltf_conflict', icon: '🔭', name: 'HTF/LTF Konflik', type: 'neutral',
+                        desc: `Bias Harian (LTF: ${conf.dailyBias === 'bull' ? 'naik' : conf.dailyBias === 'bear' ? 'turun' : 'netral'}) belum selaras dengan timeframe lebih besar (HTF) — sinyal masih rawan berbalik, tunggu konfirmasi.` });
+                }
+            } catch (e) {}
+
+            return out;
         }
 
         // Fibonacci otomatis — level 0.5 & 0.618 ditarik otomatis dari swing high/low (s.high/s.low)
@@ -15620,7 +16201,7 @@ async function saveIDBTelegramConfig(config) {
         }
         // ✅ v61: Gemini "membaca" kondisi pasar dari data yang SUDAH ada di halaman
         // (allStocks, hasil hitungan lokal) — bukan mengarang. Dipakai buat fitur
-        // "sektor yang sedang memimpin" dan insight makro ringkas di prompt AI Tajam.
+        // "sektor yang sedang memimpin" dan insight makro ringkas di prompt SobatInves AI.
         function getLeadingSectorsSnapshot() {
             try {
                 if (!Array.isArray(allStocks) || !allStocks.length) return null;
@@ -15642,6 +16223,32 @@ async function saveIDBTelegramConfig(config) {
                 })).filter(r => r.n >= 2).sort((a, b) => b.avgChg - a.avgChg);
                 return { top: rows.slice(0, 3), bottom: rows.slice(-3).reverse(), all: rows };
             } catch (e) { return null; }
+        }
+
+        // v71 — Berita geopolitik & makro global (The Fed/suku bunga AS, ketegangan geopolitik, minyak
+        // dunia, resesi/perang dagang, dsb) — dipakai memperkaya "Sentimen Global & Makro" di SobatInves AI
+        // biar bahasan geopolitik & suku bunga berbasis judul berita SUNGGUHAN, bukan asumsi generik.
+        // Cache 15 menit di memori sesi (bukan per-ticker, karena isunya sama untuk semua emiten).
+        let _globalMacroNewsCache = null, _globalMacroNewsTs = 0;
+        async function fetchGlobalMacroNews() {
+            if (_globalMacroNewsCache && (Date.now() - _globalMacroNewsTs) < 15 * 60 * 1000) return _globalMacroNewsCache;
+            try {
+                const q = '"The Fed" OR "suku bunga AS" OR "geopolitik" OR "harga minyak dunia" OR "resesi global" OR "perang dagang" OR "ekonomi global"';
+                const url = `${NEWSDATA_BASE}?apikey=${NEWSDATA_KEY}&q=${encodeURIComponent(q)}&language=id&size=6`;
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 7000);
+                const res = await fetch(url, { signal: controller.signal });
+                clearTimeout(timeoutId);
+                if (!res.ok) return _globalMacroNewsCache || [];
+                const data = await res.json();
+                if (data.status !== 'success' || !Array.isArray(data.results)) return _globalMacroNewsCache || [];
+                const out = data.results.slice(0, 5).map(a => ({
+                    title: a.title || '', desc: (a.description || '').slice(0, 160),
+                    date: a.pubDate || '', source: a.source_id || ''
+                }));
+                _globalMacroNewsCache = out; _globalMacroNewsTs = Date.now();
+                return out;
+            } catch (e) { return _globalMacroNewsCache || []; }
         }
 
         // Berita real ticker/emiten terkait untuk konteks sentimen — pakai API newsdata.io yang sama
@@ -16061,7 +16668,7 @@ async function saveIDBTelegramConfig(config) {
                 bdy.innerHTML =
                     `<div class="modal-price-block"><div><div class="modal-big-price ${s.chg>=0?'c-up':'c-dn'}">${rp(s.price)}</div><div style="font-family:IBM Plex Mono;font-size:12px;margin-top:6px;color:var(--t-med);font-weight:700;">O:${n2(s.open)} H:${n2(s.high)} L:${n2(s.low)}</div><div style="margin-top:8px;font-weight:900;font-size:15px;" class="${s.chg>=0?'c-up':'c-dn'}">${pct(s.chg)} Hari Ini</div>${s.isHalal?'<div style="margin-top:6px;display:inline-flex;align-items:center;gap:4px;background:rgba(0,179,90,0.12);border:1px solid rgba(0,179,90,0.35);border-radius:6px;padding:3px 8px;font-size:10px;font-weight:800;color:#00b35a;">☪ SAHAM HALAL (ISSI/JII)</div>':''}</div><div class="modal-score-box" style="${s.score>=9?'border-color:var(--primary);box-shadow:0 0 20px var(--primary-glow);animation:dopamineGlow 2s ease-in-out infinite;':''}"><div class="modal-score-lbl" style="${s.score>=9?'color:var(--primary);':''}">AI SCORE</div><div class="modal-score-val" style="color:${s.score>=9?'var(--primary)':s.score>=7?'var(--up)':s.score<=4?'var(--dn)':'var(--warn)'}">${s.score}/10</div></div></div>` +
                     `<div class="signal-banner ${sigCls}"><div><div class="signal-title">${sigTit}</div><div class="signal-sub">${sigSub}</div></div></div>` +
-                    `<div class="m-tabs"><div class="m-tab active btn-ripple" onclick="mTab(this,'mt-chart');loadModalChart('${s.ticker}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 17V9M12 17V5M16 17v-4"/></svg>Chart</div><div class="m-tab btn-ripple" onclick="mTab(this,'mt-strategi');loadModalStrategi('${s.ticker}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2l2.4 7.2H22l-6 4.4 2.4 7.2L12 16.4l-6.4 4.4 2.4-7.2-6-4.4h7.6z"/></svg>Multi-Strategi</div><div class="m-tab btn-ripple" onclick="mTab(this,'mt-akumulasi');loadModalAkumulasi('${s.ticker}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 17l5-5 4 4 8-8"/><path d="M15 8h6v6"/></svg>Akumulasi</div><div class="m-tab btn-ripple" onclick="mTab(this,'mt-teknikal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Teknikal</div><div class="m-tab btn-ripple" onclick="mTab(this,'mt-peramal');loadModalPeramal('${s.ticker}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Peramal</div><div class="m-tab btn-ripple" onclick="mTab(this,'mt-pivot')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Pivot</div><div class="m-tab btn-ripple" onclick="mTab(this,'mt-ta');loadModalTAWidget('${s.ticker}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><path d="M12 12l3-3"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2"/></svg>Sinyal TA</div><div class="m-tab btn-ripple" onclick="mTab(this,'mt-proyeksi');loadModalProyeksi('${s.ticker}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="14 7 21 7 21 14"/></svg>Proyeksi</div><div class="m-tab btn-ripple" onclick="mTab(this,'mt-musiman');loadModalMusiman('${s.ticker}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Musiman</div><div class="m-tab btn-ripple" onclick="mTab(this,'mt-fin');loadModalFin('${s.ticker}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Finansial</div><div class="m-tab btn-ripple" onclick="mTab(this,'mt-etf');loadModalETF('${s.sector}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>ETF Sektor</div><div class="m-tab btn-ripple" onclick="mTab(this,'mt-profil');loadModalProfil('${s.ticker}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Profil Perusahaan</div><div class="m-tab btn-ripple" onclick="mTab(this,'mt-ai');loadModalAIAnalysis('${s.ticker}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2a4 4 0 0 1 4 4v1a4 4 0 0 1-4 4 4 4 0 0 1-4-4V6a4 4 0 0 1 4-4z"/><path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><circle cx="12" cy="11" r="1"/></svg>AI Tajam</div></div>` +
+                    `<div class="m-tabs"><div class="m-tab active btn-ripple" onclick="mTab(this,'mt-chart');loadModalChart('${s.ticker}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 17V9M12 17V5M16 17v-4"/></svg>Chart</div><div class="m-tab btn-ripple" onclick="mTab(this,'mt-strategi');loadModalStrategi('${s.ticker}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2l2.4 7.2H22l-6 4.4 2.4 7.2L12 16.4l-6.4 4.4 2.4-7.2-6-4.4h7.6z"/></svg>Multi-Strategi</div><div class="m-tab btn-ripple" onclick="mTab(this,'mt-akumulasi');loadModalAkumulasi('${s.ticker}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 17l5-5 4 4 8-8"/><path d="M15 8h6v6"/></svg>Akumulasi</div><div class="m-tab btn-ripple" onclick="mTab(this,'mt-teknikal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Teknikal</div><div class="m-tab btn-ripple" onclick="mTab(this,'mt-peramal');loadModalPeramal('${s.ticker}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Peramal</div><div class="m-tab btn-ripple" onclick="mTab(this,'mt-pivot')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Pivot</div><div class="m-tab btn-ripple" onclick="mTab(this,'mt-ta');loadModalTAWidget('${s.ticker}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><path d="M12 12l3-3"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2"/></svg>Sinyal TA</div><div class="m-tab btn-ripple" onclick="mTab(this,'mt-proyeksi');loadModalProyeksi('${s.ticker}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="14 7 21 7 21 14"/></svg>Proyeksi</div><div class="m-tab btn-ripple" onclick="mTab(this,'mt-musiman');loadModalMusiman('${s.ticker}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Musiman</div><div class="m-tab btn-ripple" onclick="mTab(this,'mt-fin');loadModalFin('${s.ticker}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Finansial</div><div class="m-tab btn-ripple" onclick="mTab(this,'mt-etf');loadModalETF('${s.sector}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>ETF Sektor</div><div class="m-tab btn-ripple" onclick="mTab(this,'mt-profil');loadModalProfil('${s.ticker}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Profil Perusahaan</div><div class="m-tab btn-ripple" onclick="mTab(this,'mt-ai');loadModalAIAnalysis('${s.ticker}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2a4 4 0 0 1 4 4v1a4 4 0 0 1-4 4 4 4 0 0 1-4-4V6a4 4 0 0 1 4-4z"/><path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><circle cx="12" cy="11" r="1"/></svg>SobatInves AI</div></div>` +
                     `<div class="m-pane active" id="mt-chart"><div id="modal-tv-chart" style="min-height:560px;width:100%;overflow:visible;"></div></div>` +
                     `<div class="m-pane" id="mt-strategi"><div id="modal-strategi-content" style="padding:4px 0;"></div></div>` +
                     `<div class="m-pane" id="mt-akumulasi"><div id="modal-akumulasi-content" style="padding:4px 0;"></div></div>` +
@@ -16094,6 +16701,9 @@ async function saveIDBTelegramConfig(config) {
             }
             const ov = document.getElementById('overlay');
             if (ov) ov.classList.add('open');
+            // ✅ v79 — modal dibuka dengan tab Chart aktif secara default, jadi mode
+            // "wide-chart" langsung diaktifkan di sini (konsisten dengan mTab()).
+            if (typeof toggleModalWideChart === 'function') toggleModalWideChart(true);
             // ✅ FIX v51 — ROOT CAUSE ditemukan: tab "Chart" ditandai `active` secara visual
             // sejak modal pertama kali dibuka (pane-nya langsung terlihat), TAPI tidak ada
             // satupun kode yang memanggil loadModalChart() secara otomatis — fungsi itu
@@ -16119,6 +16729,7 @@ async function saveIDBTelegramConfig(config) {
             // selalu fetch data segar untuk ticker baru — mencegah stale-data bugs.
             // Termasuk: modal-tv-chart, modal-tv-fin, modal-profil-content,
             //           modal-ta-widget, modal-proyeksi, modal-musiman, modal-etf
+            if (typeof siStopTTS === 'function') siStopTTS(); // v70: hentikan Text-to-Audio kalau modal ditutup
             currentModalTicker = null;
             const _allModalContainers = [
                 document.getElementById('modal-tv-chart'),
@@ -16142,6 +16753,10 @@ async function saveIDBTelegramConfig(config) {
             });
             const ov = document.getElementById('overlay');
             if (ov) ov.classList.remove('open');
+            // ✅ v79 — reset mode "wide-chart" saat modal ditutup, supaya openModal()
+            // berikutnya selalu mulai dari state bersih (tab Chart) tanpa sisa lebar dari
+            // sesi sebelumnya nyangkut sesaat sebelum toggleModalWideChart(true) dipanggil lagi.
+            if (typeof toggleModalWideChart === 'function') toggleModalWideChart(false);
             // ✅ v35: jika modal ini dibuka dari Radar Anomali, kembali ke radar sheet
             // (bukan menumpuk overlay) agar pengguna lanjut menjelajah tanpa tabrakan UI.
             if (cameFromRadar) {
@@ -16303,6 +16918,18 @@ async function saveIDBTelegramConfig(config) {
             showToast('Data finansial ' + ticker + ' dimuat ✅', 'success');
         }
 
+        // Buka/tutup dropdown "Pola Smart Money (SMC)" di atas chart — tertutup secara
+        // default agar chart di bawahnya punya ruang maksimal & tampilan lebih rapi (v79).
+        function toggleSmcDrop(headEl) {
+            try {
+                const item = headEl.closest('.smc-drop');
+                if (!item) return;
+                const nowOpen = item.classList.toggle('open');
+                headEl.setAttribute('aria-expanded', nowOpen ? 'true' : 'false');
+                if (navigator.vibrate) navigator.vibrate(10);
+            } catch (e) {}
+        }
+
         function loadModalChart(ticker) {
             // ✅ v47 FIX: sanitise + pin ke currentModalTicker (ticker tidak pernah drift)
             ticker = sanitizeTicker(ticker);
@@ -16348,41 +16975,83 @@ async function saveIDBTelegramConfig(config) {
                 </div>`;
                 chartC.appendChild(idLabel);
 
-                // ✅ v66 — Baris badge indikator dekoratif (RSI/MACD/Volume/Donchian) yang dulu
-                // tampil DI ATAS chart sudah DIHAPUS. Indikator-indikator itu bukan hiasan —
-                // semuanya sudah otomatis TERPASANG LANGSUNG DI DALAM chart TradingView di bawah
-                // ini lewat parameter "studies" resmi (lihat buildStandardChartConfig), jadi
-                // badge terpisah di atas hanya bikin bingung (terlihat seperti tombol yang error
-                // padahal cuma label). Info singkat & akurat cukup satu baris hint di bawah ini.
-                // ✅ v70: Chip status indikator — konfirmasi visual bahwa RSI/MACD/Volume/Donchian
-                // memang aktif terpasang, supaya pengguna tidak ragu "indikator muncul atau tidak"
-                // walau widget TradingView masih memuat pane-nya di bawah.
-                const indChipRow = document.createElement('div');
-                indChipRow.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;margin:0 2px 8px;';
-                indChipRow.innerHTML = ['RSI 14', 'MACD', 'Volume+MA', 'Donchian 20'].map(lbl =>
-                    `<span style="display:inline-flex;align-items:center;gap:4px;font-size:9.5px;font-weight:800;padding:4px 9px;border-radius:20px;background:var(--up-bg);color:var(--up);border:1px solid var(--up-border);font-family:'IBM Plex Mono',monospace;"><span style="width:5px;height:5px;border-radius:50%;background:var(--up);"></span>${lbl}</span>`
-                ).join('');
-                chartC.appendChild(indChipRow);
+                // ✅ v77 FIX — Baris badge "RSI 14 / MACD / Volume+MA / Donchian 20" yang dulu
+                // tampil di sini DIHAPUS PERMANEN sesuai permintaan pengguna: badge itu cuma
+                // label statis (bukan tombol fungsional), jadi terlihat seperti kontrol yang
+                // error padahal tidak melakukan apa-apa. Ke-4 indikator itu SEKARANG dijamin
+                // terpasang LANGSUNG di badan chart TradingView di bawah (lihat perubahan pada
+                // chartFrame.srcdoc beberapa baris di bawah — pindah ke buildAdvancedChartSrcdoc()),
+                // jadi tidak butuh badge terpisah lagi di luar chart. Slot ini diisi ulang dengan
+                // sesuatu yang beneran berguna: badge pola Smart Money Concept (BoS/CHoCH/FVG/OB/
+                // Liquidity/MSS/EQH-EQL/Breakout/Fake Breakout/HTF-LTF) yang dihitung REAL dari
+                // data emiten ini lewat detectSmcPatterns() — lihat definisinya di dekat
+                // detectChartPattern().
+                // ✅ v79 FIX — daftar pola SMC ini SEKARANG jadi dropdown TERTUTUP secara
+                // default (bukan langsung terbuka penuh seperti sebelumnya). Sebelumnya daftar
+                // ini selalu memakan ruang vertikal penuh di atas chart walau pengguna belum
+                // tentu butuh detailnya setiap saat — membuat tab Chart terasa sesak & chart
+                // aslinya jadi lebih pendek dari seharusnya. Sekarang hanya judul ringkas +
+                // jumlah pola terdeteksi + panah yang tampil; badan daftar baru terbuka saat
+                // diketuk (lihat toggleSmcDrop() & CSS .smc-drop di stylesheet utama), sehingga
+                // chart di bawahnya langsung mendapat ruang lebih luas & nyaman dipakai.
+                const smcList = (typeof detectSmcPatterns === 'function' && s) ? detectSmcPatterns(s) : [];
+                const smcSection = document.createElement('div');
+                smcSection.className = 'smc-drop';
+                const smcHeadRow = `<div class="smc-drop-head" onclick="toggleSmcDrop(this)" role="button" tabindex="0" aria-expanded="false">
+                    <span style="font-size:12px;">🧠</span>
+                    <span style="font-size:11px;font-weight:900;color:var(--t-hi);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.3px;text-transform:uppercase;">Pola Smart Money (SMC)</span>
+                    <span style="font-size:8.5px;font-weight:800;color:var(--t-low);font-family:'IBM Plex Mono',monospace;">${smcList.length} terdeteksi</span>
+                    <svg class="smc-drop-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-left:auto;"><polyline points="6 9 12 15 18 9"/></svg>
+                </div>`;
+                const smcBody = smcList.length ?
+                    smcList.map(p => {
+                        const pillClass = p.type === 'bullish' ? 'pill-up' : p.type === 'bearish' ? 'pill-dn' : 'pill-warn';
+                        const pillLbl = p.type === 'bullish' ? 'BULLISH' : p.type === 'bearish' ? 'BEARISH' : 'NETRAL';
+                        return `<div style="display:flex;gap:8px;align-items:flex-start;padding:6px 0;border-top:1px solid var(--border-light);">
+                            <span style="font-size:14px;line-height:1.3;flex-shrink:0;">${p.icon}</span>
+                            <div style="flex:1;min-width:0;">
+                                <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                                    <span style="font-size:10.5px;font-weight:800;color:var(--t-hi);">${p.name}</span>
+                                    <span class="pill ${pillClass}">${pillLbl}</span>
+                                </div>
+                                <div style="font-size:9.5px;color:var(--t-med);font-weight:600;line-height:1.5;margin-top:2px;">${p.desc}</div>
+                            </div>
+                        </div>`;
+                    }).join('') :
+                    `<div style="font-size:10px;color:var(--t-low);font-weight:600;line-height:1.5;padding-top:8px;">Belum ada pola SMC yang cukup signifikan terdeteksi saat ini — struktur harga masih netral.</div>`;
+                smcSection.innerHTML = smcHeadRow + `<div class="smc-drop-body">${smcBody}</div>`;
+                chartC.appendChild(smcSection);
 
                 const hintRow = document.createElement('div');
                 hintRow.style.cssText = 'font-size:9.5px;color:var(--t-low);font-weight:600;margin:2px 2px 8px;line-height:1.5;background:var(--bg-elevated);border:1px solid var(--border-light);border-radius:var(--radius-sm);padding:8px 10px;';
                 hintRow.innerHTML = '✏️ <b style="color:var(--t-hi);">Cara mencoret chart:</b> chart ini adalah widget interaktif penuh (bukan gambar mentah) — sentuh &amp; tahan area chart, lalu pilih alat pada toolbar di sisi <b>kiri</b> (di layar sempit, geser/ketuk ikon panah kecil <b>»</b> untuk membukanya) untuk <b>Trend Line</b>, <b>Fibonacci</b>, atau <b>Brush</b> (coret bebas). Semua coretan tersimpan otomatis selama chart ini terbuka — tekan ikon kamera di toolbar atas untuk menyimpan/membagikan hasilnya.';
                 chartC.appendChild(hintRow);
 
-                // ─── TradingView Advanced Chart — srcdoc iframe (v38 FIX) ─────────────
-                // Metode srcdoc mencegah blank screen saat berpindah emiten dengan cepat.
-                // Setiap iframe membawa konteks HTML bersih miliknya sendiri.
+                // ─── TradingView Advanced Chart — Widget Constructor (v77 FIX) ─────────
+                // ✅ v77 ROOT-CAUSE FIX: tab Chart per-emiten ini (yang dilihat pengguna sehari-
+                // hari) SEBELUMNYA masih memakai buildTVIframeSrcdoc() + <script src=embed-widget-
+                // advanced-chart.js> PASIF — metode yang sudah diketahui tidak menjamin "studies"
+                // benar-benar ter-apply (lihat histori bug v74/v75). Komentar v76 di
+                // buildAdvancedChartSrcdoc() sempat MENGAKU dipakai "sama persis dengan chart
+                // modal emiten" — itu KELIRU; kenyataannya baru dipasang di tab Widget TA
+                // (updateTAWidget), TIDAK PERNAH benar-benar dipasang di sini. Inilah akar
+                // masalah "indikator belum terpasang" yang dilaporkan pengguna. Fix: pindah ke
+                // buildAdvancedChartSrcdoc() — sama seperti updateTAWidget() — yang menunggu
+                // onChartReady() lalu memverifikasi & menambal RSI/MACD/Volume/Donchian lewat
+                // createStudy() kalau ada yang belum masuk, jadi dijamin tampil LANGSUNG di
+                // badan chart tanpa perlu badge/tombol manual di luar chart.
                 const chartFrame = document.createElement('iframe');
-                chartFrame.style.cssText = 'width:100%;height:min(88vh,960px);min-height:720px;border:none;display:block;border-radius:var(--radius-md);'; // ✅ v59: pane RSI/MACD/Donchian butuh ruang vertikal lebih — dinaikkan dari 840/600 agar ke-4 pane (Harga+Donchian, Volume, RSI, MACD) tidak gepeng
+                // ✅ v79 — tinggi dinaikkan lagi (min(88vh,960px) → min(93vh,1120px), min-height
+                // 720px → 780px) sekarang setelah dropdown SMC di atas tidak lagi memakan ruang
+                // penuh secara default — chart jadi lebih luas & nyaman dilihat/dicoret tanpa
+                // pane-pane indikatornya jadi gepeng.
+                chartFrame.style.cssText = 'width:100%;height:min(93vh,1120px);min-height:780px;border:none;display:block;border-radius:var(--radius-md);'; // pane Harga+Donchian, Volume, RSI, MACD butuh ruang vertikal lega agar tidak berhimpitan
                 chartFrame.setAttribute('frameborder', '0');
                 chartFrame.setAttribute('scrolling', 'no');
                 chartFrame.setAttribute('allowtransparency', 'true');
-                const chartBuild = buildStandardChartConfig(tvSymbol, { allowSymbolChange: false, hideSideToolbar: false, hideTopToolbar: false });
-                chartFrame.srcdoc = buildTVIframeSrcdoc(
-                    'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js',
-                    chartBuild.config,
-                    chartBuild.bgColor
-                );
+                chartFrame.srcdoc = buildAdvancedChartSrcdoc(tvSymbol, {
+                    allowSymbolChange: false, hideSideToolbar: false, hideTopToolbar: false
+                });
                 chartC.appendChild(chartFrame);
 
                 // ✅ v60: link fallback PERMANEN (bukan cuma saat error) — jika widget publik
@@ -17284,7 +17953,7 @@ async function saveIDBTelegramConfig(config) {
 
         }
 
-        // ✅ v66 — PEMETAAN SEKTOR → KOMODITAS RELEVAN, dipakai AI Tajam untuk memutuskan
+        // ✅ v66 — PEMETAAN SEKTOR → KOMODITAS RELEVAN, dipakai SobatInves AI untuk memutuskan
         // apakah harga komoditas global perlu dicek untuk emiten ini ("jika mempengaruhi
         // saham tersebut" — bukan asal ditampilkan untuk semua sektor, mis. Perbankan/Teknologi
         // tidak punya keterkaitan langsung ke harga komoditas jadi bagian ini dilewati).
@@ -17303,7 +17972,795 @@ async function saveIDBTelegramConfig(config) {
             return [];
         }
 
-        // ─── v59: TAB "AI TAJAM" — gabungan data FMP (fundamental+teknikal real) + narasi Gemini AI ───
+        // ═══════════════════════════════════════
+        // v72: TEXT-TO-AUDIO — REWRITE MENYELURUH, anti-bug & terstruktur.
+        // Web Speech API dasarnya rapuh di banyak browser. Fix di rewrite ini:
+        //  1) Teks dipecah jadi ANTRIAN kalimat pendek (bukan 1 utterance raksasa) —
+        //     menghindari bug Chrome/Android yang memotong utterance panjang (~15 detik)
+        //     kalau tidak "dijaga hidup", dan bikin progress/pause/resume presisi per kalimat.
+        //  2) Jeda kecil sebelum speak() setelah cancel() — memanggil speak() PERSIS di
+        //     tick yang sama dengan cancel() adalah race condition yang bikin Chrome DIAM
+        //     TOTAL tanpa suara maupun error (bug lama yang banyak dilaporkan pengguna).
+        //  3) Watchdog pause+resume tiap ~12 detik selagi playing (workaround tambahan
+        //     utk bug pemotongan otomatis di sejumlah versi Chrome/WebView).
+        //  4) getVoices() bisa balikin array kosong di percobaan pertama sebelum event
+        //     'voiceschanged' nembak (terutama Android WebView) — di-retry/poll dulu.
+        //  5) Token generasi (_ttsGenId): setiap sesi baca baru/stop/ganti kecepatan
+        //     menaikkan token ini, jadi callback "basi" dari sesi lama otomatis diabaikan —
+        //     mencegah suara nyasar/dobel saat user klik-klik cepat atau ganti emiten.
+        //  6) Error 'interrupted'/'canceled' (dipicu stop/ganti ticker/ganti kecepatan)
+        //     TIDAK dianggap error asli — tidak menghentikan/merusak state.
+        //  7) 1 kalimat gagal (jarang, mis. voice bermasalah) → lanjut ke kalimat
+        //     berikutnya, bukan menghentikan seluruh pembacaan.
+        //  8) Kecepatan baca disimpan (localStorage) & dilanjutkan dari kalimat yang
+        //     sedang dibaca saat kecepatan diganti — tidak mengulang dari awal lagi.
+        //  9) Tombol Stop terpisah dari Jeda/Lanjut, plus indikator progres "(n/total)".
+        // ═══════════════════════════════════════
+        let _ttsState = 'idle';         // idle | loading | playing | paused
+        let _ttsRawText = '';
+        let _ttsBtnId = 'aiTtsBtn';
+        let _ttsQueue = [];
+        let _ttsQueueIdx = 0;
+        let _ttsRate = (() => { const r = parseFloat(lsGet('si_tts_rate', 1)); return (r && r > 0 && r <= 3) ? r : 1; })();
+        let _ttsBusy = false;           // debounce klik ganda saat transisi state
+        let _ttsVoicesCache = null;
+        let _ttsGenId = 0;              // token generasi — membatalkan callback basi dari sesi baca lama
+        // v73: anti-stuck & humanizer state ---------------------------------
+        let _ttsStallTimer = null;      // watchdog per-kalimat: kalau onstart/onend gak nembak, dianggap macet
+        let _ttsHealthTimer = null;     // healthcheck berkala: cek speechSynthesis "mati diam-diam"
+        // v74: fix race condition antara healthcheck & transisi antar-kalimat -----
+        let _ttsAdvancing = false;      // true dari saat 1 kalimat selesai sampai kalimat berikutnya benar2 mulai
+        let _ttsLastActivityAt = 0;     // timestamp aktivitas nyata terakhir (onstart/onboundary/mulai advance)
+        let _ttsRetryCount = 0;         // retry per kalimat yang sedang jalan (dibatasi biar gak infinite loop)
+        let _ttsVisHandlerBound = false;
+        // v78: fix "kebaca sampai tengah lalu diam total & gak lanjut lagi" ------------
+        let _ttsAutoRecoverCount = 0;   // total percobaan auto-recovery BERURUTAN tanpa sukses (onstart nyata)
+        let _ttsForceRestartOnResume = false; // v78: kalau true, tombol "Lanjutin" harus RESTART kalimat ini (bukan native resume()) — dipakai setelah give-up
+        let _ttsWakeLock = null;        // v78: Screen Wake Lock aktif selagi playing — mencegah layar mati/redup menghentikan audio di tengah jalan (penyebab paling umum di Android)
+
+        if ('speechSynthesis' in window) {
+            speechSynthesis.onvoiceschanged = () => { _ttsVoicesCache = speechSynthesis.getVoices(); };
+        }
+
+        // v78: ROOT-CAUSE FIX — penyebab paling umum "bacaan berhenti sendiri di tengah
+        // jalan dan gak lanjut" di HP Android adalah layar yang meredup/mati/terkunci
+        // selagi membaca: begitu layar mati, sejumlah Android/Chrome membekukan/mematikan
+        // proses audio latar tanpa event apapun ke JS (persis gejala yang dilaporkan).
+        // Screen Wake Lock API menjaga layar tetap menyala selama proses membaca aktif,
+        // jadi audio tidak dibekukan OS di tengah kalimat. Wake lock OTOMATIS dilepas
+        // browser saat tab disembunyikan — makanya juga diminta ulang begitu tab kembali
+        // terlihat (lihat _ttsBindVisibilityRecovery di bawah).
+        async function _ttsRequestWakeLock() {
+            try {
+                if (!('wakeLock' in navigator)) return;
+                if (_ttsWakeLock && !_ttsWakeLock.released) return; // sudah aktif
+                _ttsWakeLock = await navigator.wakeLock.request('screen');
+                _ttsWakeLock.addEventListener('release', () => { /* dilepas browser (mis. tab disembunyikan) — biarkan, akan diminta ulang saat perlu */ });
+            } catch (e) { /* tidak didukung / ditolak — TTS tetap jalan, cuma tanpa proteksi layar-mati ini */ }
+        }
+        function _ttsReleaseWakeLock() {
+            try { if (_ttsWakeLock && !_ttsWakeLock.released) _ttsWakeLock.release(); } catch (e) {}
+            _ttsWakeLock = null;
+        }
+
+        function _ttsBindVisibilityRecovery() {
+            // v73 FIX: sejumlah browser (terutama Chrome Android saat app dipindah ke
+            // background lalu dibuka lagi) DIAM-DIAM menghentikan speechSynthesis tanpa
+            // event apapun. Saat tab/app kembali fokus, cek kondisi nyata vs status kita —
+            // kalau nyangkut, otomatis lanjutkan dari kalimat yang sama.
+            if (_ttsVisHandlerBound) return;
+            _ttsVisHandlerBound = true;
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState !== 'visible') return;
+                if (_ttsState !== 'playing') return;
+                _ttsRequestWakeLock(); // v78: wake lock browser lepas otomatis saat tab hidden — minta ulang
+                if (!('speechSynthesis' in window)) return;
+                setTimeout(() => {
+                    if (_ttsState === 'playing' && !speechSynthesis.speaking && !speechSynthesis.pending) {
+                        _ttsSpeakFrom(_ttsQueueIdx, true);
+                    }
+                }, 250);
+            });
+        }
+
+        function _ttsRegisterSource(text, btnId) {
+            // Dipanggil setiap kali sebuah kartu analisis baru selesai dirender, supaya tombol
+            // 🔊 di kartu itu tahu teks apa yang harus dibacakan & elemen tombol mana yang diupdate.
+            _ttsRawText = text || '';
+            _ttsBtnId = btnId || 'aiTtsBtn';
+        }
+
+        function _ttsCleanText(md) {
+            if (!md) return '';
+            return md
+                .replace(/```[\s\S]*?```/g, ' ')                      // code block
+                .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '$1')            // [teks](url) → teks
+                .replace(/[0-9]️⃣/g, '')                              // angka keycap emoji (1️⃣, 2️⃣, dst)
+                .replace(/^#{1,6}\s*/gm, '')                          // heading markdown "## "
+                .replace(/\*\*(.*?)\*\*/g, '$1')                      // bold **teks**
+                .replace(/\*(.*?)\*/g, '$1')                          // italic *teks*
+                .replace(/^>\s?/gm, '')                               // blockquote ">"
+                .replace(/^[-•]\s+/gm, '. ')                          // bullet list → jeda kalimat
+                .replace(/^\d+[.)]\s+/gm, '. ')                       // list bernomor "1. " / "1) "
+                .replace(/^-{3,}$/gm, '')                             // garis pemisah "---"
+                .replace(/`/g, '')
+                .replace(/[\u{1F1E6}-\u{1F1FF}\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2190}-\u{21FF}\u{2B00}-\u{2BFF}\u{FE0F}\u{200D}]/gu, ' ') // emoji lain
+                .replace(/Rp\s?/g, 'Rupiah ')
+                .replace(/%/g, ' persen')
+                .replace(/\n{2,}/g, '. ')
+                .replace(/\n/g, '. ')
+                .replace(/\.{2,}/g, '.')
+                .replace(/\s{2,}/g, ' ')
+                .trim();
+        }
+
+        function _ttsSplitChunks(text) {
+            // Pecah teks bersih jadi kalimat-kalimat pendek (maks ±150 karakter) supaya tiap
+            // utterance singkat — kunci utama menghindari bug pemotongan audio di tengah jalan.
+            // ✅ v79 FIX: diturunkan dari 220 → 150. Di rate paling lambat (0.8x) sebuah
+            // kalimat 220 karakter masih bisa memakan ~13-14 detik — cukup dekat dengan
+            // ambang bug "auto-cutoff ~15 detik" yang sudah lama dikenal di banyak
+            // implementasi speechSynthesis. 150 karakter memberi jarak aman yang jauh lebih
+            // lega di rate manapun yang tersedia di UI (0.8x–1.5x).
+            if (!text) return [];
+            const MAX = 150;
+            const rawSentences = text.match(/[^.!?]+[.!?]+(\s+|$)|[^.!?]+$/g) || [text];
+            const chunks = [];
+            for (let s of rawSentences) {
+                s = s.trim();
+                if (!s) continue;
+                if (s.length <= MAX) { chunks.push(s); continue; }
+                let remain = s;
+                while (remain.length > MAX) {
+                    let cut = remain.lastIndexOf(', ', MAX);
+                    if (cut < 40) cut = remain.lastIndexOf(' ', MAX);
+                    if (cut < 40) cut = MAX;
+                    chunks.push(remain.slice(0, cut + 1).trim());
+                    remain = remain.slice(cut + 1).trim();
+                }
+                if (remain) chunks.push(remain);
+            }
+            return chunks.length ? chunks : [text];
+        }
+
+        function _ttsEnsureVoices() {
+            // Sejumlah browser (khususnya Android WebView & Chrome versi lama) balikin
+            // getVoices() KOSONG di percobaan pertama & kadang TIDAK PERNAH menembak event
+            // 'voiceschanged' — polling ringan di sini jadi jaring pengaman supaya suara
+            // tetap jalan (pakai voice default) alih-alih diam/gagal total.
+            return new Promise(resolve => {
+                if (!('speechSynthesis' in window)) return resolve([]);
+                const existing = speechSynthesis.getVoices();
+                if (existing && existing.length) return resolve(existing);
+                let settled = false;
+                const done = v => { if (settled) return; settled = true; resolve(v || []); };
+                try { speechSynthesis.onvoiceschanged = () => done(speechSynthesis.getVoices()); } catch (e) {}
+                let tries = 0;
+                const poll = setInterval(() => {
+                    tries++;
+                    const v = speechSynthesis.getVoices();
+                    if ((v && v.length) || tries >= 6) { clearInterval(poll); done(v); }
+                }, 150);
+            });
+        }
+
+        function _ttsPickVoice(voices) {
+            // v73: prioritaskan suara yang lebih "manusiawi". Suara cloud/network (Google,
+            // Microsoft neural, dst.) umumnya jauh lebih natural intonasinya dibanding
+            // suara lokal/offline device yang cenderung datar & robotik. Urutan pemilihan:
+            //   1) Suara id-ID dari provider berkualitas dikenal (Google/Microsoft/Natural)
+            //   2) Suara id-ID apapun (biar tetap ngomong Bahasa Indonesia yang benar)
+            //   3) Suara lain berbahasa Indonesia (kode lang diawali "id")
+            //   4) null → browser pakai voice default
+            if (!voices || !voices.length) return null;
+            const idVoices = voices.filter(v => v.lang === 'id-ID');
+            const qualityNamePattern = /google|microsoft|natural|neural|premium|enhanced|wavenet/i;
+            const qualityPick = idVoices.find(v => qualityNamePattern.test(v.name || ''));
+            if (qualityPick) return qualityPick;
+            const networkPick = idVoices.find(v => v.localService === false);
+            if (networkPick) return networkPick;
+            if (idVoices.length) return idVoices[0];
+            return voices.find(v => (v.lang || '').toLowerCase().startsWith('id')) || null;
+        }
+
+        function _ttsUpdateBtn() {
+            const btn = document.getElementById(_ttsBtnId);
+            const speedRow = document.getElementById(_ttsBtnId + '-speedRow');
+            const progWrap = document.getElementById(_ttsBtnId + '-progWrap');
+            const progFill = document.getElementById(_ttsBtnId + '-progFill');
+            const caption = document.getElementById(_ttsBtnId + '-caption');
+            if (btn) {
+                const total = _ttsQueue.length;
+                const prog = total ? ` (${Math.min(_ttsQueueIdx + 1, total)}/${total})` : '';
+                if (_ttsState === 'playing') {
+                    btn.classList.add('ai-tts-playing');
+                    btn.innerHTML = '<span class="ai-tts-eq"><span></span><span></span><span></span></span> Lagi Dibacain' + prog + '... (Jeda)';
+                } else if (_ttsState === 'paused') {
+                    btn.classList.add('ai-tts-playing');
+                    btn.innerHTML = '▶️ Lanjutin Bacain' + prog;
+                } else if (_ttsState === 'loading') {
+                    btn.classList.remove('ai-tts-playing');
+                    btn.innerHTML = '⏳ Nyiapin Suara...';
+                } else {
+                    btn.classList.remove('ai-tts-playing');
+                    btn.innerHTML = '🔊 Dengerin Analisis (T2A)';
+                }
+            }
+            if (speedRow) speedRow.style.display = (_ttsState === 'idle') ? 'none' : 'flex';
+            // v73: alur visual "baru sampai mana" — progress bar + kalimat aktif disorot,
+            // supaya pengguna tahu persis posisi pembacaan tanpa harus menebak dari audio saja.
+            if (progWrap) {
+                const total = _ttsQueue.length;
+                const showProg = total > 0 && (_ttsState === 'playing' || _ttsState === 'paused' || _ttsState === 'loading');
+                progWrap.style.display = showProg ? 'block' : 'none';
+                if (showProg && progFill) {
+                    const pct = total ? Math.min(100, Math.round(((_ttsQueueIdx + 1) / total) * 100)) : 0;
+                    progFill.style.width = pct + '%';
+                }
+                if (showProg && caption) {
+                    const curText = _ttsQueue[_ttsQueueIdx] || '';
+                    caption.innerHTML = _ttsRenderCaptionWords(curText);
+                    caption.style.opacity = (_ttsState === 'paused') ? '0.55' : '1';
+                } else if (caption) {
+                    caption.innerHTML = '';
+                }
+            }
+        }
+
+        function _ttsRenderCaptionWords(text) {
+            // Pecah kalimat aktif jadi span per-kata supaya bisa disorot kata-per-kata
+            // secara real time lewat event onboundary (lihat _ttsSpeakChunk).
+            const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            if (!text) return '';
+            const words = text.split(/(\s+)/);
+            let charPos = 0, html = '';
+            for (const w of words) {
+                if (/^\s+$/.test(w)) { html += w; charPos += w.length; continue; }
+                html += `<span class="ai-tts-word" data-start="${charPos}">${esc(w)}</span>`;
+                charPos += w.length;
+            }
+            return html;
+        }
+
+        function _ttsHighlightWordAt(charIndex) {
+            const caption = document.getElementById(_ttsBtnId + '-caption');
+            if (!caption) return;
+            let best = null;
+            caption.querySelectorAll('.ai-tts-word').forEach(el => {
+                const start = parseInt(el.dataset.start, 10);
+                if (start <= charIndex) { if (!best || start > parseInt(best.dataset.start, 10)) best = el; }
+            });
+            caption.querySelectorAll('.ai-tts-word.active').forEach(el => el.classList.remove('active'));
+            if (best) {
+                best.classList.add('active');
+                try { best.scrollIntoView({ block: 'nearest', inline: 'nearest' }); } catch (e) {}
+            }
+        }
+
+        function _ttsStartKeepAlive() {
+            _ttsClearKeepAlive();
+            _ttsRequestWakeLock(); // v78: cegah layar mati/redup membekukan audio di tengah bacaan
+            // ✅ v79 FIX — ROOT CAUSE PALING MUNGKIN dari "kebaca sampai tengah jalan lalu
+            // diam total & gak pernah lanjut lagi": trik "keep-alive" versi lama di sini
+            // memanggil speechSynthesis.pause() lalu resume() tiap 12 detik selagi playing.
+            // Ini memang workaround yang dikenal luas untuk bug auto-cutoff ~15 detik di
+            // Chrome DESKTOP untuk utterance panjang. Tapi di Android, pause()/resume() pada
+            // speechSynthesis justru punya reputasi SEBALIKNYA: pemicu paling umum
+            // speechSynthesis "nyangkut" permanen (speaking tetap true, tapi audio sudah mati
+            // & tidak ada event apapun lagi setelahnya) — persis gejala yang dilaporkan.
+            // Karena _ttsSplitChunks() sekarang membatasi tiap kalimat maksimal ±150 karakter
+            // (v79), satu utterance praktis tidak pernah lagi mendekati durasi 15 detik itu di
+            // rate manapun yang tersedia di UI — jadi trik pause/resume ini sudah tidak
+            // diperlukan untuk mencegah auto-cutoff, sementara risikonya (nyangkut permanen)
+            // tetap ada. DIHAPUS. Kalimat yang benar2 macet sekarang murni ditangani healthcheck
+            // di bawah, yang TIDAK PERNAH memanggil pause() sendiri — begitu ketahuan macet, ia
+            // selalu melakukan cancel()+speak() bersih lewat _ttsTriggerAutoRecover(), bukan
+            // pause/resume yang rawan nyangkut itu.
+            //
+            // v73/v74: healthcheck berkala tiap 4 detik — mendeteksi mesin suara yang "mati
+            // diam-diam" (status kita bilang playing, tapi sebenarnya sudah berhenti total
+            // tanpa event apapun) lalu otomatis restart bersih dari kalimat yang sama.
+            // ✅ v79 FIX — CELAH TERBESAR yang masih tersisa di versi lama: healthcheck
+            // MEMPERCAYA flag speechSynthesis.speaking sebagai bukti "masih aktif" — begitu
+            // speaking bernilai true (dan tidak paused), ia langsung dianggap sehat tanpa
+            // syarat lain. Padahal flag INI SENDIRI yang terbukti tidak bisa diandalkan di
+            // banyak Android/Chrome: speaking bisa nyangkut true SELAMANYA walau mesin TTS
+            // asli sudah mati & tidak akan pernah mengirim event onboundary/onend lagi —
+            // inilah akar bug "diam total & gak pernah lanjut" yang lolos dari pengecekan
+            // lama tanpa pernah memicu recovery. Fix: jangan percaya flag speaking/pending
+            // sama sekali sebagai sinyal utama. Satu-satunya sinyal yang dipercaya adalah
+            // BUKTI NYATA aktivitas (_ttsLastActivityAt, diperbarui di onstart/onboundary/
+            // setiap transisi terjadwal). Ambang toleransi dihitung dinamis dari estimasi
+            // lama kalimat yang sedang berjalan (formula sama dengan watchdog per-kalimat di
+            // _ttsSpeakChunk) supaya kalimat yang memang wajar butuh waktu lebih lama tidak
+            // salah dianggap macet — tapi begitu ambang itu terlampaui, recover, apapun kata
+            // flag speaking/paused dari browser.
+            const myGenAtStart = _ttsGenId;
+            _ttsHealthTimer = setInterval(() => {
+                if (myGenAtStart !== _ttsGenId) return; // sesi sudah berganti, timer lama diabaikan
+                if (_ttsState !== 'playing') return;
+                if (_ttsAdvancing) return; // sedang transisi terjadwal antar-kalimat, bukan macet
+                if (!('speechSynthesis' in window)) return;
+
+                // Sinyal jelas & murah: browser sendiri melaporkan "paused" padahal kita
+                // tidak pernah memintanya (kita sudah tidak lagi memanggil pause() sendiri
+                // sama sekali, lihat catatan v79 di atas) — nyaris pasti dipicu OS/browser
+                // sepihak (mis. layar sempat terkunci sebelum wake lock aktif). Cukup jelas
+                // untuk direspon lebih cepat daripada menunggu ambang dinamis di bawah.
+                const stuckPaused = speechSynthesis.speaking && speechSynthesis.paused;
+                if (stuckPaused) {
+                    if (Date.now() - _ttsLastActivityAt < 1500) return; // baru saja ke-pause, kasih toleransi wajar dulu
+                    try { speechSynthesis.resume(); } catch (e) {}
+                    if (Date.now() - _ttsLastActivityAt > 3000) _ttsTriggerAutoRecover(); // resume() tidak mempan dalam waktu wajar → restart bersih
+                    return;
+                }
+
+                const sentence = _ttsQueue[_ttsQueueIdx] || '';
+                const graceMs = (sentence.length * 90 / Math.max(0.5, _ttsRate)) + 6000;
+                if (Date.now() - _ttsLastActivityAt > graceMs) {
+                    _ttsTriggerAutoRecover();
+                }
+            }, 4000);
+        }
+
+        // v78: satu pintu untuk memicu auto-recovery, DIBATASI supaya tidak jadi loop diam
+        // tanpa batas kalau akar masalahnya memang tidak bisa pulih sendiri (mis. mesin TTS
+        // device sedang benar2 bermasalah). Direset begitu ada kalimat yang BENERAN mulai
+        // terdengar lagi (lihat onstart di _ttsSpeakChunk) — jadi hitungan cuma naik kalau
+        // beberapa percobaan BERTURUT-TURUT semuanya gagal, bukan akumulasi sepanjang sesi.
+        function _ttsTriggerAutoRecover() {
+            _ttsAutoRecoverCount++;
+            if (_ttsAutoRecoverCount > 4) { _ttsGiveUpGracefully(); return; }
+            _ttsSpeakFrom(_ttsQueueIdx, true);
+        }
+
+        // v78: kalau auto-recovery tetap gagal berulang kali, JANGAN diam selamanya tanpa
+        // suara/pesan (persis keluhan yang dilaporkan) — berhenti rapi di kalimat yang sama,
+        // kasih tahu pengguna lewat toast, dan tandai supaya tombol "Lanjutin Bacain"
+        // berikutnya me-restart BERSIH kalimat ini (bukan speechSynthesis.resume() native,
+        // yang percuma dipanggil karena sesi lama sudah dibatalkan total di sini).
+        function _ttsGiveUpGracefully() {
+            _ttsClearKeepAlive();
+            _ttsReleaseWakeLock();
+            if ('speechSynthesis' in window) { try { speechSynthesis.cancel(); } catch (e) {} }
+            _ttsState = 'paused';
+            _ttsForceRestartOnResume = true;
+            _ttsAutoRecoverCount = 0;
+            _ttsUpdateBtn();
+            const msg = 'Pembacaan sempat macet & dihentikan otomatis. Tekan "▶️ Lanjutin Bacain" untuk melanjutkan dari kalimat yang sama.';
+            if (typeof showToast === 'function') showToast(msg, 'warn'); else alert(msg);
+        }
+
+        let _ttsKeepAliveTimer = null;
+        function _ttsClearKeepAlive() {
+            if (_ttsKeepAliveTimer) { clearInterval(_ttsKeepAliveTimer); _ttsKeepAliveTimer = null; }
+            if (_ttsHealthTimer) { clearInterval(_ttsHealthTimer); _ttsHealthTimer = null; }
+            if (_ttsStallTimer) { clearTimeout(_ttsStallTimer); _ttsStallTimer = null; }
+        }
+
+        function siStopTTS() {
+            _ttsGenId++; // batalkan semua callback dari sesi baca sebelumnya
+            _ttsClearKeepAlive();
+            _ttsReleaseWakeLock(); // v78
+            if ('speechSynthesis' in window) { try { speechSynthesis.cancel(); } catch (e) {} }
+            _ttsState = 'idle';
+            _ttsQueue = [];
+            _ttsQueueIdx = 0;
+            _ttsBusy = false;
+            _ttsRetryCount = 0;
+            _ttsAdvancing = false; // v74
+            _ttsAutoRecoverCount = 0; // v78
+            _ttsForceRestartOnResume = false; // v78
+            _ttsUpdateBtn();
+        }
+
+        function siSetTTSRate(rate) {
+            _ttsRate = rate;
+            lsSet('si_tts_rate', rate);
+            document.querySelectorAll('.ai-tts-speed-btn[data-rate]').forEach(b => b.classList.toggle('active', Math.abs(parseFloat(b.dataset.rate) - rate) < 0.001));
+            if (_ttsState === 'playing' || _ttsState === 'paused') {
+                // v72 FIX: lanjut dari KALIMAT YANG SEDANG DIBACA di kecepatan baru — tidak
+                // mengulang dari awal lagi (bug UX lama di versi sebelumnya).
+                _ttsSpeakFrom(_ttsQueueIdx, true);
+            }
+        }
+
+        async function siToggleTTS(forceRestart) {
+            if (!('speechSynthesis' in window)) {
+                const msg = 'Yah, browser/device kamu belum dukung fitur Text-to-Audio (Web Speech API). Coba pakai Chrome/Safari versi terbaru ya.';
+                if (typeof showToast === 'function') showToast(msg, 'error'); else alert(msg);
+                return;
+            }
+            _ttsBindVisibilityRecovery();
+            if (_ttsBusy) return; // cegah klik ganda pas lagi transisi state
+            if (!forceRestart && _ttsState === 'playing') {
+                _ttsBusy = true;
+                try { speechSynthesis.pause(); } catch (e) {}
+                _ttsState = 'paused'; _ttsClearKeepAlive(); _ttsReleaseWakeLock(); _ttsUpdateBtn();
+                _ttsBusy = false;
+                return;
+            }
+            if (!forceRestart && _ttsState === 'paused') {
+                _ttsBusy = true;
+                // v78: setelah give-up otomatis (_ttsGiveUpGracefully), sesi speechSynthesis
+                // lama sudah dibatalkan total — native resume() tidak ada gunanya lagi karena
+                // tidak ada utterance ter-pause untuk dilanjutkan. Restart bersih kalimat yang
+                // sama sebagai gantinya supaya tombol ini selalu benar2 melanjutkan bacaan.
+                if (_ttsForceRestartOnResume) {
+                    _ttsForceRestartOnResume = false;
+                    _ttsBusy = false;
+                    await _ttsSpeakFrom(_ttsQueueIdx, true);
+                    return;
+                }
+                try { speechSynthesis.resume(); } catch (e) {}
+                _ttsState = 'playing'; _ttsStartKeepAlive(); _ttsUpdateBtn();
+                _ttsBusy = false;
+                return;
+            }
+            const raw = _ttsRawText;
+            if (!raw) {
+                if (typeof showToast === 'function') showToast('Belum ada teks analisis untuk dibacakan.', 'warn');
+                return;
+            }
+            _ttsBusy = true;
+            _ttsState = 'loading'; _ttsUpdateBtn();
+            _ttsAutoRecoverCount = 0; // v78: sesi baca baru, mulai hitungan recovery dari nol
+            _ttsForceRestartOnResume = false; // v78
+            _ttsQueue = _ttsSplitChunks(_ttsCleanText(raw));
+            _ttsQueueIdx = 0;
+            await _ttsSpeakFrom(0);
+            _ttsBusy = false;
+        }
+
+        async function _ttsSpeakFrom(idx, isRateChange) {
+            if (!_ttsQueue.length) { _ttsState = 'idle'; _ttsUpdateBtn(); return; }
+            const myGen = isRateChange ? _ttsGenId : ++_ttsGenId;
+            if (!isRateChange) _ttsRetryCount = 0; // sesi/kalimat baru → reset hitungan retry
+            _ttsAdvancing = true; // v74: tandai sedang transisi, healthcheck jangan ikut campur
+            try { speechSynthesis.cancel(); } catch (e) {}
+            // v72/v73 FIX: jeda kecil setelah cancel() sebelum speak() lagi — hindari race
+            // condition yang bikin sejumlah browser (terutama Chrome) diam total tanpa suara.
+            // v73: jeda sedikit diacak (100–200ms) supaya ritme antar-kalimat terasa lebih
+            // alami (napas manusia gak selalu sama persis tiap kalimat), bukan robotik-metronomik.
+            const pauseMs = 100 + Math.floor(Math.random() * 100);
+            await new Promise(r => setTimeout(r, pauseMs));
+            if (myGen !== _ttsGenId) return; // sudah dibatalkan/diganti sesi lain selagi menunggu
+
+            if (!_ttsVoicesCache || !_ttsVoicesCache.length) {
+                _ttsVoicesCache = await _ttsEnsureVoices();
+                if (myGen !== _ttsGenId) return;
+            }
+            const voice = _ttsPickVoice(_ttsVoicesCache);
+
+            _ttsQueueIdx = idx;
+            _ttsState = 'playing';
+            _ttsLastActivityAt = Date.now(); // v74
+            _ttsUpdateBtn();
+            _ttsStartKeepAlive();
+            _ttsSpeakChunk(idx, myGen, voice);
+        }
+
+        // ✅ v74 — SATU pintu masuk untuk SEMUA transisi antar-utterance (lanjut ke kalimat
+        // berikutnya, retry kalimat yang sama karena stall/error, atau recovery setelah
+        // speak() throw). Sebelumnya banyak tempat (onend, onerror, catch speak(), stall
+        // watchdog) masing-masing LANGSUNG memanggil _ttsSpeakChunk() berikutnya secara
+        // sinkron dari dalam event handler kalimat sebelumnya — pola ini dikenal rawan bikin
+        // Chrome/Android WebView diam-diam MENJATUHKAN utterance berikutnya tanpa error sama
+        // sekali (persis gejala "kebaca sampai tengah terus diem"). Fix: setiap transisi kini
+        // lewat jeda kecil terjadwal yang sama seperti kalimat pertama, DAN meng-update
+        // _ttsQueueIdx + flag _ttsAdvancing lebih awal supaya healthcheck timer tidak salah
+        // kira macet & ikut-ikutan memicu pembacaan ganda yang saling rebutan.
+        async function _ttsAdvanceToChunk(idx, gen, voice) {
+            if (gen !== _ttsGenId) return;
+            _ttsAdvancing = true;
+            _ttsQueueIdx = Math.min(idx, Math.max(0, _ttsQueue.length - 1));
+            _ttsLastActivityAt = Date.now();
+            const pauseMs = 120 + Math.floor(Math.random() * 130);
+            await new Promise(r => setTimeout(r, pauseMs));
+            if (gen !== _ttsGenId) return; // sesi berganti selagi menunggu jeda transisi
+            _ttsSpeakChunk(idx, gen, voice);
+        }
+
+        function _ttsSpeakChunk(idx, gen, voice) {
+            if (gen !== _ttsGenId) return;
+            _ttsAdvancing = false; // v74: transisi selesai, speak() akan dipanggil sekarang
+            if (idx >= _ttsQueue.length) { siStopTTS(); return; }
+            const sentence = _ttsQueue[idx];
+            const utter = new SpeechSynthesisUtterance(sentence);
+            utter.lang = 'id-ID';
+            // v73: variasi mikro rate & pitch per kalimat (±3–4%) — nada datar monoton adalah
+            // ciri paling gampang dikenali sebagai "suara robot"; variasi kecil yang konsisten
+            // dalam batas wajar bikin iramanya terasa lebih hidup tanpa merusak kejelasan ucap.
+            const rateJitter = 1 + (Math.random() * 0.06 - 0.03);
+            const pitchJitter = 1 + (Math.random() * 0.08 - 0.04);
+            utter.rate = Math.max(0.5, Math.min(2.5, _ttsRate * rateJitter));
+            utter.pitch = Math.max(0.7, Math.min(1.3, pitchJitter));
+            if (voice) utter.voice = voice;
+
+            // v73: watchdog macet — kalau onstart TIDAK nembak sama sekali dalam waktu wajar
+            // (bug diam total tanpa error/tanpa event, sering terjadi di Chrome/WebView),
+            // paksa retry kalimat ini (maks 2x) baru lanjut ke kalimat berikutnya.
+            const estMs = Math.max(2500, sentence.length * 90 / Math.max(0.5, utter.rate)) + 6000;
+            if (_ttsStallTimer) clearTimeout(_ttsStallTimer);
+            _ttsStallTimer = setTimeout(() => {
+                if (gen !== _ttsGenId) return;
+                if (_ttsRetryCount < 2) {
+                    _ttsRetryCount++;
+                    try { speechSynthesis.cancel(); } catch (e) {}
+                    _ttsAdvanceToChunk(idx, gen, voice);
+                } else {
+                    _ttsRetryCount = 0;
+                    _ttsAdvanceToChunk(idx + 1, gen, voice); // kalimat ini kayaknya emang bermasalah, lewati
+                }
+            }, estMs);
+
+            utter.onstart = () => {
+                if (gen !== _ttsGenId) return;
+                if (_ttsStallTimer) { clearTimeout(_ttsStallTimer); _ttsStallTimer = null; }
+                _ttsRetryCount = 0;
+                _ttsAutoRecoverCount = 0; // v78: kalimat beneran mulai terdengar → mesin sehat, reset hitungan recovery
+                _ttsAdvancing = false;
+                _ttsQueueIdx = idx;
+                _ttsLastActivityAt = Date.now(); // v74: bukti nyata mesin masih hidup
+                _ttsUpdateBtn();
+            };
+            // v73: highlight kata berjalan real-time (kalau browser dukung onboundary) —
+            // ini bagian dari alur visual "baru sampai mana" pembacaannya.
+            utter.onboundary = e => {
+                if (gen !== _ttsGenId) return;
+                _ttsLastActivityAt = Date.now(); // v74
+                if (e && (e.name === 'word' || e.name === undefined)) _ttsHighlightWordAt(e.charIndex || 0);
+            };
+            utter.onend = () => {
+                if (gen !== _ttsGenId) return;
+                if (_ttsStallTimer) { clearTimeout(_ttsStallTimer); _ttsStallTimer = null; }
+                _ttsAdvanceToChunk(idx + 1, gen, voice);
+            };
+            utter.onerror = e => {
+                if (gen !== _ttsGenId) return;
+                if (_ttsStallTimer) { clearTimeout(_ttsStallTimer); _ttsStallTimer = null; }
+                // 'interrupted'/'canceled' terjadi WAJAR saat user stop/ganti emiten/ganti
+                // kecepatan — bukan error asli, jangan hentikan/rusak state karenanya.
+                if (e && (e.error === 'interrupted' || e.error === 'canceled')) return;
+                // Error asli di satu kalimat (mis. voice bermasalah) → retry dulu (maks 2x)
+                // sebelum benar-benar dilewati, biar satu kalimat bermasalah gak langsung
+                // bikin bacaan "loncat" tanpa dicoba ulang.
+                if (_ttsRetryCount < 2) {
+                    _ttsRetryCount++;
+                    _ttsAdvanceToChunk(idx, gen, voice);
+                } else {
+                    _ttsRetryCount = 0;
+                    _ttsAdvanceToChunk(idx + 1, gen, voice);
+                }
+            };
+            try {
+                speechSynthesis.speak(utter);
+            } catch (e) {
+                // speak() sendiri bisa throw di sejumlah browser saat state internal kacau —
+                // jangan biarkan seluruh sesi baca mati total, coba lanjut kalimat berikutnya.
+                if (_ttsStallTimer) { clearTimeout(_ttsStallTimer); _ttsStallTimer = null; }
+                _ttsAdvanceToChunk(idx + 1, gen, voice);
+            }
+        }
+
+        function _ttsControlsHtml(btnId, label) {
+            // Markup tombol T2A + baris kecepatan (dengan tombol Stop) — dipakai di semua
+            // varian kartu analisis (Mode Dasar, Mode Canggih, snapshot FMP-only) supaya
+            // konsisten & state "active" kecepatan selalu sinkron dengan preferensi tersimpan.
+            const rates = [0.8, 1, 1.25, 1.5];
+            return `<button class="ai-regen-btn btn-ripple ai-tts-btn" id="${btnId}" onclick="siToggleTTS()">${label || '🔊 Dengerin Analisis (T2A)'}</button>` +
+                `<div class="ai-tts-speed-row" id="${btnId}-speedRow" style="display:none;">` +
+                `<span style="font-size:9.5px;color:var(--t-low);font-weight:700;">Kecepatan:</span>` +
+                rates.map(r => `<button class="ai-tts-speed-btn" data-rate="${r}" onclick="siSetTTSRate(${r})">${r}x</button>`).join('') +
+                `<button type="button" class="ai-tts-speed-btn ai-tts-stop-btn" onclick="siStopTTS()" title="Hentikan pembacaan">⏹ Stop</button>` +
+                `</div>` +
+                `<div class="ai-tts-prog-wrap" id="${btnId}-progWrap" style="display:none;">` +
+                `<div class="ai-tts-progressbar"><div class="ai-tts-progressbar-fill" id="${btnId}-progFill"></div></div>` +
+                `<div class="ai-tts-caption" id="${btnId}-caption"></div>` +
+                `</div>`;
+        }
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // ✅ v75 — SobatInves AI: RENCANA TP/SL OTOMATIS + KARTU RINGKASAN TERSTRUKTUR
+        // ROOT-CAUSE FIX: sejak v72 CSS untuk kartu terstruktur (.ai-score-header,
+        // .ai-tpsl-box, .ai-twin-grid, .ai-sector-card, .ai-summary-box, .ai-full-toggle)
+        // sudah ditulis lengkap, TAPI tidak pernah benar-benar dirender di manapun — tab
+        // "SobatInves AI" cuma nge-dump teks Gemini mentah (mode canggih) atau 2 paragraf
+        // pendek (mode dasar). Fungsi-fungsi di bawah ini MEMBANGUN kartu itu sungguhan,
+        // 100% dari data yang SUDAH DIHITUNG app (skor 6-strategi, pivot, MA, 52w range)
+        // — bukan hasil parsing teks bebas Gemini — supaya angka rating/TP/SL selalu
+        // konsisten & akurat walau gaya narasi AI di bawahnya berubah-ubah, dan supaya
+        // pengguna TETAP dapat kartu lengkap (skor, TP/SL, kekuatan/risiko, rotasi sektor)
+        // walau belum pasang API key Gemini sama sekali (Mode Dasar).
+        // ═══════════════════════════════════════════════════════════════════════
+        const AI_RATING_META = {
+            'STRONG BUY': { label: 'AKUMULASI KUAT', emoji: '🟢', ring: 'var(--up)' },
+            'BUY': { label: 'AKUMULASI', emoji: '🟢', ring: 'var(--up)' },
+            'HOLD': { label: 'WAIT & SEE', emoji: '🟡', ring: 'var(--warn)' },
+            'REDUCE': { label: 'KURANGI / HATI-HATI', emoji: '🟠', ring: 'var(--dn)' },
+            'SELL': { label: 'HINDARI / CUTLOSS', emoji: '🔴', ring: 'var(--dn)' }
+        };
+
+        // Rencana entry/TP/SL deterministik dari Pivot Point, MA20/MA50, & rentang 52-minggu
+        // (pakai fallback pita persentase berbasis volatilitas harian kalau level teknikal
+        // tidak tersedia/tidak masuk akal) — supaya SELALU ada angka konkret, tidak pernah "N/A".
+        function computeAITradePlan(s) {
+            const price = Number(s.price) || 0;
+            if (!price) return null;
+            const strat = computeMultiStrategy(s);
+            const pivot = s.pivot || {};
+            const ma20 = Number(s.ma20) || 0, ma50 = Number(s.ma50) || 0;
+            const high52w = Number(s.high52w) || 0, low52w = Number(s.low52w) || 0;
+            const volPct = Math.min(9, Math.max(3, (Number(s.volatilityD) || 0) > 0 ? Number(s.volatilityD) * 1.8 : 4));
+
+            let resCandidates = [pivot.r1, pivot.r2, high52w]
+                .map(Number).filter(v => v > price * 1.005).sort((a, b) => a - b);
+            let tp1 = resCandidates[0] || null;
+            let tp2 = resCandidates.find(v => v > (tp1 || 0) * 1.015) || resCandidates[1] || null;
+
+            let supCandidates = [pivot.s1, pivot.s2, ma20 < price ? ma20 : null, ma50 < price ? ma50 : null, low52w]
+                .map(v => Number(v) || 0).filter(v => v > 0 && v < price * 0.995).sort((a, b) => b - a);
+            let sl = supCandidates[0] || null;
+
+            if (!tp1) tp1 = price * (1 + volPct / 100);
+            if (!tp2 || tp2 <= tp1 * 1.01) tp2 = price * (1 + (volPct * 2.1) / 100);
+            if (!sl) sl = price * (1 - (volPct * 0.85) / 100);
+
+            let entryHigh = price;
+            let entryLow = Math.max(sl * 1.015, Math.min(price * 0.985, (ma20 > 0 && ma20 < price ? ma20 : price * 0.975)));
+            if (entryLow >= entryHigh) entryLow = entryHigh * 0.99;
+
+            const riskAbs = (entryHigh - sl) || 1;
+            const rr1 = (tp1 - entryHigh) / riskAbs;
+            const rr2 = (tp2 - entryHigh) / riskAbs;
+
+            return {
+                strat, price, entryLow, entryHigh, tp1, tp2, sl,
+                tp1Pct: (tp1 / price - 1) * 100, tp2Pct: (tp2 / price - 1) * 100, slPct: (sl / price - 1) * 100,
+                rr1: Math.max(0.1, rr1), rr2: Math.max(0.1, rr2), volPct
+            };
+        }
+
+        // Kartu ringkasan terstruktur: badge cepat + gauge skor konviksi + rencana TP/SL
+        // visual + kekuatan-vs-risiko + rotasi sektor. Dipakai identik di Mode Dasar
+        // MAUPUN Mode AI Canggih, supaya pengguna tanpa key Gemini pun tetap dapat
+        // analisis lengkap (fundamental ringkas, teknikal, TP/SL, sektor) — bukan cuma
+        // 2 baris teks generik seperti sebelumnya.
+        function renderAIQuickCard(s, plan, pattern, mtf, sectorSnap) {
+            if (!plan) return '<div class="ai-err-box">Data harga belum tersedia untuk menyusun rencana.</div>';
+            const strat = plan.strat;
+            const meta = AI_RATING_META[strat.rating] || AI_RATING_META['HOLD'];
+            const scorePct = Math.max(2, Math.min(98, Math.round(((strat.convictionScore + 100) / 200) * 100)));
+            const ringColor = strat.ratingColor === 'up' ? 'var(--up)' : strat.ratingColor === 'dn' ? 'var(--dn)' : 'var(--warn)';
+
+            const badges = [];
+            badges.push({ t: (s.goldenCross ? 'Golden Cross ✅' : 'Death Cross ⚠️'), cls: s.goldenCross ? 'ai-badge-on' : 'ai-badge-warn' });
+            badges.push({ t: (s.bandarStatus === 'acc' ? 'Bandar Akumulasi 🟢' : s.bandarStatus === 'dist' ? 'Bandar Distribusi 🔴' : 'Bandar Netral'), cls: s.bandarStatus === 'acc' ? 'ai-badge-on' : s.bandarStatus === 'dist' ? 'ai-badge-warn' : 'ai-badge-info' });
+            badges.push({ t: (mtf && mtf.aligned ? `Selaras ${mtf.direction === 'bull' ? 'Bullish' : 'Bearish'} ${mtf.strength}%` : 'Timeframe Belum Selaras'), cls: (mtf && mtf.aligned) ? (mtf.direction === 'bull' ? 'ai-badge-on' : 'ai-badge-warn') : 'ai-badge-info' });
+            const rsiV = Number(s.rsi) || 0;
+            badges.push({ t: 'RSI ' + rsiV.toFixed(0) + (rsiV > 70 ? ' Overbought' : rsiV < 30 ? ' Oversold' : ' Netral'), cls: rsiV > 70 ? 'ai-badge-warn' : rsiV < 30 ? 'ai-badge-info' : '' });
+            badges.push({ t: 'Vol ' + (Number(s.volRatio) || 0).toFixed(1) + 'x Avg', cls: (Number(s.volRatio) || 0) >= 1.5 ? 'ai-badge-on' : '' });
+            if (s.isHalal) badges.push({ t: '☪ Saham Syariah', cls: 'ai-badge-info' });
+            const badgeHtml = `<div class="ai-badge-row">${badges.map(b => `<span class="ai-badge-pill ${b.cls}">${b.t}</span>`).join('')}</div>`;
+
+            const scoreCardHtml = `<div class="ai-score-card">
+                <div class="ai-score-header">
+                    <div class="ai-score-header-title">🎯 Skor Konviksi SobatInves AI</div>
+                    <div class="ai-score-gauge-wrap">
+                        <div class="ai-score-ring" style="background:conic-gradient(${ringColor} 0% ${scorePct}%, var(--border-light) ${scorePct}% 100%);">
+                            <div class="ai-score-ring-inner"><div class="ai-score-ring-val">${strat.convictionScore >= 0 ? '+' : ''}${strat.convictionScore}</div></div>
+                        </div>
+                        <div class="ai-score-gauge-cap" style="color:${ringColor};">${meta.emoji} ${strat.rating}</div>
+                    </div>
+                </div>
+                <p class="ai-md-p" style="margin:0;">${strat.narrative}</p>
+            </div>`;
+
+            const spanLo = plan.sl, spanHi = plan.tp2 * 1.02;
+            const posPct = v => Math.max(3, Math.min(97, ((v - spanLo) / ((spanHi - spanLo) || 1)) * 100));
+            const tpslHtml = `<div class="ai-tpsl-box">
+                <div class="ai-tpsl-line">📐 Rencana Trading Otomatis <span style="font-weight:600;color:var(--t-low);font-size:10px;">(dari Pivot/MA/52w-range, bukan tebakan)</span></div>
+                <div class="ai-tpsl-track">
+                    <div class="ai-tpsl-dot" style="left:${posPct(plan.sl)}%;background:var(--dn);" title="Stop-Loss"></div>
+                    <div class="ai-tpsl-dot" style="left:${posPct(plan.entryHigh)}%;background:var(--primary);" title="Entry"></div>
+                    <div class="ai-tpsl-dot" style="left:${posPct(plan.tp1)}%;background:var(--up);" title="TP1"></div>
+                    <div class="ai-tpsl-dot" style="left:${posPct(plan.tp2)}%;background:var(--up);opacity:0.55;" title="TP2"></div>
+                </div>
+                <ul class="ai-tpsl-bullets">
+                    <li><b>Entry area:</b> Rp ${n2(plan.entryLow)} – Rp ${n2(plan.entryHigh)}</li>
+                    <li><b>Target TP1:</b> Rp ${n2(plan.tp1)} <span style="color:var(--up);">(${plan.tp1Pct>=0?'+':''}${plan.tp1Pct.toFixed(1)}%)</span></li>
+                    <li><b>Target TP2:</b> Rp ${n2(plan.tp2)} <span style="color:var(--up);">(${plan.tp2Pct>=0?'+':''}${plan.tp2Pct.toFixed(1)}%)</span></li>
+                    <li><b>Stop-Loss:</b> Rp ${n2(plan.sl)} <span style="color:var(--dn);">(${plan.slPct.toFixed(1)}%)</span></li>
+                    <li><b>Risk:Reward</b> — ke TP1 ±1:${plan.rr1.toFixed(1)} · ke TP2 ±1:${plan.rr2.toFixed(1)}</li>
+                    <li style="color:var(--t-low);">Skenario edukatif berbasis data, BUKAN ajakan beli/jual. Boleh dicicil (scaling-in), jangan all-in satu entry.</li>
+                </ul>
+            </div>`;
+
+            const bulls = strat.strategies.filter(x => x.verdict === 'bullish').sort((a, b) => b.score - a.score).slice(0, 3);
+            const bears = strat.strategies.filter(x => x.verdict === 'bearish').sort((a, b) => a.score - b.score).slice(0, 3);
+            const twinHtml = `<div class="ai-twin-grid">
+                <div class="ai-twin-box">
+                    <div class="ai-twin-box-title" style="color:var(--up);">🟢 Kekuatan Pendukung</div>
+                    <ul>${bulls.length ? bulls.map(b => `<li>${b.icon} ${b.reasons[0]}</li>`).join('') : '<li>Belum ada sinyal bullish signifikan saat ini.</li>'}</ul>
+                </div>
+                <div class="ai-twin-box">
+                    <div class="ai-twin-box-title" style="color:var(--dn);">🔴 Risiko Diwaspadai</div>
+                    <ul>${bears.length ? bears.map(b => `<li>${b.icon} ${b.reasons[0]}</li>`).join('') : '<li>Belum ada sinyal bearish signifikan saat ini.</li>'}</ul>
+                </div>
+            </div>`;
+
+            let sectorHtml = '';
+            if (sectorSnap && sectorSnap.top && sectorSnap.top.length) {
+                const mySec = s.sector || 'Lainnya';
+                const seen = new Set();
+                const rows = sectorSnap.top.concat(sectorSnap.bottom).filter(r => { if (seen.has(r.sector)) return false; seen.add(r.sector); return true; });
+                sectorHtml = `<div class="ai-sector-card">
+                    <div class="ai-sector-card-title">🔄 Rotasi Sektor Hari Ini</div>
+                    <span class="ai-sector-stay-safe">Emiten: ${mySec}</span>
+                    ${rows.slice(0, 5).map(r => {
+                        const isMine = r.sector === mySec;
+                        const up = r.avgChg >= 0;
+                        return `<div class="ai-sector-bar-row" style="background:${up ? 'rgba(0,179,90,0.14)' : 'rgba(255,59,59,0.14)'};${isMine ? 'outline:1.5px solid ' + (up ? 'var(--up)' : 'var(--dn)') + ';' : ''}">
+                            <span class="ai-sector-name" style="color:var(--t-hi);">${isMine ? '👉 ' : ''}${r.sector}</span>
+                            <span class="ai-sector-tag" style="color:${up ? 'var(--up)' : 'var(--dn)'};">${up ? '+' : ''}${r.avgChg.toFixed(2)}% · ${r.breadth}% naik</span>
+                        </div>`;
+                    }).join('')}
+                </div>`;
+            }
+
+            const fundBits = [];
+            if (s.pe > 0) fundBits.push(`P/E ${s.pe.toFixed(1)}x`);
+            if (s.pbv > 0) fundBits.push(`P/BV ${s.pbv.toFixed(2)}x`);
+            if (s.divY > 0) fundBits.push(`Div. Yield ${s.divY.toFixed(1)}%`);
+            if (s.mktcap > 0) fundBits.push(`Mkt Cap ${fmtBig(s.mktcap)}`);
+            const summaryHtml = `<div class="ai-summary-box">
+                <div class="ai-summary-box-title">📋 Ringkasan Kilat</div>
+                <ul>
+                    <li>Harga <b>Rp ${n2(s.price)}</b> (${pct(s.chg)} hari ini) — sinyal gabungan 6-strategi: <b style="color:${ringColor};">${meta.emoji} ${strat.rating}</b> (keselarasan ${strat.agreementPct}% dari 6 lensa analisis).</li>
+                    <li>Teknikal: RSI(14) ${rsiV.toFixed(1)}, MACD ${s.macdBull ? 'bullish' : 'bearish'}, tren MA <b>${s.trendTxt || '-'}</b>, pola ${s.candleText || '-'} / ${pattern ? pattern.name : '-'}.</li>
+                    ${fundBits.length ? `<li>Fundamental ringkas: ${fundBits.join(' · ')}${s.isHalal ? ' · ☪ Syariah' : ''}.</li>` : ''}
+                    <li>Sektor <b>${s.sector || '-'}</b>${sectorSnap && sectorSnap.top && sectorSnap.top[0] ? ` — sektor terkuat hari ini: ${sectorSnap.top[0].sector} (${sectorSnap.top[0].avgChg>=0?'+':''}${sectorSnap.top[0].avgChg.toFixed(2)}%)` : ''}.</li>
+                </ul>
+            </div>`;
+
+            return badgeHtml + scoreCardHtml + tpslHtml + twinHtml + sectorHtml + summaryHtml;
+        }
+
+        // Versi teks polos dari kartu ringkasan — dipakai sebagai naskah Text-to-Audio
+        // di Mode Dasar (supaya tombol "Dengerin Analisis" tetap membacakan sesuatu yang
+        // substansial & terstruktur, bukan cuma dua kalimat generik seperti sebelumnya).
+        function buildAIQuickSummaryText(s, plan, pattern, mtf, sectorSnap) {
+            if (!plan) return `Data harga ${s.ticker} belum tersedia untuk menyusun rencana.`;
+            const strat = plan.strat;
+            const meta = AI_RATING_META[strat.rating] || AI_RATING_META['HOLD'];
+            const parts = [];
+            parts.push(`Ringkasan SobatInves AI untuk ${s.ticker}, ${s.name || s.ticker}.`);
+            parts.push(`Harga sekarang Rp ${n2(s.price)}, berubah ${pct(s.chg)} hari ini.`);
+            parts.push(`Sinyal gabungan enam strategi: ${meta.label}, dengan skor konviksi ${strat.convictionScore >= 0 ? 'plus' : 'minus'} ${Math.abs(strat.convictionScore)} dari seratus, keselarasan ${strat.agreementPct} persen.`);
+            parts.push(`Teknikal: RSI empat belas di ${(Number(s.rsi) || 0).toFixed(1)}, MACD ${s.macdBull ? 'bullish' : 'bearish'}, volume ${(Number(s.volRatio) || 0).toFixed(1)} kali rata-rata, tren moving average ${s.trendTxt || '-'}.`);
+            if (mtf && mtf.aligned) parts.push(`Konfluensi multi timeframe ${mtf.direction === 'bull' ? 'bullish' : 'bearish'} dengan kekuatan ${mtf.strength} persen.`);
+            parts.push(`Bandar sedang ${s.bandarStatus === 'acc' ? 'akumulasi' : s.bandarStatus === 'dist' ? 'distribusi' : 'netral'}.`);
+            if (s.pe > 0 || s.divY > 0) parts.push(`Fundamental ringkas: PE ${s.pe > 0 ? s.pe.toFixed(1) : '-'} kali, dividend yield ${s.divY > 0 ? s.divY.toFixed(1) : '0'} persen.`);
+            parts.push(`Rencana trading otomatis: entry area Rp ${n2(plan.entryLow)} sampai Rp ${n2(plan.entryHigh)}, target take profit satu Rp ${n2(plan.tp1)}, target take profit dua Rp ${n2(plan.tp2)}, stop loss Rp ${n2(plan.sl)}.`);
+            if (sectorSnap && sectorSnap.top && sectorSnap.top[0]) parts.push(`Sektor ${s.sector || '-'}, sektor paling kuat hari ini adalah ${sectorSnap.top[0].sector}.`);
+            parts.push('Ini skenario edukatif berbasis data teknikal dan fundamental aplikasi, bukan rekomendasi atau ajakan jual beli resmi. Tetap lakukan riset mandiri.');
+            return parts.join(' ');
+        }
+
+        // Buka/tutup narasi lengkap ala Kepala Riset (Mode AI Canggih) — kartu ringkasan
+        // di atasnya tetap selalu terlihat sebagai dasbor cepat.
+        function toggleAIFullNarrative() {
+            const wrap = document.getElementById('aiFullNarrativeWrap');
+            const btn = document.getElementById('aiFullToggleBtn');
+            const label = document.getElementById('aiFullToggleLabel');
+            if (!wrap || !label) return;
+            const isOpen = wrap.style.display !== 'none';
+            wrap.style.display = isOpen ? 'none' : 'block';
+            label.textContent = isOpen ? 'Tampilkan Analisis Lengkap ala Kepala Riset' : 'Sembunyikan Analisis Lengkap ala Kepala Riset';
+            if (btn) btn.classList.toggle('open', !isOpen);
+        }
+
+        // ─── v59: TAB "SobatInves AI" — gabungan data FMP (fundamental+teknikal real) + narasi Gemini AI ───
         const _aiLoadingMsgs = [
             'Lagi ngulik data fundamental dari FMP...', 'Nyari sinyal teknikal tersembunyi...',
             'Ngajak Gemini AI mikir bareng...', 'Nge-crosscheck bandarmologi & momentum...',
@@ -17317,31 +18774,30 @@ async function saveIDBTelegramConfig(config) {
             if (!c || !s) return;
             if (!forceRefresh && c._loadedTicker === ticker) return;
             c._loadedTicker = ticker;
+            if (typeof siStopTTS === 'function') siStopTTS(); // v70: analisis baru dimuat → hentikan audio lama
 
-            // ─── Mode dasar (belum pasang key Gemini) — tetap kasih hasil, bukan cuma error ───
+            // ─── Mode dasar (belum pasang key Gemini) — kartu ringkasan LENGKAP tetap
+            // tersaji: skor konviksi 6-strategi, badge teknikal, rencana TP/SL otomatis,
+            // kekuatan vs risiko, dan rotasi sektor — semua dari data lokal, TANPA perlu
+            // API key sama sekali. Pasang Gemini cuma menambahkan narasi naratif + berita. ───
             if (!hasGeminiKey()) {
                 const pattern0 = detectChartPattern(s);
                 const mtf0 = computeMTFConfluence(s);
-                const stance = s.score >= 7 ? { label: '📈 Akumulasi', color: 'var(--up)' } :
-                    s.score <= 4 ? { label: '⚠️ Hindari Dulu', color: 'var(--dn)' } :
-                    { label: '⏳ Wait & See', color: 'var(--warn)' };
+                const sectorSnap0 = getLeadingSectorsSnapshot();
+                const plan0 = computeAITradePlan(s);
+                const rawTextBasic = buildAIQuickSummaryText(s, plan0, pattern0, mtf0, sectorSnap0);
+                _ttsRegisterSource(rawTextBasic, 'aiTtsBtn');
                 c.innerHTML = `
                 <div class="ai-src-banner" style="background:rgba(155,123,255,0.08);border-color:rgba(155,123,255,0.3);">
                     <div class="ai-src-icon">🔒</div>
-                    <div><div class="ai-src-title" style="color:#9B7BFF;">Mode Dasar — Gemini AI belum dipasang</div><div class="ai-src-sub">Pasang API key Gemini gratis di <b>Akun → Bot AI — FMP &amp; Gemini</b> biar auto upgrade: rekomendasi beli/jual, deteksi pola multi-timeframe, sentimen berita real-time, & insight sektor.</div></div>
+                    <div><div class="ai-src-title" style="color:#9B7BFF;">Mode Dasar — Gemini AI belum dipasang</div><div class="ai-src-sub">Skor, badge teknikal, rencana TP/SL & rotasi sektor di bawah tetap 100% jalan pakai data lokal real-time. Pasang API key Gemini gratis di <b>Akun → Bot AI — FMP &amp; Gemini</b> buat naik ke mode canggih: narasi analis lengkap ala Kepala Riset, sentimen berita real-time, & pengaruh makro/komoditas.</div></div>
                 </div>
-                <div class="ai-gemini-card">
-                    <div class="ai-gemini-head">
-                        <div class="ai-gemini-badge">📊 Ringkasan Cepat (data lokal)</div>
-                        <span class="ai-mood-pill" style="background:${s.score>=7?'rgba(0,179,90,0.12)':s.score<=4?'rgba(255,59,59,0.12)':'rgba(245,166,35,0.12)'};color:${s.score>=7?'var(--up)':s.score<=4?'var(--dn)':'var(--warn)'};">Skor AI ${s.score}/10</span>
-                    </div>
-                    <p class="ai-md-p"><b>${s.ticker}</b> lagi RSI(14) di ${s.rsi?.toFixed(1) ?? '-'}, MACD ${s.macdBull ? 'bullish ✅' : 'bearish ⚠️'}, volume ${s.volRatio?.toFixed(1) ?? '-'}x rata-rata. Tren MA: ${s.trendTxt || '-'}. Pola candle/chart: ${s.candleText || '-'} / ${pattern0.name}. Bandar lagi ${s.bandarStatus === 'acc' ? 'akumulasi 🟢' : s.bandarStatus === 'dist' ? 'distribusi 🔴' : 'netral'}.</p>
-                    <p class="ai-md-p">Sikap teknikal kasar: <b style="color:${stance.color};">${stance.label}</b> ${mtf0.aligned ? `(konfluensi ${mtf0.direction === 'bull' ? 'bullish' : 'bearish'} multi-timeframe ${mtf0.strength}%)` : ''}. Ini baru dari data teknikal app doang ya, belum ada narasi AI + berita real-time.</p>
-                </div>
-                <button class="ai-regen-btn btn-ripple" onclick="openProfileFromModal && openProfileFromModal(); openProfSubPage('subpage-aikeys');">🔑 Pasang Gemini AI Sekarang</button>
+                ${renderAIQuickCard(s, plan0, pattern0, mtf0, sectorSnap0)}
+                ${_ttsControlsHtml('aiTtsBtn')}
+                <button class="ai-regen-btn btn-ripple" style="margin-top:8px;" onclick="openAIKeysFromModal()">🔑 Pasang Gemini AI Sekarang</button>
                 <div style="margin-top:10px;padding:10px 12px;background:rgba(245,166,35,0.08);border:1px solid rgba(245,166,35,0.2);border-radius:8px;">
                     <div style="font-size:9px;color:var(--warn);font-family:'IBM Plex Mono',monospace;font-weight:900;margin-bottom:4px;">⚠️ DISCLAIMER</div>
-                    <div style="font-size:10px;color:var(--t-med);font-weight:600;line-height:1.5;">Ringkasan otomatis dari indikator teknikal aplikasi, bukan rekomendasi/ajakan jual-beli. Selalu riset mandiri sebelum ambil keputusan.</div>
+                    <div style="font-size:10px;color:var(--t-med);font-weight:600;line-height:1.5;">Ringkasan &amp; rencana TP/SL otomatis dari indikator teknikal &amp; fundamental aplikasi, bukan rekomendasi/ajakan jual-beli. Selalu riset mandiri sebelum ambil keputusan.</div>
                 </div>`;
                 return;
             }
@@ -17360,9 +18816,9 @@ async function saveIDBTelegramConfig(config) {
             const results = await Promise.allSettled([
                 fetchFMPQuote(ticker), fetchFMPProfile(ticker), fetchFMPRatios(ticker),
                 fetchFMPKeyMetrics(ticker), fetchFMPGrowth(ticker), fetchFMPTechnical(ticker, 'rsi', 14, '1day'),
-                fetchTickerSentimentNews(ticker, s.name)
+                fetchTickerSentimentNews(ticker, s.name), fetchGlobalMacroNews()
             ]);
-            const [rQuote, rProfile, rRatios, rMetrics, rGrowth, rTech, rNews] = results;
+            const [rQuote, rProfile, rRatios, rMetrics, rGrowth, rTech, rNews, rGeoNews] = results;
             const fmpQuote = rQuote.status === 'fulfilled' ? rQuote.value : null;
             const fmpProfile = rProfile.status === 'fulfilled' ? rProfile.value : null;
             const fmpRatios = rRatios.status === 'fulfilled' ? rRatios.value : null;
@@ -17370,6 +18826,7 @@ async function saveIDBTelegramConfig(config) {
             const fmpGrowth = rGrowth.status === 'fulfilled' ? rGrowth.value : null;
             const fmpTech = rTech.status === 'fulfilled' ? rTech.value : [];
             const tickerNews = rNews.status === 'fulfilled' ? rNews.value : [];
+            const globalMacroNews = rGeoNews.status === 'fulfilled' ? rGeoNews.value : [];
             const fmpOk = !!(fmpQuote || fmpProfile || fmpRatios || fmpMetrics);
             const sectorSnap = getLeadingSectorsSnapshot();
             // ✅ v66 — Cek harga komoditas HANYA kalau sektor emiten ini relevan (Energi, Tambang,
@@ -17379,12 +18836,31 @@ async function saveIDBTelegramConfig(config) {
             if (relevantCommKeys.length && !(idxCache['GOLD'] || idxCache['OIL'] || idxCache['CPO'] || idxCache['COAL'])) {
                 try { await fetchIndices('commodities'); } catch (e) {}
             }
+            // ✅ v67 — "SobatInves AI" ala Hedge Fund: tarik juga IHSG, kurs Rupiah (USD/IDR), dan indeks
+            // Wall Street (S&P500/Nasdaq/Dow) kalau belum ada di cache, biar prompt AI punya lapisan
+            // "Sentimen Global & Makro" yang sesungguhnya (bukan cuma komoditas & berita mikro).
+            if (!idxCache['IDX']) { try { await fetchIndices('asia'); } catch (e) {} }
+            if (!(idxCache['SPX'] || idxCache['NDX'] || idxCache['DJI'])) { try { await fetchIndices('us'); } catch (e) {} }
+            if (!idxCache['USDIDR']) { try { await fetchIndices('forex'); } catch (e) {} }
             if (currentModalTicker !== ticker) { clearInterval(msgTimer); return; } // user sudah pindah emiten lain
 
             // ─── 2) Susun konteks data lokal (indikator yang sudah dihitung app) ───
             const pattern = detectChartPattern(s);
             const mtf = computeMTFConfluence(s);
             const fibZ = fibZoneInfo(s);
+            // ✅ v75 — Rencana TP/SL deterministik (Pivot/MA/52w-range), dihitung SEKALI di sini
+            // lalu (a) dirender ke kartu ringkasan visual yang selalu tampil di atas narasi, DAN
+            // (b) disuntik ke prompt sebagai angka OTORITATIF supaya bagian "Target TP/SL" di
+            // narasi Gemini tidak pernah kontradiksi dengan angka yang tampil di kartu.
+            const plan = computeAITradePlan(s);
+            const tpslCtx = plan ? `
+RENCANA TP/SL YANG SUDAH DIHITUNG MESIN APLIKASI (dari Pivot Point/MA/rentang 52-minggu — pakai PERSIS angka ini di bagian "Target Take Profit & Stop Loss", boleh dibulatkan wajar & ditambah kalimat penjelasan, JANGAN hitung ulang angka yang berbeda):
+- Entry area: Rp ${n2(plan.entryLow)} – Rp ${n2(plan.entryHigh)}
+- Target TP1: Rp ${n2(plan.tp1)} (${plan.tp1Pct>=0?'+':''}${plan.tp1Pct.toFixed(1)}%)
+- Target TP2: Rp ${n2(plan.tp2)} (${plan.tp2Pct>=0?'+':''}${plan.tp2Pct.toFixed(1)}%)
+- Stop-Loss: Rp ${n2(plan.sl)} (${plan.slPct.toFixed(1)}%)
+- Risk:Reward ke TP1 ±1:${plan.rr1.toFixed(1)}, ke TP2 ±1:${plan.rr2.toFixed(1)}
+- Rating gabungan 6-strategi (Trend/Momentum/Mean-Reversion/Volume/Breakout/Fundamental): ${plan.strat.rating} (skor konviksi ${plan.strat.convictionScore>=0?'+':''}${plan.strat.convictionScore}/100, keselarasan ${plan.strat.agreementPct}%)` : '';
             const localCtx = `
 DATA LOKAL APLIKASI (real-time BEI, sudah dihitung):
 - Ticker: ${s.ticker} (${s.name || s.ticker}) — Sektor: ${s.sector || '-'}
@@ -17442,40 +18918,77 @@ KONDISI SEKTOR BURSA SAAT INI (dihitung real-time dari seluruh data emiten di ap
                 return `\nHARGA KOMODITAS GLOBAL RELEVAN (real-time, ikut mempengaruhi sektor ${s.sector || '-'} emiten ini):\n${lines.join('\n')}`;
             })();
 
-            const prompt = `Kamu adalah analis saham senior yang jago teknikal & fundamental Bursa Efek Indonesia (BEI), dengan kemampuan tambahan: membaca sentimen makro/mikro ekonomi & berita, mengaitkan harga komoditas global ke emiten yang terdampak, deteksi pola multi-timeframe, dan mengaitkan posisi emiten dengan rotasi sektor pasar saat ini. Gaya ngomongmu santai dan gaul khas anak saham/trader retail Indonesia di komunitas (boleh pakai istilah seperti "cuan", "sat set", "wait and see", "ARA/ARB", "cutloss", "hold santuy", dsb secukupnya, jangan berlebihan/norak). Meski santai, analisismu HARUS tajam, presisi, jujur, dan hati-hati — jangan hype/pompom, jangan asal optimis, sebutkan risiko dengan jelas.
+            // ✅ v67 — SENTIMEN GLOBAL: IHSG, kurs Rupiah (USD/IDR), & Wall Street (S&P500/Nasdaq/Dow).
+            // Dibaca ala meja riset hedge fund: emiten tidak berdiri sendiri, tapi terkoneksi ke
+            // arah indeks domestik, kekuatan/kelemahan Rupiah, dan risk appetite global (Wall Street).
+            // v71 — ditambah BERITA GEOPOLITIK & MAKRO GLOBAL (The Fed/suku bunga AS, geopolitik, minyak
+            // dunia) dari fetchGlobalMacroNews() supaya bagian ini bicara berbasis judul berita nyata,
+            // bukan cuma angka indeks & bukan cuma asumsi umum.
+            const globalCtx = (() => {
+                const ihsg = idxCache['IDX'], usdidr = idxCache['USDIDR'], spx = idxCache['SPX'],
+                    ndx = idxCache['NDX'], dji = idxCache['DJI'];
+                const lines = [];
+                if (ihsg && ihsg.price) lines.push(`- IHSG (indeks bursa domestik): ${n2(ihsg.price)} (${ihsg.chg>=0?'+':''}${ihsg.chg.toFixed(2)}% hari ini)`);
+                if (usdidr && usdidr.price) lines.push(`- Kurs USD/IDR (Rupiah): Rp ${n2(usdidr.price)} (${usdidr.chg>=0?'+':''}${usdidr.chg.toFixed(2)}% hari ini — ${usdidr.chg>=0?'Rupiah melemah vs Dolar':'Rupiah menguat vs Dolar'})`);
+                if (spx && spx.price) lines.push(`- Wall Street S&amp;P 500: ${spx.chg>=0?'+':''}${spx.chg.toFixed(2)}% (sentimen risk-on/off global)`);
+                if (ndx && ndx.price) lines.push(`- Wall Street Nasdaq 100: ${ndx.chg>=0?'+':''}${ndx.chg.toFixed(2)}%`);
+                if (dji && dji.price) lines.push(`- Wall Street Dow Jones: ${dji.chg>=0?'+':''}${dji.chg.toFixed(2)}%`);
+                const geoLines = (globalMacroNews || []).slice(0, 3).map(n =>
+                    `- [${n.date ? new Date(n.date).toLocaleDateString('id-ID') : '-'}] ${n.title}${n.desc ? ' — ' + n.desc : ''} (${n.source || '-'})`);
+                let out = '';
+                if (lines.length) {
+                    out += `\nSENTIMEN GLOBAL & MAKRO REAL-TIME (kondisi bursa domestik, kekuatan Rupiah, dan risk appetite Wall Street — ikut menentukan arah dana asing & IHSG):\n${lines.join('\n')}`;
+                } else {
+                    out += '\nCATATAN SENTIMEN GLOBAL: Data IHSG/Rupiah/Wall Street real-time sedang tidak berhasil ditarik saat ini — bahas secara kualitatif seperlunya, JANGAN mengarang angka pasti.';
+                }
+                if (geoLines.length) {
+                    out += `\n\nBERITA GEOPOLITIK & MAKRO GLOBAL TERBARU (The Fed/suku bunga AS, geopolitik, harga minyak dunia, resesi/perang dagang — untuk bahan bahasan sentimen global & suku bunga):\n${geoLines.join('\n')}`;
+                } else {
+                    out += '\n\nCATATAN: Tidak ada berita geopolitik/makro global spesifik yang berhasil ditarik saat ini — kalau mau singgung geopolitik/suku bunga The Fed, bahas kualitatif seperlunya berdasarkan tren umum, JANGAN mengarang judul berita atau angka spesifik yang tidak ada di data ini.';
+                }
+                return out;
+            })();
 
+            const prompt = `Kamu adalah Kepala Riset (Head of Research) di sebuah meja trading/hedge fund yang fokus di Bursa Efek Indonesia (BEI) — analisismu dibangun dengan disiplin "top-down" ala institusi besar: mulai dari gambaran besar (sentimen global & makro), lalu makin menyempit ke sektor, ke fundamental perusahaan, baru ke teknikal & timing entry/exit — persis cara hedge fund menyusun tesis sebelum ambil posisi. Kamu jago teknikal & fundamental BEI, jago membaca sentimen makro/mikro ekonomi & berita termasuk isu geopolitik dan kebijakan suku bunga bank sentral (BI & The Fed), jago mengaitkan harga komoditas global & kurs Rupiah ke emiten yang terdampak, jago deteksi pola candlestick (termasuk varian Doji, Hammer/Hanging Man, Shooting Star/Inverted Hammer, Spinning Top, Marubozu) & pola chart (Double Top/Bottom, Head & Shoulders, Cup & Handle, Triangle) multi-timeframe, dan jago mengaitkan posisi emiten dengan rotasi sektor pasar saat ini.
+
+Gaya ngomongmu SANTAI BANGET kayak lagi nongkrong bareng temen deket di warkop/grup saham — ngobrol asik ala anak saham/trader retail Indonesia, boleh sesekali ketawa-ketawa kecil di kalimat pembuka/penutup (misal "wkwk", "hehe", "santuy dulu bre") secukupnya, jangan berlebihan. Boleh pakai istilah gaul saham seperti "cuan", "sat set", "wait and see", "ARA/ARB", "cutloss", "hold santuy", "gercep", "war di harga", dsb secukupnya, jangan berlebihan/norak/spam emoji. Selipkan JUGA sedikit kosakata gaul Sunda modern secukupnya biar berasa akrab/nostalgia lokal — misalnya "euy", "pisan", "atuh", "mah", "teh", "we/wae", "kumaha", "cenah", "tos" — dipakai nyelip natural di kalimat Bahasa Indonesia gaul (BUKAN nulis kalimat penuh Bahasa Sunda), dan jangan dipaksakan di setiap kalimat biar tetap gampang dipahami semua pembaca Indonesia termasuk yang bukan orang Sunda. TAPI meskipun santai & sambil ketawa-ketawa, isi kepalamu tetap seorang profesional riset kelas hedge fund: analisismu HARUS tajam, presisi, berbasis data, jujur, dan hati-hati — jangan hype/pompom, jangan asal optimis, jangan FOMO-in orang, sebutkan risiko dan skenario gagal (invalidation) dengan jelas setara caramu bicara ke investor institusi, cuma bahasanya aja yang santuy & renyah buat trader retail.
+
+${globalCtx}
 ${localCtx}
 ${fmpCtx}
 ${newsCtx}
 ${sectorCtx}
 ${commodityCtx}
+${tpslCtx}
 
-Tulis analisis dalam Bahasa Indonesia gaul santai dengan ALUR/URUTAN BERPIKIR seorang analis profesional, pakai heading "## " persis seperti daftar berikut, dan "- " untuk poin (JANGAN ubah urutan atau nama heading):
+Tulis analisis dalam Bahasa Indonesia gaul santai dengan ALUR/URUTAN BERPIKIR seorang analis profesional top-down (global → makro → sektor → perusahaan → teknikal → strategi), pakai heading "## " persis seperti daftar berikut, dan "- " untuk poin (JANGAN ubah urutan atau nama heading):
 ## Ringkasan Kilat
-## 1️⃣ Analisis Fundamental
-## 2️⃣ Sentimen Makro & Mikro Ekonomi
-## 3️⃣ Pengaruh Harga Komoditas
-## 4️⃣ Analisis Teknikal Lengkap
-## 5️⃣ Arus Dana & Bandarmologi
-## 6️⃣ Strategi & Peluang
-## 7️⃣ Target Take Profit & Stop Loss
-## 8️⃣ Analisa Tambahan & Rekomendasi Sektor
+## 1️⃣ Sentimen Global & Makro
+## 2️⃣ Sentimen Mikro & Berita Perusahaan
+## 3️⃣ Analisis Fundamental
+## 4️⃣ Pengaruh Harga Komoditas
+## 5️⃣ Analisis Teknikal & Pola Candlestick Lengkap
+## 6️⃣ Arus Dana & Bandarmologi
+## 7️⃣ Strategi & Peluang
+## 8️⃣ Target Take Profit & Stop Loss (Manajemen Risiko)
+## 9️⃣ Analisa Tambahan & Rekomendasi Sektor
 
 Panduan tiap bagian:
-- "Ringkasan Kilat": 2-3 kalimat TL;DR sikap keseluruhan duluan sebelum masuk detail (biar pembaca yang buru-buru tetap dapat inti).
-- "1️⃣ Analisis Fundamental": bedah dulu kesehatan bisnisnya dari data FMP/lokal di atas (valuasi PE/PBV, ROE, utang, pertumbuhan, Graham Number kalau ada) — INI JADI DASAR PALING AWAL sebelum bicara teknikal.
-- "2️⃣ Sentimen Makro & Mikro Ekonomi": gabungkan sentimen berita terkini soal emiten (mikro) DENGAN kondisi makro yang relevan (suku bunga BI, inflasi, nilai tukar rupiah, kebijakan pemerintah/sektor) kalau datanya mendukung — jangan mengarang data makro yang tidak disebutkan di atas, cukup insight umum yang wajar.
-- "3️⃣ Pengaruh Harga Komoditas": KALAU ada data "HARGA KOMODITAS GLOBAL RELEVAN" di atas, bahas bagaimana pergerakan komoditas itu berpotensi mempengaruhi kinerja emiten ini (margin, pendapatan, biaya produksi). KALAU TIDAK ADA data komoditas sama sekali di konteks (sektor emiten memang tidak berkaitan langsung ke komoditas, misalnya perbankan/teknologi/telko), tulis singkat 1 kalimat bahwa harga komoditas global tidak berdampak signifikan/langsung ke emiten ini — JANGAN mengarang keterkaitan yang tidak masuk akal.
-- "4️⃣ Analisis Teknikal Lengkap": RSI, Stochastic, MACD, Bollinger, tren MA/Golden Cross, konfluensi multi-timeframe (Daily/Weekly/Monthly), pola candle & pola chart otomatis, level Fibonacci — pakai semua data teknikal lokal di atas.
-- "5️⃣ Arus Dana & Bandarmologi": status akumulasi/distribusi, volume vs rata-rata, dan apa artinya untuk pergerakan harga ke depan.
-- "6️⃣ Strategi & Peluang": kasih sikap SEJELAS mungkin dengan label besar (contoh: 🟢 AKUMULASI / 🟡 TUNGGU KONFIRMASI / 🔴 HINDARI DULU / ⚪ CUTLOSS), jelaskan skenario/peluang dan alasannya berdasarkan gabungan fundamental+makro+komoditas+teknikal di atas (bukan cuma teknikal doang).
-- "7️⃣ Target Take Profit & Stop Loss": WAJIB kasih angka KONKRET kalau datanya mendukung (pakai level support/resisten/pivot/Fibonacci yang sudah ada di data) — format jelas misalnya "Entry area: Rp X - Rp Y", "Target TP1: Rp X (+Z%)", "Target TP2: Rp X (+Z%)" kalau relevan, "Stop-Loss/Cutloss: di bawah Rp X (-Z%)". Kalau data pivot/support-resisten tidak cukup mendukung angka presisi, boleh kasih range perkiraan berbasis level yang ada, tapi tetap harus ada angka, jangan cuma "tentukan sendiri". Tegaskan ini SKENARIO EDUKATIF berbasis data, bukan rekomendasi/ajakan beli-jual resmi, keputusan akhir 100% di tangan investor.
-- "8️⃣ Analisa Tambahan & Rekomendasi Sektor": insight penutup — posisi emiten ini dibanding sektornya (pakai data sektor di atas), sektor lain yang sedang lebih kuat kalau investor mau diversifikasi/rotasi, dan satu hal penting lain yang belum kebahas (misal risiko likuiditas, katalis mendatang, dsb) kalau ada.
+- "Ringkasan Kilat": 2-3 kalimat TL;DR sikap keseluruhan duluan sebelum masuk detail (biar pembaca yang buru-buru tetap dapat inti) — sebutkan juga level konviksi kamu (Tinggi/Sedang/Rendah) berdasarkan seberapa banyak sinyal (global+makro+fundamental+teknikal) yang SEARAH/selaras.
+- "1️⃣ Sentimen Global & Makro": buka dengan gambaran besar dulu ala meja riset hedge fund — pakai data "SENTIMEN GLOBAL & MAKRO REAL-TIME" (arah IHSG, kuat/lemahnya Rupiah/USD-IDR, risk appetite Wall Street S&P500/Nasdaq/Dow) DAN data "BERITA GEOPOLITIK & MAKRO GLOBAL TERBARU" di atas (kebijakan suku bunga The Fed/BI, isu geopolitik, harga minyak dunia, resesi/perang dagang) kalau tersedia — jelaskan gimana kondisi ini secara umum mendorong atau menahan minat investor asing & dana besar masuk ke saham BEI termasuk emiten ini. Jangan mengarang angka atau judul berita makro/geopolitik yang tidak disebutkan di atas.
+- "2️⃣ Sentimen Mikro & Berita Perusahaan": fokus ke level PERUSAHAAN — sentimen dari berita terbaru terkait emiten ini spesifik (aksi korporasi, kinerja, isu manajemen, rumor pasar, dsb dari data berita di atas). Kalau tidak ada berita, bilang terus terang sepi katalis, jangan mengarang.
+- "3️⃣ Analisis Fundamental": bedah kesehatan bisnisnya dari data FMP/lokal di atas (valuasi PE/PBV, ROE, utang/Debt-Equity, pertumbuhan revenue/EPS, Graham Number kalau ada) — apakah harga saat ini murah/wajar/mahal secara fundamental.
+- "4️⃣ Pengaruh Harga Komoditas": KALAU ada data "HARGA KOMODITAS GLOBAL RELEVAN" di atas, bahas bagaimana pergerakan komoditas itu berpotensi mempengaruhi kinerja emiten ini (margin, pendapatan, biaya produksi). KALAU TIDAK ADA data komoditas sama sekali di konteks (sektor emiten memang tidak berkaitan langsung ke komoditas, misalnya perbankan/teknologi/telko), tulis singkat 1 kalimat bahwa harga komoditas global tidak berdampak signifikan/langsung ke emiten ini — JANGAN mengarang keterkaitan yang tidak masuk akal.
+- "5️⃣ Analisis Teknikal & Pola Candlestick Lengkap": bedah LENGKAP — RSI, Stochastic, MACD, Bollinger Band, tren MA/Golden Cross, konfluensi multi-timeframe (Daily/Weekly/Monthly, sebut jelas kalau selaras atau belum), level Fibonacci retracement/golden zone, DAN pola candlestick + pola chart klasik yang terdeteksi di data ("Pola candle" & "Pola chart otomatis" di atas) — jelaskan MAKNA pola itu sesuai konteks tren yang tertulis di datanya (misal Hammer di downtrend = potensi reversal naik, tapi kalau labelnya justru "Hammer-shape di Uptrend" itu artinya mirip Hanging Man = sinyal waspada bukan bullish; Shooting Star di uptrend = potensi reversal turun, sedang "Shooting Star-shape di Downtrend" mirip Inverted Hammer = potensi bullish tapi perlu konfirmasi; Dragonfly/Gravestone Doji = varian Doji yang lebih condong arah; Spinning Top = indecision; Double Top/Bottom & Head & Shoulders = reversal; Cup & Handle & Triangle = continuation/breakout, dst — sesuaikan dengan nama pola yang BENERAN muncul di data, jangan sebut pola yang tidak ada di data), dan sebutkan APA yang jadi konfirmasi/pembatal (invalidation) dari pola tersebut biar analisisnya presisi bukan cuma sebut nama pola doang.
+- "6️⃣ Arus Dana & Bandarmologi": status akumulasi/distribusi, volume vs rata-rata, dan apa artinya untuk pergerakan harga ke depan — termasuk kaitkan dengan sentimen global di bagian 1 (misal: kalau Rupiah lagi tertekan/asing lagi risk-off, biasanya dana asing cenderung keluar dulu dari saham BEI).
+- "7️⃣ Strategi & Peluang": kasih sikap SEJELAS mungkin dengan label besar (contoh: 🟢 AKUMULASI / 🟡 TUNGGU KONFIRMASI / 🔴 HINDARI DULU / ⚪ CUTLOSS), jelaskan skenario/peluang dan alasannya berdasarkan gabungan SEMUA lapisan analisis di atas (global+makro+mikro+fundamental+komoditas+teknikal+bandarmologi) — bukan cuma teknikal doang, persis cara hedge fund merangkum tesis sebelum eksekusi.
+- "8️⃣ Target Take Profit & Stop Loss (Manajemen Risiko)": PAKAI PERSIS angka dari "RENCANA TP/SL YANG SUDAH DIHITUNG MESIN APLIKASI" di atas (Entry area, TP1, TP2, Stop-Loss, Risk:Reward) — jangan hitung ulang angka lain yang berbeda dari itu, supaya konsisten dengan kartu ringkasan yang dilihat pengguna. Tugasmu di bagian ini adalah MENJELASKAN kenapa level-level itu masuk akal (kaitkan ke pivot/support-resisten/MA/52w-range yang relevan dari data teknikal di atas) dan kasih saran manajemen risiko praktis ala trading desk (misal jangan all-in di satu entry, boleh nyicil/scaling-in, atau size posisi kecil dulu kalau sinyal belum 100% selaras). Tegaskan ini SKENARIO EDUKATIF berbasis data, bukan rekomendasi/ajakan beli-jual resmi, keputusan akhir & besaran risiko 100% di tangan investor.
+- "9️⃣ Analisa Tambahan & Rekomendasi Sektor": insight penutup — posisi emiten ini dibanding sektornya (pakai data sektor di atas), sektor lain yang sedang lebih kuat kalau investor mau diversifikasi/rotasi, dan satu hal penting lain yang belum kebahas (misal risiko likuiditas, katalis mendatang, sensitivitas ke Rupiah/suku bunga, dsb) kalau ada.
 
-Jangan mengarang angka, berita, atau data makro/komoditas yang tidak tersedia di konteks di atas. Maksimal sekitar 650-750 kata total, padat dan tajam, jangan bertele-tele.`;
+Jangan mengarang angka, berita, atau data global/makro/komoditas yang tidak tersedia di konteks di atas. Tulis LENGKAP & mendalam, sekitar 900-1100 kata total (boleh lebih kalau datanya kaya) — tetap padat & tajam per kalimat (hindari basa-basi kosong), tapi jangan dipotong pendek; pastikan ke-9 bagian di atas dibahas satu-satu dengan cukup detail, bukan cuma 1-2 kalimat generik per bagian.`;
 
             try {
-                const aiText = await callGemini(prompt, { temperature: 0.8, maxTokens: 2200 });
+                const aiText = await callGemini(prompt, { temperature: 0.8, maxTokens: 3200 });
                 clearInterval(msgTimer);
                 if (currentModalTicker !== ticker) return;
                 const fundGridHtml = fmpOk ? `<div class="ai-fund-grid">
@@ -17493,18 +19006,27 @@ Jangan mengarang angka, berita, atau data makro/komoditas yang tidak tersedia di
                     <div><div class="ai-src-title">Mode AI Canggih Aktif</div><div class="ai-src-sub">${fmpOk ? 'FMP' : 'Data lokal'} + Berita real-time + Sektor + Gemini AI</div></div>
                 </div>
                 ${fundGridHtml}
-                <div class="ai-gemini-card">
-                    <div class="ai-gemini-head">
-                        <div class="ai-gemini-badge">✨ Analisis AI Tajam</div>
-                        <span class="ai-mood-pill" style="background:${s.score>=7?'rgba(0,179,90,0.12)':s.score<=4?'rgba(255,59,59,0.12)':'rgba(245,166,35,0.12)'};color:${s.score>=7?'var(--up)':s.score<=4?'var(--dn)':'var(--warn)'};">Skor AI ${s.score}/10</span>
+                ${renderAIQuickCard(s, plan, pattern, mtf, sectorSnap)}
+                <button class="ai-full-toggle btn-ripple open" id="aiFullToggleBtn" onclick="toggleAIFullNarrative()">
+                    <span id="aiFullToggleLabel">Sembunyikan Analisis Lengkap ala Kepala Riset</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div id="aiFullNarrativeWrap" style="display:block;">
+                    <div class="ai-gemini-card">
+                        <div class="ai-gemini-head">
+                            <div class="ai-gemini-badge">✨ Analisis SobatInves AI</div>
+                            <span class="ai-mood-pill" style="background:${s.score>=7?'rgba(0,179,90,0.12)':s.score<=4?'rgba(255,59,59,0.12)':'rgba(245,166,35,0.12)'};color:${s.score>=7?'var(--up)':s.score<=4?'var(--dn)':'var(--warn)'};">Skor AI ${s.score}/10</span>
+                        </div>
+                        ${renderLiteMarkdown(aiText)}
                     </div>
-                    ${renderLiteMarkdown(aiText)}
                 </div>
-                <button class="ai-regen-btn btn-ripple" onclick="loadModalAIAnalysis('${s.ticker}', true)">🔄 Analisis Ulang</button>
+                ${_ttsControlsHtml('aiTtsBtn')}
+                <button class="ai-regen-btn btn-ripple" style="margin-top:8px;" onclick="loadModalAIAnalysis('${s.ticker}', true)">🔄 Analisis Ulang</button>
                 <div style="margin-top:10px;padding:10px 12px;background:rgba(245,166,35,0.08);border:1px solid rgba(245,166,35,0.2);border-radius:8px;">
                     <div style="font-size:9px;color:var(--warn);font-family:'IBM Plex Mono',monospace;font-weight:900;margin-bottom:4px;">⚠️ DISCLAIMER</div>
                     <div style="font-size:10px;color:var(--t-med);font-weight:600;line-height:1.5;">Analisis dihasilkan AI (Gemini) berdasarkan data FMP, berita, & indikator aplikasi — bisa saja meleset. Bukan rekomendasi/ajakan jual-beli resmi. Selalu lakukan riset mandiri dan pertimbangkan profil risiko sebelum mengambil keputusan investasi.</div>
                 </div>`;
+                _ttsRegisterSource(aiText, 'aiTtsBtn');
             } catch (err) {
                 clearInterval(msgTimer);
                 if (currentModalTicker !== ticker) return;
@@ -17535,7 +19057,7 @@ Jangan mengarang angka, berita, atau data makro/komoditas yang tidak tersedia di
                 _fmpExplorerLoaded = true;
                 if (!_fmpExplorerList.length) {
                     statusEl.textContent = '⚠️ FMP tidak mengembalikan emiten untuk exchange JKT (kemungkinan limitasi plan/API).';
-                    listEl.innerHTML = '<div style="text-align:center;padding:30px;color:var(--t-med);border:1px dashed var(--border-strong);border-radius:var(--radius-lg);font-weight:700;background:var(--card-bg);">Coba tombol 🔄 lagi sesaat lagi, atau cek dulu tab "AI Tajam" di salah satu emiten (fallback data lokal tetap jalan).</div>';
+                    listEl.innerHTML = '<div style="text-align:center;padding:30px;color:var(--t-med);border:1px dashed var(--border-strong);border-radius:var(--radius-lg);font-weight:700;background:var(--card-bg);">Coba tombol 🔄 lagi sesaat lagi, atau cek dulu tab "SobatInves AI" di salah satu emiten (fallback data lokal tetap jalan).</div>';
                     return;
                 }
                 statusEl.textContent = '✅ ' + _fmpExplorerList.length + ' emiten dari FMP · ' +
@@ -17633,10 +19155,13 @@ Rasio TTM: ROE ${ratios?.returnOnEquityTTM ?? '-'}, Net Margin ${ratios?.netProf
 
 Tulis singkat (maks 200 kata): 1-2 kalimat ringkasan kondisi, poin valuasi, poin risiko, dan sikap umum (Layak Dipantau / Kurang Menarik / Data Terlalu Minim untuk Disimpulkan). Tegaskan ini bukan rekomendasi beli/jual.`;
                 const aiText = await callGemini(prompt, { temperature: 0.8, maxTokens: 700 });
+                const ttsBtnId = 'aiTtsBtn-fmp-' + ticker;
                 target.innerHTML = `<div class="ai-gemini-card" style="margin-top:10px;">
-                    <div class="ai-gemini-head"><div class="ai-gemini-badge">✨ Analisis AI (mode FMP-only)</div></div>
+                    <div class="ai-gemini-head"><div class="ai-gemini-badge">✨ SobatInves AI (mode FMP-only)</div></div>
                     ${renderLiteMarkdown(aiText)}
-                </div>`;
+                </div>
+                ${_ttsControlsHtml(ttsBtnId)}`;
+                _ttsRegisterSource(aiText, ttsBtnId);
             } catch (err) {
                 target.innerHTML = `<div class="ai-err-box" style="margin-top:10px;font-size:11px;">${(err && err.message) || 'Gagal memuat analisis AI.'}</div>`;
             }
@@ -17681,12 +19206,22 @@ Tulis singkat (maks 200 kata): 1-2 kalimat ringkasan kondisi, poin valuasi, poin
             renderWlHeatmap();
         }
 
+        // ✅ v79 — Modal saham dibuat lebih lega KHUSUS saat tab "Chart" aktif (lihat
+        // breakpoint .modal-sheet.wide-chart di stylesheet utama). Dipusatkan di satu
+        // fungsi supaya openModal()/closeModal()/mTab() semuanya konsisten.
+        function toggleModalWideChart(isChartTab) {
+            const sheet = document.getElementById('modalSheet');
+            if (!sheet) return;
+            sheet.classList.toggle('wide-chart', !!isChartTab);
+        }
+
         function mTab(btn, id) {
             document.querySelectorAll('.m-tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.m-pane').forEach(p => p.classList.remove('active'));
             if (btn) btn.classList.add('active');
             const d = document.getElementById(id);
             if (d) d.classList.add('active');
+            toggleModalWideChart(id === 'mt-chart');
             if (navigator.vibrate) navigator.vibrate(15);
         }
 
@@ -18804,8 +20339,9 @@ Tulis singkat (maks 200 kata): 1-2 kalimat ringkasan kondisi, poin valuasi, poin
                 </table>
               </div>
               <div class="ai-widget-btns">
-                <button class="ai-btn ai-btn-primary" onclick="openModal('${s.ticker}')">📊 BUKA MODAL</button>
-                <button class="ai-btn ai-btn-outline" onclick="window.open('https://www.tradingview.com/chart/?symbol=IDX:${s.ticker}', '_blank')">📈 TRADINGVIEW</button>
+                <button class="ai-btn ai-btn-primary" onclick="openModalToAI('${s.ticker}')">🧠 SOBATINVES AI</button>
+                <button class="ai-btn ai-btn-outline" onclick="openModal('${s.ticker}')">📊 MODAL</button>
+                <button class="ai-btn ai-btn-outline" onclick="window.open('https://www.tradingview.com/chart/?symbol=IDX:${s.ticker}', '_blank')">📈 TV</button>
               </div>
             </div>
           `;
@@ -19155,6 +20691,15 @@ Tulis singkat (maks 200 kata): 1-2 kalimat ringkasan kondisi, poin valuasi, poin
         // Tutup radar dulu, baru buka modal saham. Saat modal ditutup, radar dibuka
         // kembali otomatis supaya pengguna bisa lanjut menjelajah anomali lain.
         let cameFromRadar = false;
+        function openModalToAI(ticker) {
+            // Jalan pintas dari widget chat "SobatInves AI" → langsung buka modal DAN
+            // pindah ke tab analisis SobatInves AI (bukan tab Chart default), karena
+            // konteksnya sudah jelas: pengguna sedang minta analisis, bukan sekadar chart.
+            openModal(ticker);
+            const tabBtn = document.querySelector('.m-tab[onclick*="mt-ai"]');
+            if (tabBtn) { mTab(tabBtn, 'mt-ai'); loadModalAIAnalysis(ticker); }
+        }
+
         function openModalFromRadar(ticker) {
             ticker = sanitizeTicker(ticker);   // ✅ v37: sanitise before opening
             const radarOverlay = document.getElementById('radarPanelOverlay');
@@ -20882,6 +22427,24 @@ Tulis singkat (maks 200 kata): 1-2 kalimat ringkasan kondisi, poin valuasi, poin
                 nav('profil', document.querySelector('.nav-btn[onclick*="profil"]') || activeNav);
                 setTimeout(() => openProfSubPage('subpage-panduan'), 340);
             } catch (e) { console.warn('openGuide error:', e); }
+        }
+
+        // ✅ v75 FIX — ROOT CAUSE tombol "Pasang Gemini AI Sekarang" di tab SobatInves AI
+        // (Mode Dasar) tidak pernah benar-benar membuka halaman pengaturan key: tombol lama
+        // memanggil `openProfileFromModal()`, sebuah fungsi yang TIDAK PERNAH didefinisikan
+        // di manapun (hanya dijaga `&&` supaya tidak error, tapi jadi no-op diam-diam), lalu
+        // langsung memanggil openProfSubPage() TANPA lebih dulu pindah ke halaman "Akun" (nav)
+        // maupun menutup modal saham yang sedang terbuka — akibatnya subpage pengaturan
+        // ter-render tersembunyi di belakang modal / di halaman yang sedang tidak aktif.
+        // Fix: ikuti pola openGuide() di atas — tutup modal, pindah ke tab Akun, baru buka
+        // subpage "Bot AI — FMP & Gemini" setelah transisi halaman selesai.
+        function openAIKeysFromModal() {
+            try {
+                if (typeof closeModal === 'function') closeModal();
+                const activeNav = document.querySelector('.nav-btn.active');
+                nav('profil', document.querySelector('.nav-btn[onclick*="profil"]') || activeNav);
+                setTimeout(() => openProfSubPage('subpage-aikeys'), 340);
+            } catch (e) { console.warn('openAIKeysFromModal error:', e); }
         }
 
         // Accordion toggle — hanya satu topik terbuka pada satu waktu agar rapi di mobile.
@@ -22722,8 +24285,16 @@ Tulis singkat (maks 200 kata): 1-2 kalimat ringkasan kondisi, poin valuasi, poin
             if (navigator.vibrate) navigator.vibrate([30,15,30]);
             /* confetti removed */
 
-            // Auto-send Telegram notification for trade
-            sendTradeJournalTelegram(trade, realizedPL, pairedTrade);
+            // ✅ v77 FIX: auto-send ke Telegram DIHAPUS dari sini. Sebelumnya SETIAP trade
+            // yang dicatat di Jurnal (transaksi pribadi pengguna) otomatis ditembak ke bot
+            // Telegram tanpa syarat (category=null di sendTelegram → tidak bisa dimatikan
+            // lewat toggle "Filter Notifikasi" di halaman Bot Telegram sama sekali, dan tidak
+            // pernah didaftarkan di daftar "Jenis Pesan Telegram" pada halaman itu). Ini yang
+            // membuat notifikasi pembelian Jurnal nyelonong ke channel Telegram tanpa
+            // sepengetahuan/kendali pengguna. Catatan Jurnal adalah data pribadi, bukan
+            // sinyal pasar — jadi TIDAK di-broadcast otomatis lagi. Fungsi
+            // sendTradeJournalTelegram() tetap dipertahankan di bawah (tidak dihapus) supaya
+            // bisa dipakai lagi nanti kalau mau dipasang di belakang toggle eksplisit.
         }
 
         function sendTradeJournalTelegram(trade, realizedPL, buyTrade) {
@@ -23574,6 +25145,37 @@ Tulis singkat (maks 200 kata): 1-2 kalimat ringkasan kondisi, poin valuasi, poin
             </svg>`;
         }
 
+        // ✅ v77 — Edit Saldo Jurnal dari halaman Profil (kartu "TOTAL SALDO"). Nominal yang
+        // diisi di sini adalah MODAL AWAL (journalCapital) — variabel & localStorage key yang
+        // SAMA dengan yang dipakai calcJournalStats()/renderJournal() di halaman Jurnal, jadi
+        // begitu disimpan angkanya otomatis konsisten di kedua tempat (Profil & Jurnal).
+        function openEditSaldoModal() {
+            const inp = document.getElementById('editSaldoInp');
+            if (inp) inp.value = journalCapital || '';
+            const modal = document.getElementById('modal-edit-saldo');
+            if (modal) { modal.classList.add('active'); document.body.style.overflow = 'hidden'; }
+            playAudioFeedback('open');
+        }
+        function closeEditSaldoModal() {
+            const modal = document.getElementById('modal-edit-saldo');
+            if (modal) modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        function saveEditSaldoModal() {
+            const inp = document.getElementById('editSaldoInp');
+            const raw = inp ? inp.value : '';
+            const val = parseFloat(String(raw).replace(/[^\d.-]/g, '')) || 0;
+            if (val < 0) { showToast('Saldo tidak boleh negatif!', 'warn'); return; }
+            journalCapital = val;
+            lsSet('si_journal_capital', val);
+            updateProfTradingStats();
+            if (typeof renderJournal === 'function') renderJournal();
+            closeEditSaldoModal();
+            showToast('Saldo Jurnal diperbarui: ' + rp(val), 'success');
+            playAudioFeedback('success');
+            if (navigator.vibrate) navigator.vibrate(20);
+        }
+
         function saveInitialCapital() {
             const val = parseFloat(document.getElementById('initialCapitalInp')?.value) || 0;
             journalCapital = val;
@@ -24066,7 +25668,7 @@ Jumlah Emiten: <b>${allStocks ? allStocks.length : 0}</b>
             _fmpExplorerLoaded = false; // biar Explorer FMP narik ulang pakai key baru
             Object.keys(_fmpCache).forEach(k => delete _fmpCache[k]); // buang cache lama (key lama)
             updateAiKeysStatusPage();
-            if (statusEl) { statusEl.className = 'tg-status ok'; statusEl.textContent = '✅ Key FMP tersimpan! Coba tab "AI Tajam" atau "Explorer FMP".'; }
+            if (statusEl) { statusEl.className = 'tg-status ok'; statusEl.textContent = '✅ Key FMP tersimpan! Coba tab "SobatInves AI" atau "Explorer FMP".'; }
             showToast('Key FMP tersimpan ✅', 'success');
             playAudioFeedback('success');
         }
@@ -24118,7 +25720,7 @@ Jumlah Emiten: <b>${allStocks ? allStocks.length : 0}</b>
             }
             lsSet('si_gemini_key', val);
             updateAiKeysStatusPage();
-            if (statusEl) { statusEl.className = 'tg-status ok'; statusEl.textContent = '✅ Key Gemini tersimpan! Mode AI canggih otomatis nyala di tab "AI Tajam".'; }
+            if (statusEl) { statusEl.className = 'tg-status ok'; statusEl.textContent = '✅ Key Gemini tersimpan! Mode AI canggih otomatis nyala di tab "SobatInves AI".'; }
             showToast('Key Gemini tersimpan ✅ — mode AI canggih aktif!', 'success');
             playAudioFeedback('success');
         }
@@ -24151,7 +25753,7 @@ Jumlah Emiten: <b>${allStocks ? allStocks.length : 0}</b>
             if (el) el.value = '';
             updateAiKeysStatusPage();
             const statusEl = document.getElementById('geminiStatusMsgPage');
-            if (statusEl) { statusEl.className = 'tg-status'; statusEl.textContent = 'Key Gemini dihapus. AI Tajam balik ke mode dasar.'; }
+            if (statusEl) { statusEl.className = 'tg-status'; statusEl.textContent = 'Key Gemini dihapus. SobatInves AI balik ke mode dasar.'; }
             showToast('Key Gemini dihapus', 'warn');
         }
 
@@ -24442,6 +26044,37 @@ Jumlah Emiten: <b>${allStocks ? allStocks.length : 0}</b>
             <div class="qb-disclaimer">
                 ⚠️ Fitur ini menambahkan ke portofolio SobatInves saja. Transaksi nyata dilakukan melalui broker Anda masing-masing. Investasi selalu mengandung risiko — lakukan riset mandiri sebelum membeli.
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     EDIT SALDO JURNAL MODAL — v77: custom nominal Total Saldo dari Profil
+     Reuse styling .qb-sheet/.qb-handle/.qb-header/.qb-title/.qb-close/.qb-body
+     (sudah dipakai modal Beli Cepat) supaya tidak perlu CSS baru sama sekali.
+     ═══════════════════════════════════════════════════════════════ -->
+<div id="modal-edit-saldo" onclick="if(event.target===this)closeEditSaldoModal()">
+    <div class="qb-sheet" onclick="event.stopPropagation()">
+        <div class="qb-handle"></div>
+        <div class="qb-header">
+            <div>
+                <div class="qb-title">💰 Ubah Saldo Jurnal</div>
+                <div style="font-size:10px;color:var(--t-med);font-weight:600;margin-top:2px;">Modal awal ini dipakai untuk hitung Total Saldo &amp; performa di Jurnal Trading</div>
+            </div>
+            <button class="qb-close btn-ripple" onclick="closeEditSaldoModal()">✕</button>
+        </div>
+        <div class="qb-body">
+            <div>
+                <div class="prof-inp-lbl">Nominal Saldo (Rp)</div>
+                <input type="number" inputmode="numeric" class="prof-inp" id="editSaldoInp" placeholder="cth. 10000000">
+            </div>
+            <div style="font-size:9.5px;color:var(--t-low);font-weight:600;line-height:1.5;">
+                ℹ️ Ini adalah <b>modal awal</b> Jurnal — Total Saldo yang tampil = nominal ini + P&amp;L Realized dari semua trade yang sudah ditutup.
+            </div>
+            <button class="prof-save-btn btn-ripple" onclick="saveEditSaldoModal()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
+                SIMPAN SALDO
+            </button>
         </div>
     </div>
 </div>

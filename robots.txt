@@ -1,0 +1,11 @@
+# SobatInves Ultimate — robots.txt
+# Upload file ini ke root domain Anda, sehingga bisa diakses persis di:
+# https://sobatinves.jangproject.com/robots.txt
+#
+# Mengizinkan semua mesin pencari (Googlebot, Bingbot, dll.) untuk meng-index
+# seluruh halaman publik aplikasi ini.
+
+User-agent: *
+Allow: /
+
+Sitemap: https://sobatinves.jangproject.com/sitemap.xml
