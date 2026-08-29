@@ -3661,6 +3661,12 @@ async function saveIDBTelegramConfig(config) {
             transition: all 0.2s;
             overflow: hidden;
         }
+        /* Focus indicators remain visible against both the light and dark palettes. */
+        button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
+            outline: 3px solid var(--accent);
+            outline-offset: 3px;
+            box-shadow: 0 0 0 6px var(--bg-surface), 0 0 0 9px var(--primary);
+        }
         .modal-close:active {
             background: var(--dn);
             border-color: var(--dn);
@@ -10471,10 +10477,10 @@ async function saveIDBTelegramConfig(config) {
             <div class="header-search-wrap" style="position:relative;display:flex;align-items:center;flex:1;max-width:640px;">
                 <svg style="position:absolute;left:10px;color:var(--t-med);width:14px;height:14px;pointer-events:none;z-index:1;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                 <input type="text" id="headerSearch" class="header-search-input" style="width:100%;" placeholder="Cari saham..." oninput="onHeaderSearchLive(this.value)" onfocus="onHeaderSearchFocus()" autocomplete="off">
-                <button class="search-clear-btn" id="searchClearBtn" onclick="clearHeaderSearch()" title="Hapus pencarian">✕</button>
+                <button type="button" class="search-clear-btn" id="searchClearBtn" onclick="clearHeaderSearch()" title="Hapus pencarian" aria-label="Hapus pencarian saham">✕</button>
                 <div class="search-results-drop" id="searchResultsDrop"></div>
             </div>
-            <button class="header-theme-btn btn-ripple" onclick="toggleDarkModeFromProfile()" title="Ganti Mode Terang / Gelap" aria-label="Ganti mode terang atau gelap">
+            <button type="button" class="header-theme-btn btn-ripple" onclick="toggleDarkModeFromProfile()" title="Ganti Mode Terang / Gelap" aria-label="Ganti mode terang atau gelap" aria-pressed="true">
                 <svg class="dm-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
                 <svg class="dm-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M20.5 14.5A8.5 8.5 0 1 1 9.5 3.5a7 7 0 0 0 11 11z"/></svg>
             </button>
@@ -10719,7 +10725,7 @@ async function saveIDBTelegramConfig(config) {
                         </div>
                         <!-- Calc Preview -->
                         <div id="tradeCalcPreview" style="display:none;background:var(--bg-surface);border:1px solid var(--border-light);border-radius:var(--radius-md);padding:10px 12px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--t-med);"></div>
-                        <button class="trade-submit-btn btn-ripple" onclick="addTradeJournal()">
+                        <button type="button" class="trade-submit-btn btn-ripple" onclick="addTradeJournal()">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:6px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                             SIMPAN TRADE
                         </button>
@@ -10739,7 +10745,7 @@ async function saveIDBTelegramConfig(config) {
                         </div>
                         <div style="display:flex;gap:6px;align-items:center;">
                             <span id="riwayatTotalCount" style="font-size:10px;background:var(--primary-light);color:var(--primary);border:1px solid rgba(0,85,255,0.2);border-radius:5px;padding:2px 8px;font-family:'IBM Plex Mono',monospace;font-weight:900;">0</span>
-                            <button onclick="exportTradesCSV()" style="padding:5px 10px;border-radius:var(--radius-md);background:var(--bg-elevated);border:1px solid var(--border-light);color:var(--t-med);font-size:10px;font-weight:800;cursor:pointer;font-family:'IBM Plex Mono',monospace;" title="Export CSV">↓ CSV</button>
+                            <button type="button" onclick="exportTradesCSV()" style="padding:5px 10px;border-radius:var(--radius-md);background:var(--bg-elevated);border:1px solid var(--border-light);color:var(--t-med);font-size:10px;font-weight:800;cursor:pointer;font-family:'IBM Plex Mono',monospace;" title="Export CSV">↓ CSV</button>
                         </div>
                     </div>
                     <!-- Search row -->
@@ -10782,7 +10788,7 @@ async function saveIDBTelegramConfig(config) {
                     <div style="background:var(--bg-surface);border-radius:var(--radius-xl) var(--radius-xl) 0 0;padding:20px 16px;width:100%;max-width:600px;max-height:80vh;overflow-y:auto;animation:fadeUp 0.3s ease;">
                         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
                             <div style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;color:var(--t-hi);">✏️ Edit Trade</div>
-                            <button onclick="closeEditModal()" style="width:30px;height:30px;border-radius:8px;background:var(--bg-elevated);border:1px solid var(--border-light);color:var(--t-med);font-size:16px;cursor:pointer;">✕</button>
+                            <button type="button" onclick="closeEditModal()" aria-label="Tutup editor transaksi" style="width:30px;height:30px;border-radius:8px;background:var(--bg-elevated);border:1px solid var(--border-light);color:var(--t-med);font-size:16px;cursor:pointer;">✕</button>
                         </div>
                         <div style="display:flex;flex-direction:column;gap:10px;">
                             <div class="trade-form-grid">
@@ -10800,7 +10806,7 @@ async function saveIDBTelegramConfig(config) {
                             </div>
                             <div><label class="trade-inp-lbl">Catatan / Alasan</label><textarea class="trade-inp" id="editNote" rows="3" style="resize:vertical;min-height:60px;font-family:inherit;"></textarea></div>
                             <input type="hidden" id="editTradeId">
-                            <button class="trade-submit-btn btn-ripple" onclick="saveEditTrade()">💾 SIMPAN PERUBAHAN</button>
+                            <button type="button" class="trade-submit-btn btn-ripple" onclick="saveEditTrade()">💾 SIMPAN PERUBAHAN</button>
                         </div>
                     </div>
                 </div>
@@ -11030,7 +11036,7 @@ async function saveIDBTelegramConfig(config) {
                         <div class="sync-dot" id="syncDot"></div>
                         <span id="syncStatusText" style="color:var(--t-med);">Cloud Sync Aktif</span>
                     </div>
-                    <button onclick="syncToSheet()" style="background:var(--primary-light);border:1px solid var(--primary);color:var(--primary);border-radius:7px;padding:4px 10px;font-size:10px;font-weight:900;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all 0.2s;" onmouseover="this.style.background='var(--primary)';this.style.color='#fff';" onmouseout="this.style.background='var(--primary-light)';this.style.color='var(--primary)';">↑ SYNC</button>
+                    <button type="button" onclick="syncToSheet()" style="background:var(--primary-light);border:1px solid var(--primary);color:var(--primary);border-radius:7px;padding:4px 10px;font-size:10px;font-weight:900;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all 0.2s;" onmouseover="this.style.background='var(--primary)';this.style.color='#fff';" onmouseout="this.style.background='var(--primary-light)';this.style.color='var(--primary)';">↑ SYNC</button>
                 </div>
 
                 <div class="status-bar" id="statusBar">
@@ -11202,7 +11208,7 @@ async function saveIDBTelegramConfig(config) {
                                 SCANNING BEI REAL-TIME
                             </p>
                         </div>
-                        <button class="radar-close-btn" onclick="closeRadarPanel()">
+                        <button type="button" class="radar-close-btn" onclick="closeRadarPanel()" aria-label="Tutup panel radar">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                         </button>
                     </div>
@@ -11230,9 +11236,9 @@ async function saveIDBTelegramConfig(config) {
                         Top Movers Hari Ini
                     </div>
                     <div style="display:flex;gap:4px;">
-                        <button class="mover-tab active btn-ripple" id="moverTabGainer" onclick="switchMovers('gainer',this)" style="font-size:9px;padding:3px 8px;">📈 Naik</button>
-                        <button class="mover-tab btn-ripple" id="moverTabLoser" onclick="switchMovers('loser',this)" style="font-size:9px;padding:3px 8px;">📉 Turun</button>
-                        <button class="mover-tab btn-ripple" id="moverTabVol" onclick="switchMovers('vol',this)" style="font-size:9px;padding:3px 8px;">🔥 Vol</button>
+                        <button type="button" class="mover-tab active btn-ripple" id="moverTabGainer" onclick="switchMovers('gainer',this)" style="font-size:9px;padding:3px 8px;">📈 Naik</button>
+                        <button type="button" class="mover-tab btn-ripple" id="moverTabLoser" onclick="switchMovers('loser',this)" style="font-size:9px;padding:3px 8px;">📉 Turun</button>
+                        <button type="button" class="mover-tab btn-ripple" id="moverTabVol" onclick="switchMovers('vol',this)" style="font-size:9px;padding:3px 8px;">🔥 Vol</button>
                     </div>
                 </div>
                 <div class="mover-mini-scroll" id="moversMiniGrid">
@@ -11260,13 +11266,13 @@ async function saveIDBTelegramConfig(config) {
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:8px;">
                 <span style="font-size:13px;color:var(--t-med);font-weight:800;text-transform:uppercase;letter-spacing:0.5px;" id="countLbl">Memuat data...</span>
                 <div class="sl-layout-group" id="slLayoutGroup" role="group" aria-label="Tata letak daftar emiten">
-                    <button class="sl-layout-btn active" data-layout="list" onclick="setStockListLayout('list')" title="Tampilan list">
+                    <button type="button" class="sl-layout-btn active" data-layout="list" onclick="setStockListLayout('list')" title="Tampilan list" aria-label="Tampilan daftar" aria-pressed="true">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
                     </button>
-                    <button class="sl-layout-btn" data-layout="grid" onclick="setStockListLayout('grid')" title="Tampilan grid 2 kolom">
+                    <button type="button" class="sl-layout-btn" data-layout="grid" onclick="setStockListLayout('grid')" title="Tampilan grid 2 kolom" aria-label="Tampilan grid dua kolom" aria-pressed="false">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg>
                     </button>
-                    <button class="sl-layout-btn" data-layout="carousel" onclick="setStockListLayout('carousel')" title="Tampilan geser (slide)">
+                    <button type="button" class="sl-layout-btn" data-layout="carousel" onclick="setStockListLayout('carousel')" title="Tampilan geser (slide)" aria-label="Tampilan carousel" aria-pressed="false">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><rect x="2" y="6" width="6" height="12" rx="1.2"/><rect x="9" y="4" width="6" height="16" rx="1.2"/><rect x="16" y="6" width="6" height="12" rx="1.2"/></svg>
                     </button>
                 </div>
@@ -11321,7 +11327,7 @@ async function saveIDBTelegramConfig(config) {
                     <div><label class="ctrl-lbl">RSI</label><select class="ctrl-select" id="scRSI"><option value="all">Semua</option><option value="oversold">Oversold &lt;40</option></select></div>
                 </div>
             </div>
-            <button class="run-btn btn-ripple" onclick="runScreener()">JALANKAN SCREENER</button>
+            <button type="button" class="run-btn btn-ripple" onclick="runScreener()">JALANKAN SCREENER</button>
             <div style="margin-top:20px"><div id="scCount" style="font-size:13px;color:var(--primary);font-weight:800;margin-bottom:14px;text-transform:uppercase;letter-spacing:1px;"></div><div class="stock-list" id="scResults"></div></div>
         </div>
 
@@ -11368,7 +11374,7 @@ async function saveIDBTelegramConfig(config) {
                     <!-- Quick-add watchlist -->
                     <div class="porto-watchlist-quickrow" id="hmAddRow">
                         <input type="text" class="porto-wl-inp" id="hmAddTicker" placeholder="Tambah ke watchlist, misal: BBCA" maxlength="8" oninput="this.value=this.value.toUpperCase();" onkeydown="if(event.key==='Enter')addToWatchlistHM()">
-                        <button class="porto-wl-add-btn btn-ripple" onclick="addToWatchlistHM()">+ Tambah</button>
+                        <button type="button" class="porto-wl-add-btn btn-ripple" onclick="addToWatchlistHM()">+ Tambah</button>
                     </div>
                     <!-- Heatmap body -->
                     <div class="heatmap-body" id="wlHeatmap">
@@ -11413,7 +11419,7 @@ async function saveIDBTelegramConfig(config) {
                         <div><label class="ctrl-lbl">RSI</label><select class="ctrl-select" id="scRSIHub"><option value="all">Semua</option><option value="oversold">Oversold &lt;40</option></select></div>
                     </div>
                 </div>
-                <button class="run-btn btn-ripple" onclick="runScreenerHub()">JALANKAN SCREENER</button>
+                <button type="button" class="run-btn btn-ripple" onclick="runScreenerHub()">JALANKAN SCREENER</button>
                 <div style="margin-top:20px"><div id="scCountHub" style="font-size:13px;color:var(--primary);font-weight:800;margin-bottom:14px;text-transform:uppercase;letter-spacing:1px;"></div><div class="stock-list" id="scResultsHub"></div></div>
             </div>
 
@@ -11425,7 +11431,7 @@ async function saveIDBTelegramConfig(config) {
                 <div style="font-size:12px;color:var(--t-med);margin-bottom:14px;font-weight:600;line-height:1.6;">Daftar emiten BEI langsung dari database <b>Financial Modeling Prep</b> — lebih luas dari data lokal aplikasi. Ketuk emiten untuk lihat snapshot fundamental &amp; minta <b>Analisis AI Gemini</b> instan.</div>
                 <div style="display:flex;gap:8px;margin-bottom:14px;">
                     <input type="text" class="compare-ticker-input" id="fmpExplorerSearch" placeholder="Cari ticker / nama emiten..." style="flex:1;text-transform:uppercase;" oninput="filterFMPExplorer()">
-                    <button class="run-btn btn-ripple" style="width:auto;padding:0 16px;margin:0;" onclick="loadFMPExplorerList(true)">🔄</button>
+                    <button type="button" class="run-btn btn-ripple" style="width:auto;padding:0 16px;margin:0;" onclick="loadFMPExplorerList(true)" aria-label="Muat ulang daftar emiten">🔄</button>
                 </div>
                 <div id="fmpExplorerStatus" style="font-size:11px;color:var(--t-med);font-weight:700;margin-bottom:10px;"></div>
                 <div class="stock-list" id="fmpExplorerResults"></div>
@@ -11438,7 +11444,7 @@ async function saveIDBTelegramConfig(config) {
                     <div class="compare-card"><input type="text" class="compare-ticker-input" id="cmp-a" placeholder="BBCA" value="BBCA" style="text-transform:uppercase;"><div id="cmp-data-a" style="color:var(--t-med);font-size:12px;text-align:center;font-weight:700;">—</div></div>
                     <div class="compare-card"><input type="text" class="compare-ticker-input" id="cmp-b" placeholder="BBRI" value="BBRI" style="text-transform:uppercase;"><div id="cmp-data-b" style="color:var(--t-med);font-size:12px;text-align:center;font-weight:700;">—</div></div>
                 </div>
-                <button class="run-btn btn-ripple" onclick="runComparator()" style="font-size:18px;margin-bottom:18px;">BANDINGKAN</button>
+                <button type="button" class="run-btn btn-ripple" onclick="runComparator()" style="font-size:18px;margin-bottom:18px;">BANDINGKAN</button>
                 <div id="compareResult"></div>
             </div>
 
@@ -11450,7 +11456,7 @@ async function saveIDBTelegramConfig(config) {
                         <div><div class="porto-add-lbl">Kode</div><input type="text" class="porto-add-inp" id="al-ticker" placeholder="BBCA" style="text-transform:uppercase;"></div>
                         <div><div class="porto-add-lbl">Kondisi</div><select class="porto-add-inp" id="al-cond"><option value="above">Di atas</option><option value="below">Di bawah</option></select></div>
                         <div class="col2"><div class="porto-add-lbl">Target Harga (Rp)</div><input type="number" class="porto-add-inp" id="al-price" placeholder="10000"></div>
-                        <div class="col2"><button class="porto-add-btn btn-ripple" onclick="addAlert()">SET ALERT</button></div>
+                        <div class="col2"><button type="button" class="porto-add-btn btn-ripple" onclick="addAlert()">SET ALERT</button></div>
                     </div>
                 </div>
                 <div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;margin-bottom:12px;color:var(--t-hi);">Alert Aktif</div>
@@ -11627,7 +11633,7 @@ async function saveIDBTelegramConfig(config) {
                             <div class="calc-grp" style="margin-bottom:10px;"><label class="calc-lbl">Pilih Emiten</label><select class="calc-inp" id="mc-stock-select" onchange="autofillMC(this.value)"><option value="">— Pilih Kode Saham —</option></select></div>
                             <div class="input-row"><div class="calc-grp"><label class="calc-lbl">Modal (Rp)</label><input type="number" class="calc-inp" id="mc-capital" placeholder="10000000" value="10000000" oninput="calcMonteCarlo()"></div><div class="calc-grp"><label class="calc-lbl">Horizon (hari bursa)</label><input type="number" class="calc-inp" id="mc-horizon" placeholder="20" value="20" oninput="calcMonteCarlo()"></div></div>
                             <div class="input-row"><div class="calc-grp"><label class="calc-lbl">Harga Saat Ini</label><input type="number" class="calc-inp" id="mc-price" placeholder="1000" oninput="calcMonteCarlo()"></div><div class="calc-grp"><label class="calc-lbl">Volatilitas Harian (%)</label><input type="number" class="calc-inp" id="mc-vol" placeholder="2.5" step="0.1" oninput="calcMonteCarlo()"></div></div>
-                            <button class="btn-ripple" style="width:100%;padding:11px;background:var(--primary);color:#fff;border:none;border-radius:var(--radius-md);font-weight:800;font-size:12px;margin-top:4px;cursor:pointer;" onclick="calcMonteCarlo()">🎲 Jalankan Simulasi (1.000 skenario)</button>
+                            <button type="button" class="btn-ripple" style="width:100%;padding:11px;background:var(--primary);color:#fff;border:none;border-radius:var(--radius-md);font-weight:800;font-size:12px;margin-top:4px;cursor:pointer;" onclick="calcMonteCarlo()">🎲 Jalankan Simulasi (1.000 skenario)</button>
                             <div id="mc-result-wrap" style="margin-top:14px;"></div>
                         </div>
                     </div>
@@ -11660,8 +11666,8 @@ async function saveIDBTelegramConfig(config) {
             <div style="background:var(--card-bg);border-radius:var(--radius-lg);border:1px solid var(--border-light);padding:9px 12px;margin-bottom:8px;box-shadow:var(--shadow-sm);display:flex;align-items:center;gap:8px;">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--t-med)" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                 <input id="newsSearchInp" type="text" placeholder="Cari berita IHSG, dividen, IPO, emiten..." oninput="newsSearch(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:12px;color:var(--t-hi);font-weight:600;font-family:'IBM Plex Mono',monospace;" autocomplete="off"/>
-                <button onclick="clearNewsSearch()" style="background:none;border:none;color:var(--t-low);font-size:15px;cursor:pointer;padding:0 2px;" title="Hapus pencarian">✕</button>
-                <button onclick="refreshNews()" style="background:var(--primary-light);border:none;color:var(--primary);font-size:10px;font-weight:900;font-family:IBM Plex Mono;padding:4px 8px;border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:4px;" title="Refresh berita">↺ Refresh</button>
+                <button type="button" onclick="clearNewsSearch()" aria-label="Hapus pencarian berita" style="background:none;border:none;color:var(--t-low);font-size:15px;cursor:pointer;padding:0 2px;" title="Hapus pencarian">✕</button>
+                <button type="button" onclick="refreshNews()" style="background:var(--primary-light);border:none;color:var(--primary);font-size:10px;font-weight:900;font-family:IBM Plex Mono;padding:4px 8px;border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:4px;" title="Refresh berita">↺ Refresh</button>
                 <span class="news-realtime-badge"><span class="news-realtime-dot"></span>AUTO</span>
             </div>
             <div class="news-tab-bar">
@@ -11848,7 +11854,7 @@ async function saveIDBTelegramConfig(config) {
             <!-- ══ SUB-PAGE: PANDUAN PENGGUNAAN (v59) ══ -->
             <div id="subpage-panduan" class="prof-subpage" style="display:none;">
                 <div class="prof-subpage-head">
-                    <button class="prof-back-btn btn-ripple" onclick="closeProfSubPage()">
+                    <button type="button" class="prof-back-btn btn-ripple" onclick="closeProfSubPage()" aria-label="Kembali ke pengaturan profil">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
                     </button>
                     <span>Panduan Penggunaan</span>
@@ -12204,7 +12210,7 @@ async function saveIDBTelegramConfig(config) {
             <!-- ══ SUB-PAGE: PROFIL ══ -->
             <div id="subpage-profil" class="prof-subpage" style="display:none;">
                 <div class="prof-subpage-head">
-                    <button class="prof-back-btn btn-ripple" onclick="closeProfSubPage()">
+                    <button type="button" class="prof-back-btn btn-ripple" onclick="closeProfSubPage()" aria-label="Kembali ke pengaturan profil">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
                     </button>
                     <span>Profil Saya</span>
@@ -12229,7 +12235,7 @@ async function saveIDBTelegramConfig(config) {
                         <div class="prof-inp-lbl">Email (tidak dapat diubah)</div>
                         <input type="email" class="prof-inp" id="editEmailInp" placeholder="—" disabled style="opacity:0.6;">
                     </div>
-                    <button class="prof-save-btn btn-ripple" onclick="saveProfileName()" style="margin-top:4px;">
+                    <button type="button" class="prof-save-btn btn-ripple" onclick="saveProfileName()" style="margin-top:4px;">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
                         SIMPAN PERUBAHAN
                     </button>
@@ -12240,11 +12246,11 @@ async function saveIDBTelegramConfig(config) {
             <!-- ══ SUB-PAGE: NOTIFIKASI ══ -->
             <div id="subpage-notif" class="prof-subpage" style="display:none;">
                 <div class="prof-subpage-head">
-                    <button class="prof-back-btn btn-ripple" onclick="closeProfSubPage()">
+                    <button type="button" class="prof-back-btn btn-ripple" onclick="closeProfSubPage()" aria-label="Kembali ke pengaturan profil">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
                     </button>
                     <span>Riwayat Notifikasi</span>
-                    <button onclick="clearNotifs()" style="margin-left:auto;font-size:10px;color:var(--primary);background:var(--primary-light);border:1px solid rgba(0,85,255,0.2);border-radius:6px;padding:4px 10px;cursor:pointer;font-weight:800;font-family:'IBM Plex Mono',monospace;">Hapus Semua</button>
+                    <button type="button" onclick="clearNotifs()" style="margin-left:auto;font-size:10px;color:var(--primary);background:var(--primary-light);border:1px solid rgba(0,85,255,0.2);border-radius:6px;padding:4px 10px;cursor:pointer;font-weight:800;font-family:'IBM Plex Mono',monospace;">Hapus Semua</button>
                 </div>
                 <div id="pageNotifList" style="padding-bottom:24px;"><div style="text-align:center;padding:30px;color:var(--t-med);font-size:12px;font-weight:600;">Belum ada notifikasi</div></div>
             </div>
@@ -12252,7 +12258,7 @@ async function saveIDBTelegramConfig(config) {
                         <!-- ══ SUB-PAGE: TELEGRAM BOT ══ -->
             <div id="subpage-aikeys" class="prof-subpage" style="display:none;">
                 <div class="prof-subpage-head">
-                    <button class="prof-back-btn btn-ripple" onclick="closeProfSubPage()">
+                    <button type="button" class="prof-back-btn btn-ripple" onclick="closeProfSubPage()" aria-label="Kembali ke pengaturan profil">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
                     </button>
                     <span>Bot AI — FMP &amp; Gemini</span>
@@ -12287,12 +12293,12 @@ async function saveIDBTelegramConfig(config) {
                         <div style="font-size:10px;font-weight:800;color:var(--t-med);margin-bottom:4px;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:0.5px;">FMP API KEY</div>
                         <input type="text" class="tg-field" id="fmpApiKeyPage" placeholder="Tempel API key FMP di sini..." oninput="onApiKeyInputPage('fmp')">
                     </div>
-                    <button class="tg-save-btn btn-ripple" onclick="saveFmpApiKeyPage()" style="margin-top:12px;">
+                    <button type="button" class="tg-save-btn btn-ripple" onclick="saveFmpApiKeyPage()" style="margin-top:12px;">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:6px;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
                         Simpan Key FMP
                     </button>
-                    <button class="tg-test-btn btn-ripple" onclick="testFmpApiKeyPage()">🔎 Tes Koneksi FMP</button>
-                    <button class="tg-disconnect-btn btn-ripple" onclick="disconnectFmpApiKeyPage()">✕ Hapus Key FMP</button>
+                    <button type="button" class="tg-test-btn btn-ripple" onclick="testFmpApiKeyPage()">🔎 Tes Koneksi FMP</button>
+                    <button type="button" class="tg-disconnect-btn btn-ripple" onclick="disconnectFmpApiKeyPage()">✕ Hapus Key FMP</button>
                     <div class="tg-status" id="fmpStatusMsgPage"></div>
                 </div>
 
@@ -12320,12 +12326,12 @@ async function saveIDBTelegramConfig(config) {
                         <div style="font-size:10px;font-weight:800;color:var(--t-med);margin-bottom:4px;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:0.5px;">GEMINI API KEY</div>
                         <input type="text" class="tg-field" id="geminiApiKeyPage" placeholder="Tempel API key Gemini di sini..." oninput="onApiKeyInputPage('gemini')">
                     </div>
-                    <button class="tg-save-btn btn-ripple" onclick="saveGeminiApiKeyPage()" style="margin-top:12px;">
+                    <button type="button" class="tg-save-btn btn-ripple" onclick="saveGeminiApiKeyPage()" style="margin-top:12px;">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:6px;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
                         Simpan Key Gemini
                     </button>
-                    <button class="tg-test-btn btn-ripple" onclick="testGeminiApiKeyPage()">✨ Tes Koneksi Gemini</button>
-                    <button class="tg-disconnect-btn btn-ripple" onclick="disconnectGeminiApiKeyPage()">✕ Hapus Key Gemini</button>
+                    <button type="button" class="tg-test-btn btn-ripple" onclick="testGeminiApiKeyPage()">✨ Tes Koneksi Gemini</button>
+                    <button type="button" class="tg-disconnect-btn btn-ripple" onclick="disconnectGeminiApiKeyPage()">✕ Hapus Key Gemini</button>
                     <div class="tg-status" id="geminiStatusMsgPage"></div>
                 </div>
 
@@ -12336,7 +12342,7 @@ async function saveIDBTelegramConfig(config) {
 
             <div id="subpage-telegram" class="prof-subpage" style="display:none;">
                 <div class="prof-subpage-head">
-                    <button class="prof-back-btn btn-ripple" onclick="closeProfSubPage()">
+                    <button type="button" class="prof-back-btn btn-ripple" onclick="closeProfSubPage()" aria-label="Kembali ke pengaturan profil">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
                     </button>
                     <span>Pengaturan Telegram Bot</span>
@@ -12359,7 +12365,7 @@ async function saveIDBTelegramConfig(config) {
                                 </div>
                                 <div class="tg-master-status" id="tgMasterStatusPage">Nonaktif — konfigurasi Chat ID dulu</div>
                             </div>
-                            <button class="tg-master-btn" id="tgMasterBtnPage" onclick="tgMasterTogglePage()" title="ON/OFF Telegram Notifikasi"></button>
+                            <button type="button" class="tg-master-btn" id="tgMasterBtnPage" onclick="tgMasterTogglePage()" title="ON/OFF Telegram Notifikasi" aria-label="Aktifkan notifikasi Telegram" aria-pressed="false"></button>
                         </div>
 
                         <!-- STATUS INFO -->
@@ -12408,12 +12414,12 @@ async function saveIDBTelegramConfig(config) {
                         </div>
                     </div>
 
-                    <button class="tg-save-btn btn-ripple" onclick="saveTelegramConfigPage()" style="margin-top:12px;">
+                    <button type="button" class="tg-save-btn btn-ripple" onclick="saveTelegramConfigPage()" style="margin-top:12px;">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:6px;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
                         Simpan & Aktifkan
                     </button>
-                    <button class="tg-test-btn btn-ripple" onclick="testTelegramBotPage()">🔔 Kirim Pesan Uji</button>
-                    <button class="tg-disconnect-btn btn-ripple" onclick="disconnectTelegramPage()">✕ Putus Koneksi</button>
+                    <button type="button" class="tg-test-btn btn-ripple" onclick="testTelegramBotPage()">🔔 Kirim Pesan Uji</button>
+                    <button type="button" class="tg-disconnect-btn btn-ripple" onclick="disconnectTelegramPage()">✕ Putus Koneksi</button>
                     <div class="tg-status" id="tgStatusMsgPage"></div>
                 </div>
 
@@ -12431,49 +12437,49 @@ async function saveIDBTelegramConfig(config) {
                                 <div class="tg-toggle-label">🛰️ Radar Anomali</div>
                                 <div class="tg-toggle-sub">Vol spike, breakout, flash crash, bandar masuk</div>
                             </div>
-                            <button class="tg-mini-toggle on" id="tgToggleRadarPage" onclick="toggleNotifTypePage('radar',this)"></button>
+                            <button type="button" class="tg-mini-toggle on" id="tgToggleRadarPage" aria-label="Radar Anomali" aria-pressed="true" onclick="toggleNotifTypePage('radar',this)"></button>
                         </div>
                         <div class="tg-toggle-row">
                             <div>
                                 <div class="tg-toggle-label">🎯 Price Alert</div>
                                 <div class="tg-toggle-sub">Harga target saham tercapai (atas/bawah)</div>
                             </div>
-                            <button class="tg-mini-toggle on" id="tgTogglePriceAlertPage" onclick="toggleNotifTypePage('priceAlert',this)"></button>
+                            <button type="button" class="tg-mini-toggle on" id="tgTogglePriceAlertPage" aria-label="Price Alert" aria-pressed="true" onclick="toggleNotifTypePage('priceAlert',this)"></button>
                         </div>
                         <div class="tg-toggle-row">
                             <div>
                                 <div class="tg-toggle-label">📊 Perubahan Skor AI Emiten</div>
                                 <div class="tg-toggle-sub">AI Score watchlist & top emiten naik/turun ≥3 pts</div>
                             </div>
-                            <button class="tg-mini-toggle on" id="tgToggleScorePage" onclick="toggleNotifTypePage('scoreChange',this)"></button>
+                            <button type="button" class="tg-mini-toggle on" id="tgToggleScorePage" aria-label="Perubahan Skor AI Emiten" aria-pressed="true" onclick="toggleNotifTypePage('scoreChange',this)"></button>
                         </div>
                         <div class="tg-toggle-row">
                             <div>
                                 <div class="tg-toggle-label">🌍 Perubahan Fear & Greed</div>
                                 <div class="tg-toggle-sub">FGI berubah zona (IHSG, S&amp;P, BTC, dll)</div>
                             </div>
-                            <button class="tg-mini-toggle on" id="tgToggleFGIPage" onclick="toggleNotifTypePage('fgChange',this)"></button>
+                            <button type="button" class="tg-mini-toggle on" id="tgToggleFGIPage" aria-label="Perubahan Fear dan Greed" aria-pressed="true" onclick="toggleNotifTypePage('fgChange',this)"></button>
                         </div>
                         <div class="tg-toggle-row">
                             <div>
                                 <div class="tg-toggle-label">📈 Watchlist Movement</div>
                                 <div class="tg-toggle-sub">Harga watchlist bergerak >3% & skor berubah</div>
                             </div>
-                            <button class="tg-mini-toggle on" id="tgToggleWatchlistPage" onclick="toggleNotifTypePage('watchlist',this)"></button>
+                            <button type="button" class="tg-mini-toggle on" id="tgToggleWatchlistPage" aria-label="Watchlist Movement" aria-pressed="true" onclick="toggleNotifTypePage('watchlist',this)"></button>
                         </div>
                         <div class="tg-toggle-row" style="background:linear-gradient(135deg,rgba(0,214,143,0.07),transparent);border-radius:12px;margin-top:4px;border:1px solid var(--up-border);">
                             <div>
                                 <div class="tg-toggle-label" style="color:var(--up);">🚀 Sinyal Bullish Kuat</div>
                                 <div class="tg-toggle-sub">TradingView: Skor≥8 + MACD+RSI+Vol+Bandar — dengan tombol Beli di Telegram</div>
                             </div>
-                            <button class="tg-mini-toggle on" id="tgToggleBullishPage" onclick="toggleNotifTypePage('bullishSignal',this)"></button>
+                            <button type="button" class="tg-mini-toggle on" id="tgToggleBullishPage" aria-label="Sinyal Bullish Kuat" aria-pressed="true" onclick="toggleNotifTypePage('bullishSignal',this)"></button>
                         </div>
                         <div class="tg-toggle-row" style="background:linear-gradient(135deg,rgba(44,165,224,0.1),transparent);border-radius:12px;margin-top:4px;border:1px solid #2CA5E0;">
                             <div>
                                 <div class="tg-toggle-label" style="color:#2CA5E0;">🗞️ Berita Otomatis Harian</div>
                                 <div class="tg-toggle-sub">Dikirim dari <b>server</b> (Google Apps Script) — tetap jalan walau app/HP ditutup</div>
                             </div>
-                            <button class="tg-mini-toggle on" id="tgToggleNewsAutoPage" onclick="toggleNotifTypePage('newsAuto',this)"></button>
+                            <button type="button" class="tg-mini-toggle on" id="tgToggleNewsAutoPage" aria-label="Berita Otomatis" aria-pressed="true" onclick="toggleNotifTypePage('newsAuto',this)"></button>
                         </div>
                         <div style="font-size:9px;color:var(--t-low);font-weight:600;margin-top:8px;line-height:1.5;padding:0 2px;">
                             ℹ️ Semua notifikasi di atas <b>kecuali Berita Otomatis</b> hanya terkirim saat aplikasi ini sedang terbuka. <b>Berita Otomatis</b> berjalan 24 jam di server — pastikan tombol "Simpan Pengaturan ke Cloud" di bawah sudah ditekan agar aktif.
@@ -12525,11 +12531,11 @@ async function saveIDBTelegramConfig(config) {
                         <div style="font-size:11px;color:var(--t-med);font-weight:600;line-height:1.6;margin-bottom:12px;">
                             Data Chat ID dan filter notifikasi akan disimpan ke Google Sheets Anda melalui backend server.
                         </div>
-                        <button class="tg-save-btn btn-ripple" onclick="syncTelegramToSheet()" style="background:var(--up);margin-top:0;">
+                        <button type="button" class="tg-save-btn btn-ripple" onclick="syncTelegramToSheet()" style="background:var(--up);margin-top:0;">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:6px;"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
                             Simpan Pengaturan ke Cloud
                         </button>
-                        <button class="tg-save-btn btn-ripple" onclick="testBeritaOtomatisSekarang()" style="background:#2CA5E0;margin-top:8px;">
+                        <button type="button" class="tg-save-btn btn-ripple" onclick="testBeritaOtomatisSekarang()" style="background:#2CA5E0;margin-top:8px;">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:6px;"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
                             🗞️ Tes Kirim Berita Otomatis Sekarang
                         </button>
@@ -12602,7 +12608,7 @@ async function saveIDBTelegramConfig(config) {
             <!-- ══ SUB-PAGE: TAMPILAN ══ -->
             <div id="subpage-tampilan" class="prof-subpage" style="display:none;">
                 <div class="prof-subpage-head">
-                    <button class="prof-back-btn btn-ripple" onclick="closeProfSubPage()">
+                    <button type="button" class="prof-back-btn btn-ripple" onclick="closeProfSubPage()" aria-label="Kembali ke pengaturan profil">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
                     </button>
                     <span>Tampilan &amp; Widget</span>
@@ -12652,7 +12658,7 @@ async function saveIDBTelegramConfig(config) {
                                     <div class="audio-bar"></div><div class="audio-bar"></div><div class="audio-bar"></div>
                                 </div>
                             </div>
-                            <button class="btn-ripple" onclick="playAudioFeedback('dopamine')" style="width:100%;padding:10px;background:var(--primary-light);border:1px solid rgba(0,85,255,0.2);border-radius:10px;color:var(--primary);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;letter-spacing:1px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;">
+                            <button type="button" class="btn-ripple" onclick="playAudioFeedback('dopamine')" style="width:100%;padding:10px;background:var(--primary-light);border:1px solid rgba(0,85,255,0.2);border-radius:10px;color:var(--primary);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;letter-spacing:1px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                                 TEST SUARA
                             </button>
@@ -12667,8 +12673,8 @@ async function saveIDBTelegramConfig(config) {
                                 <span style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;color:var(--t-hi);text-transform:uppercase;letter-spacing:0.5px;">Widget Beranda</span>
                             </div>
                             <div style="display:flex;gap:6px;">
-                                <button class="btn-ripple" onclick="setAllWidgets(true)" style="font-size:9px;font-weight:900;padding:4px 10px;background:var(--up-bg);border:1px solid var(--up-border);color:var(--up);border-radius:6px;cursor:pointer;font-family:'IBM Plex Mono',monospace;">AKTIFKAN SEMUA</button>
-                                <button class="btn-ripple" onclick="setAllWidgets(false)" style="font-size:9px;font-weight:900;padding:4px 10px;background:var(--dn-bg);border:1px solid var(--dn-border);color:var(--dn);border-radius:6px;cursor:pointer;font-family:'IBM Plex Mono',monospace;">MATIKAN SEMUA</button>
+                                <button type="button" class="btn-ripple" onclick="setAllWidgets(true)" style="font-size:9px;font-weight:900;padding:4px 10px;background:var(--up-bg);border:1px solid var(--up-border);color:var(--up);border-radius:6px;cursor:pointer;font-family:'IBM Plex Mono',monospace;">AKTIFKAN SEMUA</button>
+                                <button type="button" class="btn-ripple" onclick="setAllWidgets(false)" style="font-size:9px;font-weight:900;padding:4px 10px;background:var(--dn-bg);border:1px solid var(--dn-border);color:var(--dn);border-radius:6px;cursor:pointer;font-family:'IBM Plex Mono',monospace;">MATIKAN SEMUA</button>
                             </div>
                         </div>
 
@@ -12854,7 +12860,7 @@ async function saveIDBTelegramConfig(config) {
             <!-- ══ SUB-PAGE: TENTANG ══ -->
             <div id="subpage-tentang" class="prof-subpage" style="display:none;">
                 <div class="prof-subpage-head">
-                    <button class="prof-back-btn btn-ripple" onclick="closeProfSubPage()">
+                    <button type="button" class="prof-back-btn btn-ripple" onclick="closeProfSubPage()" aria-label="Kembali ke pengaturan profil">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
                     </button>
                     <span>Tentang Aplikasi</span>
@@ -12889,7 +12895,7 @@ async function saveIDBTelegramConfig(config) {
             <!-- ══ SUB-PAGE: DUKUNGAN ══ -->
             <div id="subpage-dukungan" class="prof-subpage" style="display:none;">
                 <div class="prof-subpage-head">
-                    <button class="prof-back-btn btn-ripple" onclick="closeProfSubPage()">
+                    <button type="button" class="prof-back-btn btn-ripple" onclick="closeProfSubPage()" aria-label="Kembali ke pengaturan profil">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
                     </button>
                     <span>Dukung Developer</span>
@@ -12974,7 +12980,7 @@ async function saveIDBTelegramConfig(config) {
                     </div>
 
                     <!-- Main Saweria button -->
-                    <button class="btn-ripple" onclick="openSaweria(0)" style="width:100%;padding:15px;background:linear-gradient(135deg,#f97316,#ea580c);border:none;border-radius:var(--radius-lg);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;letter-spacing:1px;cursor:pointer;box-shadow:0 8px 24px rgba(249,115,22,0.4);transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:10px;margin-top:4px;">
+                    <button type="button" class="btn-ripple" onclick="openSaweria(0)" style="width:100%;padding:15px;background:linear-gradient(135deg,#f97316,#ea580c);border:none;border-radius:var(--radius-lg);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;letter-spacing:1px;cursor:pointer;box-shadow:0 8px 24px rgba(249,115,22,0.4);transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:10px;margin-top:4px;">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
                         DUKUNG DI SAWERIA
                     </button>
@@ -12990,7 +12996,7 @@ async function saveIDBTelegramConfig(config) {
     </main>
 
     <!-- FLOATING AI BUTTON -->
-    <button class="fab-ai btn-ripple" onclick="toggleAI()" title="AI Analyst">
+    <button type="button" class="fab-ai btn-ripple" onclick="toggleAI()" title="AI Analyst" aria-label="Buka asisten AI" aria-expanded="false" aria-controls="aiPanel">
         <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
             <line x1="9" y1="10" x2="15" y2="10"/>
@@ -12999,7 +13005,7 @@ async function saveIDBTelegramConfig(config) {
     </button>
 
     <!-- AI PANEL -->
-    <div class="ai-panel" id="aiPanel">
+    <div class="ai-panel" id="aiPanel" role="dialog" aria-modal="true" aria-label="Asisten SobatInves AI">
         <div class="ai-head">
             <div class="ai-title">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -13008,7 +13014,7 @@ async function saveIDBTelegramConfig(config) {
                 </svg>
                 SobatInves AI
             </div>
-            <button class="ai-close btn-ripple" onclick="toggleAI()">
+            <button type="button" class="ai-close btn-ripple" onclick="toggleAI()" aria-label="Tutup asisten AI">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
         </div>
@@ -13027,7 +13033,7 @@ async function saveIDBTelegramConfig(config) {
             </div>
             <div class="chat-input-row">
                 <input type="text" class="chat-input" id="chatInput" placeholder="Tanya analisis saham, teknikal, rekomendasi..." onkeydown="if((event||window.event).key==='Enter')sendChat()">
-                <button class="chat-send btn-ripple" onclick="sendChat()">
+                <button type="button" class="chat-send btn-ripple" onclick="sendChat()" aria-label="Kirim pesan ke asisten AI">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
                 </button>
             </div>
@@ -13036,13 +13042,13 @@ async function saveIDBTelegramConfig(config) {
 
     <!-- BOTTOM NAV -->
     <nav class="bottom-nav">
-        <button class="nav-btn active btn-ripple" onclick="nav('home',this)" title="Beranda">
+        <button type="button" class="nav-btn active btn-ripple" onclick="nav('home',this)" title="Beranda">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-5h-6v5H4a1 1 0 0 1-1-1V9.5z"/>
             </svg>
             <div class="nav-label">Beranda</div>
         </button>
-        <button class="nav-btn btn-ripple" onclick="nav('jurnal',this)" title="Jurnal">
+        <button type="button" class="nav-btn btn-ripple" onclick="nav('jurnal',this)" title="Jurnal">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                 <polyline points="14 2 14 8 20 8"/>
@@ -13051,7 +13057,7 @@ async function saveIDBTelegramConfig(config) {
             </svg>
             <div class="nav-label">Jurnal</div>
         </button>
-        <button class="nav-btn btn-ripple" onclick="nav('hub',this)" title="Hub">
+        <button type="button" class="nav-btn btn-ripple" onclick="nav('hub',this)" title="Hub">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="3" y="3" width="7" height="7" rx="1.5"/>
                 <rect x="14" y="3" width="7" height="7" rx="1.5"/>
@@ -13060,7 +13066,7 @@ async function saveIDBTelegramConfig(config) {
             </svg>
             <div class="nav-label">Hub</div>
         </button>
-        <button class="nav-btn btn-ripple" onclick="nav('news',this)" title="Berita">
+        <button type="button" class="nav-btn btn-ripple" onclick="nav('news',this)" title="Berita">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4"/>
                 <polyline points="14 2 14 8 20 8"/>
@@ -13069,7 +13075,7 @@ async function saveIDBTelegramConfig(config) {
             </svg>
             <div class="nav-label">Berita</div>
         </button>
-        <button class="nav-btn btn-ripple" onclick="nav('profil',this)" title="Akun">
+        <button type="button" class="nav-btn btn-ripple" onclick="nav('profil',this)" title="Akun">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                 <circle cx="12" cy="7" r="4"/>
@@ -13079,15 +13085,15 @@ async function saveIDBTelegramConfig(config) {
     </nav>
 
     <!-- MODAL -->
-    <div class="overlay" id="overlay">
+    <div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="mTicker">
         <div class="modal-sheet" id="modalSheet">
             <div class="modal-handle"></div>
             <div class="modal-head">
                 <div style="display:flex;align-items:center;gap:12px;">
                     <div class="modal-ticker" id="mTicker">—</div>
-                    <button id="mTvBtn" class="btn-ripple" style="display:none;background:var(--primary);color:#fff;padding:6px 12px;border-radius:8px;font-size:11px;border:none;font-family:'Barlow Condensed',sans-serif;font-weight:800;letter-spacing:1px;cursor:pointer;box-shadow:var(--shadow-primary);transition:all 0.2s;">CHART</button>
+                    <button type="button" id="mTvBtn" class="btn-ripple" aria-label="Buka chart TradingView" style="display:none;background:var(--primary);color:#fff;padding:6px 12px;border-radius:8px;font-size:11px;border:none;font-family:'Barlow Condensed',sans-serif;font-weight:800;letter-spacing:1px;cursor:pointer;box-shadow:var(--shadow-primary);transition:all 0.2s;">CHART</button>
                 </div>
-                <button class="modal-close btn-ripple" onclick="closeModal()">
+                <button type="button" class="modal-close btn-ripple" onclick="closeModal()" aria-label="Tutup detail saham">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
             </div>
@@ -13113,8 +13119,8 @@ async function saveIDBTelegramConfig(config) {
             </div>
             <div id="ctpPreview" style="background:var(--bg-surface);border:1px solid var(--border-light);border-radius:var(--radius-md);padding:10px 12px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--t-med);margin-bottom:14px;">Masukkan harga jual untuk melihat estimasi P&amp;L.</div>
             <div style="display:flex;gap:8px;">
-                <button onclick="closeCloseTradeModal()" style="flex:1;padding:12px;background:var(--bg-elevated);color:var(--t-med);border:1px solid var(--border-light);border-radius:var(--radius-md);font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:900;cursor:pointer;">Batal</button>
-                <button onclick="confirmCloseTradeTP()" style="flex:2;padding:12px;background:var(--up);color:#fff;border:none;border-radius:var(--radius-md);font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:900;letter-spacing:0.5px;cursor:pointer;box-shadow:0 5px 18px var(--up-glow);">✓ KONFIRMASI TUTUP</button>
+                <button type="button" onclick="closeCloseTradeModal()" style="flex:1;padding:12px;background:var(--bg-elevated);color:var(--t-med);border:1px solid var(--border-light);border-radius:var(--radius-md);font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:900;cursor:pointer;">Batal</button>
+                <button type="button" onclick="confirmCloseTradeTP()" style="flex:2;padding:12px;background:var(--up);color:#fff;border:none;border-radius:var(--radius-md);font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:900;letter-spacing:0.5px;cursor:pointer;box-shadow:0 5px 18px var(--up-glow);">✓ KONFIRMASI TUTUP</button>
             </div>
         </div>
     </div>
@@ -13136,10 +13142,10 @@ async function saveIDBTelegramConfig(config) {
                 <span>Portofolio, Watchlist &amp; Alert tetap tersimpan aman di perangkat ini.</span>
             </div>
             <div class="logout-btn-row">
-                <button class="logout-cancel-btn btn-ripple" onclick="cancelLogout()">
+                <button type="button" class="logout-cancel-btn btn-ripple" onclick="cancelLogout()">
                     BATAL
                 </button>
-                <button class="logout-confirm-btn btn-ripple" onclick="confirmLogout()">
+                <button type="button" class="logout-confirm-btn btn-ripple" onclick="confirmLogout()">
                     YA, KELUAR
                 </button>
             </div>
@@ -13228,6 +13234,8 @@ async function saveIDBTelegramConfig(config) {
             const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
             const pill = document.getElementById('darkModeTogglePill');
             if (pill) pill.classList.toggle('on', isDark);
+            const headerThemeButton = document.querySelector('.header-theme-btn');
+            if (headerThemeButton) headerThemeButton.setAttribute('aria-pressed', String(isDark));
             const title = document.getElementById('pageDmTitle');
             if (title) title.textContent = isDark ? 'Mode Gelap' : 'Mode Terang';
         }
@@ -15936,7 +15944,9 @@ async function saveIDBTelegramConfig(config) {
         }
         function syncStockListLayoutUI() {
             document.querySelectorAll('.sl-layout-btn').forEach(b => {
-                b.classList.toggle('active', b.dataset.layout === stockListLayout);
+                const isActive = b.dataset.layout === stockListLayout;
+                b.classList.toggle('active', isActive);
+                b.setAttribute('aria-pressed', String(isActive));
             });
         }
 
@@ -16603,7 +16613,9 @@ async function saveIDBTelegramConfig(config) {
             </svg>`;
         }
 
+        let modalFocusReturnTarget = null;
         function openModal(ticker) {
+            modalFocusReturnTarget = document.activeElement;
             // ✅ v47 FIX: sanitise input — trailing spaces / wrong-case tidak pernah menyebabkan miss
             // ✅ v48 FIX: pakai getStock() terpusat agar lookup selalu konsisten dengan allStocks
             ticker = sanitizeTicker(ticker);
@@ -16689,11 +16701,11 @@ async function saveIDBTelegramConfig(config) {
                     `<div class="m-pane" id="mt-profil"><div id="modal-profil-content" style="padding:4px 0;"></div></div>` +
                     `<div class="m-pane" id="mt-ai"><div id="modal-ai-content" style="padding:4px 0;"></div></div>` +
                     `<div class="modal-split-actions" style="display:flex;gap:10px;margin-top:20px;">
-                        <button class="run-btn btn-ripple" onclick="goToJournalFromModal('${s.ticker}')" style="flex:1;font-size:13.5px;background:var(--card-bg);border:1.5px solid var(--primary);color:var(--primary);box-shadow:none;display:flex;align-items:center;justify-content:center;gap:6px;padding:13px 8px;">
+                        <button type="button" class="run-btn btn-ripple" onclick="goToJournalFromModal('${s.ticker}')" style="flex:1;font-size:13.5px;background:var(--card-bg);border:1.5px solid var(--primary);color:var(--primary);box-shadow:none;display:flex;align-items:center;justify-content:center;gap:6px;padding:13px 8px;">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
                             Masuk Jurnal
                         </button>
-                        <button class="run-btn btn-ripple" onclick="toggleWL('${s.ticker}')" id="modalWlBtn" style="flex:1;font-size:13.5px;${watchlist.includes(s.ticker)?'background:var(--card-bg);border:1.5px solid var(--dn);color:var(--dn);box-shadow:none;':'background:var(--up);border:none;color:#fff;box-shadow:0 5px 18px var(--up-glow);'}display:flex;align-items:center;justify-content:center;gap:6px;padding:13px 8px;">
+                        <button type="button" class="run-btn btn-ripple" onclick="toggleWL('${s.ticker}')" id="modalWlBtn" style="flex:1;font-size:13.5px;${watchlist.includes(s.ticker)?'background:var(--card-bg);border:1.5px solid var(--dn);color:var(--dn);box-shadow:none;':'background:var(--up);border:none;color:#fff;box-shadow:0 5px 18px var(--up-glow);'}display:flex;align-items:center;justify-content:center;gap:6px;padding:13px 8px;">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="${watchlist.includes(s.ticker)?'none':'currentColor'}" stroke="currentColor" stroke-width="2.3"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
                             ${watchlist.includes(s.ticker)?'Hapus Watchlist':'Simpan Watchlist'}
                         </button>
@@ -16701,6 +16713,8 @@ async function saveIDBTelegramConfig(config) {
             }
             const ov = document.getElementById('overlay');
             if (ov) ov.classList.add('open');
+            const closeButton = document.querySelector('.modal-close');
+            if (closeButton) requestAnimationFrame(() => closeButton.focus());
             // ✅ v79 — modal dibuka dengan tab Chart aktif secara default, jadi mode
             // "wide-chart" langsung diaktifkan di sini (konsisten dengan mTab()).
             if (typeof toggleModalWideChart === 'function') toggleModalWideChart(true);
@@ -16753,6 +16767,9 @@ async function saveIDBTelegramConfig(config) {
             });
             const ov = document.getElementById('overlay');
             if (ov) ov.classList.remove('open');
+            if (modalFocusReturnTarget && typeof modalFocusReturnTarget.focus === 'function') {
+                modalFocusReturnTarget.focus();
+            }
             // ✅ v79 — reset mode "wide-chart" saat modal ditutup, supaya openModal()
             // berikutnya selalu mulai dari state bersih (tab Chart) tanpa sisa lebar dari
             // sesi sebelumnya nyangkut sesaat sebelum toggleModalWideChart(true) dipanggil lagi.
@@ -16968,7 +16985,7 @@ async function saveIDBTelegramConfig(config) {
                 </div>
                 <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
                     ${s ? `<span style="font-size:12px;font-weight:900;color:${chgUp?'var(--up)':'var(--dn)'};">Rp${n2(s.price)} <small style="font-size:10px;">${chgUp?'▲':'▼'}${Math.abs(Number(s.chg)||0).toFixed(2)}%</small></span>` : ''}
-                    <button class="btn-ripple" onclick="shareTickerAnalysis('${ticker}')" title="Bagikan hasil analisa" style="display:flex;align-items:center;gap:4px;padding:5px 9px;border-radius:7px;border:1px solid rgba(56,139,253,0.35);background:var(--primary-light);color:var(--primary);font-size:10px;font-weight:800;cursor:pointer;">
+                    <button type="button" class="btn-ripple" onclick="shareTickerAnalysis('${ticker}')" title="Bagikan hasil analisa" style="display:flex;align-items:center;gap:4px;padding:5px 9px;border-radius:7px;border:1px solid rgba(56,139,253,0.35);background:var(--primary-light);color:var(--primary);font-size:10px;font-weight:800;cursor:pointer;">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="10.6" x2="15.4" y2="6.4"/><line x1="8.6" y1="13.4" x2="15.4" y2="17.6"/></svg>
                         Bagikan
                     </button>
@@ -18548,10 +18565,10 @@ async function saveIDBTelegramConfig(config) {
             // varian kartu analisis (Mode Dasar, Mode Canggih, snapshot FMP-only) supaya
             // konsisten & state "active" kecepatan selalu sinkron dengan preferensi tersimpan.
             const rates = [0.8, 1, 1.25, 1.5];
-            return `<button class="ai-regen-btn btn-ripple ai-tts-btn" id="${btnId}" onclick="siToggleTTS()">${label || '🔊 Dengerin Analisis (T2A)'}</button>` +
+            return `<button type="button" class="ai-regen-btn btn-ripple ai-tts-btn" id="${btnId}" onclick="siToggleTTS()">${label || '🔊 Dengerin Analisis (T2A)'}</button>` +
                 `<div class="ai-tts-speed-row" id="${btnId}-speedRow" style="display:none;">` +
                 `<span style="font-size:9.5px;color:var(--t-low);font-weight:700;">Kecepatan:</span>` +
-                rates.map(r => `<button class="ai-tts-speed-btn" data-rate="${r}" onclick="siSetTTSRate(${r})">${r}x</button>`).join('') +
+                rates.map(r => `<button type="button" class="ai-tts-speed-btn" data-rate="${r}" onclick="siSetTTSRate(${r})">${r}x</button>`).join('') +
                 `<button type="button" class="ai-tts-speed-btn ai-tts-stop-btn" onclick="siStopTTS()" title="Hentikan pembacaan">⏹ Stop</button>` +
                 `</div>` +
                 `<div class="ai-tts-prog-wrap" id="${btnId}-progWrap" style="display:none;">` +
@@ -18794,7 +18811,7 @@ async function saveIDBTelegramConfig(config) {
                 </div>
                 ${renderAIQuickCard(s, plan0, pattern0, mtf0, sectorSnap0)}
                 ${_ttsControlsHtml('aiTtsBtn')}
-                <button class="ai-regen-btn btn-ripple" style="margin-top:8px;" onclick="openAIKeysFromModal()">🔑 Pasang Gemini AI Sekarang</button>
+                <button type="button" class="ai-regen-btn btn-ripple" style="margin-top:8px;" onclick="openAIKeysFromModal()">🔑 Pasang Gemini AI Sekarang</button>
                 <div style="margin-top:10px;padding:10px 12px;background:rgba(245,166,35,0.08);border:1px solid rgba(245,166,35,0.2);border-radius:8px;">
                     <div style="font-size:9px;color:var(--warn);font-family:'IBM Plex Mono',monospace;font-weight:900;margin-bottom:4px;">⚠️ DISCLAIMER</div>
                     <div style="font-size:10px;color:var(--t-med);font-weight:600;line-height:1.5;">Ringkasan &amp; rencana TP/SL otomatis dari indikator teknikal &amp; fundamental aplikasi, bukan rekomendasi/ajakan jual-beli. Selalu riset mandiri sebelum ambil keputusan.</div>
@@ -19007,7 +19024,7 @@ Jangan mengarang angka, berita, atau data global/makro/komoditas yang tidak ters
                 </div>
                 ${fundGridHtml}
                 ${renderAIQuickCard(s, plan, pattern, mtf, sectorSnap)}
-                <button class="ai-full-toggle btn-ripple open" id="aiFullToggleBtn" onclick="toggleAIFullNarrative()">
+                <button type="button" class="ai-full-toggle btn-ripple open" id="aiFullToggleBtn" onclick="toggleAIFullNarrative()">
                     <span id="aiFullToggleLabel">Sembunyikan Analisis Lengkap ala Kepala Riset</span>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
                 </button>
@@ -19021,7 +19038,7 @@ Jangan mengarang angka, berita, atau data global/makro/komoditas yang tidak ters
                     </div>
                 </div>
                 ${_ttsControlsHtml('aiTtsBtn')}
-                <button class="ai-regen-btn btn-ripple" style="margin-top:8px;" onclick="loadModalAIAnalysis('${s.ticker}', true)">🔄 Analisis Ulang</button>
+                <button type="button" class="ai-regen-btn btn-ripple" style="margin-top:8px;" onclick="loadModalAIAnalysis('${s.ticker}', true)">🔄 Analisis Ulang</button>
                 <div style="margin-top:10px;padding:10px 12px;background:rgba(245,166,35,0.08);border:1px solid rgba(245,166,35,0.2);border-radius:8px;">
                     <div style="font-size:9px;color:var(--warn);font-family:'IBM Plex Mono',monospace;font-weight:900;margin-bottom:4px;">⚠️ DISCLAIMER</div>
                     <div style="font-size:10px;color:var(--t-med);font-weight:600;line-height:1.5;">Analisis dihasilkan AI (Gemini) berdasarkan data FMP, berita, & indikator aplikasi — bisa saja meleset. Bukan rekomendasi/ajakan jual-beli resmi. Selalu lakukan riset mandiri dan pertimbangkan profil risiko sebelum mengambil keputusan investasi.</div>
@@ -19033,7 +19050,7 @@ Jangan mengarang angka, berita, atau data global/makro/komoditas yang tidak ters
                 c._loadedTicker = null; // izinkan retry otomatis kalau tab dibuka lagi
                 const isNoKey = err && err.message === 'GEMINI_NO_KEY';
                 c.innerHTML = `<div class="ai-err-box"><b style="color:var(--dn);">${isNoKey ? 'Key Gemini belum aktif.' : 'Gagal memuat analisis AI.'}</b><br>${isNoKey ? 'Pasang API key Gemini di Akun → Bot AI — FMP & Gemini.' : ((err && err.message) ? err.message : 'Terjadi kesalahan tak terduga.')}<br><span style="color:var(--t-low);font-size:10.5px;">Kemungkinan penyebab: limit kuota API harian, koneksi internet, atau key API belum aktif.</span></div>
-                <button class="ai-regen-btn btn-ripple" onclick="loadModalAIAnalysis('${s.ticker}', true)">🔄 Coba Lagi</button>`;
+                <button type="button" class="ai-regen-btn btn-ripple" onclick="loadModalAIAnalysis('${s.ticker}', true)">🔄 Coba Lagi</button>`;
             }
         }
 
@@ -19129,7 +19146,7 @@ Jangan mengarang angka, berita, atau data global/makro/komoditas yang tidak ters
                         <div class="ai-fund-card"><div class="ai-fund-lbl">52w Range</div><div class="ai-fund-val" style="font-size:10.5px;">${quote?.yearLow ?? '—'} – ${quote?.yearHigh ?? '—'}</div></div>
                         <div class="ai-fund-card"><div class="ai-fund-lbl">Industri</div><div class="ai-fund-val" style="font-size:10.5px;">${profile?.industry || '—'}</div></div>
                     </div>
-                    <button class="ai-regen-btn btn-ripple" onclick="runFMPOnlyGeminiAnalysis('${ticker}', ${JSON.stringify(profile?.companyName || ticker)})">✨ Minta Analisis AI Gaul (Gemini)</button>
+                    <button type="button" class="ai-regen-btn btn-ripple" onclick="runFMPOnlyGeminiAnalysis('${ticker}', ${JSON.stringify(profile?.companyName || ticker)})">✨ Minta Analisis AI Gaul (Gemini)</button>
                     <div id="fmpExpGemini-${ticker}"></div>
                 </div>`;
             } catch (err) {
@@ -19273,7 +19290,7 @@ Tulis singkat (maks 200 kata): 1-2 kalimat ringkasan kondisi, poin valuasi, poin
                 totalModal += modal;
                 if (pasar) totalPasar += pasar;
                 const plColor = pl !== null ? (pl >= 0 ? 'var(--up)' : 'var(--dn)') : 'var(--t-med)';
-                return `<tr><td><b style="font-family:Barlow Condensed;font-size:15px;">${p.ticker}</b>${p.note?'<div style="font-size:10px;color:var(--t-med);margin-top:3px;">'+p.note+'</div>':''}</td><td>${p.lot}</td><td>${n2(p.harga)}</td><td>${hargaPasar?n2(hargaPasar):'<span style="color:var(--t-med);">—</span>'}</td><td style="color:${plColor};font-weight:800;">${pl!==null?(pl>=0?'+':'')+n2(Math.round(pl))+'<br><span style="font-size:9px;">'+(plPct>=0?'+':'')+plPct.toFixed(2)+'%</span>':'—'}</td><td><button class="porto-del-btn" onclick="deletePortfolio(${i})">✕</button></td></tr>`;
+                return `<tr><td><b style="font-family:Barlow Condensed;font-size:15px;">${p.ticker}</b>${p.note?'<div style="font-size:10px;color:var(--t-med);margin-top:3px;">'+p.note+'</div>':''}</td><td>${p.lot}</td><td>${n2(p.harga)}</td><td>${hargaPasar?n2(hargaPasar):'<span style="color:var(--t-med);">—</span>'}</td><td style="color:${plColor};font-weight:800;">${pl!==null?(pl>=0?'+':'')+n2(Math.round(pl))+'<br><span style="font-size:9px;">'+(plPct>=0?'+':'')+plPct.toFixed(2)+'%</span>':'—'}</td><td><button type="button" class="porto-del-btn" onclick="deletePortfolio(${i})">✕</button></td></tr>`;
             }).join('');
             tbody.innerHTML = rows;
             const totalPL = totalPasar - totalModal;
@@ -19395,7 +19412,7 @@ Tulis singkat (maks 200 kata): 1-2 kalimat ringkasan kondisi, poin valuasi, poin
             if (!el) return;
             if (!priceAlerts.length) { el.innerHTML = '<div class="porto-empty">Belum ada alert.</div>'; return; }
             el.innerHTML = priceAlerts.map((a, i) =>
-                `<div class="alert-item ${a.triggered?'active-alert':''}"><div><div style="display:flex;align-items:center;"><span class="alert-status" style="background:${a.triggered?'var(--gold)':'var(--up)'};animation:${a.triggered?'none':'pulse 2s infinite'};"></span><div class="alert-symbol">${a.ticker}</div>${a.triggered?'<span style="margin-left:8px;font-size:9px;background:var(--gold);color:#fff;padding:3px 7px;border-radius:5px;font-weight:900;">TRIGGERED</span>':''}</div><div class="alert-condition">${a.cond==='above'?'▲ >=':'▼ <='} ${rp(a.targetPrice)}</div></div><button class="alert-del btn-ripple" onclick="deleteAlert(${i})">Hapus</button></div>`
+                `<div class="alert-item ${a.triggered?'active-alert':''}"><div><div style="display:flex;align-items:center;"><span class="alert-status" style="background:${a.triggered?'var(--gold)':'var(--up)'};animation:${a.triggered?'none':'pulse 2s infinite'};"></span><div class="alert-symbol">${a.ticker}</div>${a.triggered?'<span style="margin-left:8px;font-size:9px;background:var(--gold);color:#fff;padding:3px 7px;border-radius:5px;font-weight:900;">TRIGGERED</span>':''}</div><div class="alert-condition">${a.cond==='above'?'▲ >=':'▼ <='} ${rp(a.targetPrice)}</div></div><button type="button" class="alert-del btn-ripple" onclick="deleteAlert(${i})">Hapus</button></div>`
                 ).join('');
         }
 
@@ -20237,6 +20254,12 @@ Tulis singkat (maks 200 kata): 1-2 kalimat ringkasan kondisi, poin valuasi, poin
             // Open AI panel
             const p = document.getElementById('aiPanel');
             if (p) p.classList.add('open');
+            const aiTrigger = document.querySelector('.fab-ai');
+            if (aiTrigger) {
+                aiFocusReturnTarget = document.activeElement;
+                aiTrigger.setAttribute('aria-expanded', 'true');
+                aiTrigger.setAttribute('aria-label', 'Tutup asisten AI');
+            }
             // Clear previous messages and start fresh with emiten context
             const chatMsgs = document.getElementById('chatMsgs');
             if (chatMsgs) chatMsgs.innerHTML = '';
@@ -20257,15 +20280,25 @@ Tulis singkat (maks 200 kata): 1-2 kalimat ringkasan kondisi, poin valuasi, poin
             spawnSparkles(document.querySelector('.fab-ai') || document.body, 'var(--primary)', 8);
         }
 
+        let aiFocusReturnTarget = null;
         function toggleAI() {
             const p = document.getElementById('aiPanel');
+            const trigger = document.querySelector('.fab-ai');
             if (!p) return;
-            p.classList.toggle('open');
-            if (p.classList.contains('open')) {
+            const willOpen = !p.classList.contains('open');
+            if (willOpen) aiFocusReturnTarget = document.activeElement;
+            p.classList.toggle('open', willOpen);
+            if (trigger) {
+                trigger.setAttribute('aria-expanded', String(willOpen));
+                trigger.setAttribute('aria-label', willOpen ? 'Tutup asisten AI' : 'Buka asisten AI');
+            }
+            if (willOpen) {
                 const inp = document.getElementById('chatInput');
                 if (inp) inp.focus();
-                spawnSparkles(document.querySelector('.fab-ai'), '#fff', 10);
+                spawnSparkles(trigger, '#fff', 10);
                 if (navigator.vibrate) navigator.vibrate([20, 10, 20]);
+            } else if (aiFocusReturnTarget && typeof aiFocusReturnTarget.focus === 'function') {
+                aiFocusReturnTarget.focus();
             }
         }
 
@@ -20339,9 +20372,9 @@ Tulis singkat (maks 200 kata): 1-2 kalimat ringkasan kondisi, poin valuasi, poin
                 </table>
               </div>
               <div class="ai-widget-btns">
-                <button class="ai-btn ai-btn-primary" onclick="openModalToAI('${s.ticker}')">🧠 SOBATINVES AI</button>
-                <button class="ai-btn ai-btn-outline" onclick="openModal('${s.ticker}')">📊 MODAL</button>
-                <button class="ai-btn ai-btn-outline" onclick="window.open('https://www.tradingview.com/chart/?symbol=IDX:${s.ticker}', '_blank')">📈 TV</button>
+                <button type="button" class="ai-btn ai-btn-primary" onclick="openModalToAI('${s.ticker}')">🧠 SOBATINVES AI</button>
+                <button type="button" class="ai-btn ai-btn-outline" onclick="openModal('${s.ticker}')">📊 MODAL</button>
+                <button type="button" class="ai-btn ai-btn-outline" onclick="window.open('https://www.tradingview.com/chart/?symbol=IDX:${s.ticker}', '_blank')">📈 TV</button>
               </div>
             </div>
           `;
@@ -20391,7 +20424,7 @@ Tulis singkat (maks 200 kata): 1-2 kalimat ringkasan kondisi, poin valuasi, poin
                         `${i+1}. <span class="ticker-link" onclick="openModal('${s.ticker}')">${s.ticker}</span> — ${rp(s.price)} (<span class="c-up">${pct(s.chg)}</span>) | Skor: ${s.score}/10<br>`;
                 });
                 res +=
-                    `<br><button class="ai-btn ai-btn-primary" onclick="filterBy(document.querySelectorAll('.chip')[0], 'all');nav('home',document.querySelectorAll('.nav-btn')[0]);toggleAI();" style="margin-top:8px;">👀 Tampilkan di Tabel</button>`;
+                    `<br><button type="button" class="ai-btn ai-btn-primary" onclick="filterBy(document.querySelectorAll('.chip')[0], 'all');nav('home',document.querySelectorAll('.nav-btn')[0]);toggleAI();" style="margin-top:8px;">👀 Tampilkan di Tabel</button>`;
                 return res;
             }
             if (/(dividen|yield|pasif)/.test(query)) {
@@ -20418,7 +20451,7 @@ Tulis singkat (maks 200 kata): 1-2 kalimat ringkasan kondisi, poin valuasi, poin
                 if (!portfolio.length) return 'Portofolio Anda masih kosong. Silakan masuk ke tab <b>Hub</b> → <b>Portofolio</b> untuk menambahkannya.';
                 return `Anda memiliki ${portfolio.length} saham di dalam portofolio:<br><br>` + portfolio.map(p =>
                     `• <b>${p.ticker}</b> (${p.lot} Lot) @ ${rp(p.harga)}`).join('<br>') +
-                    `<br><br><button class="ai-btn ai-btn-primary" onclick="nav('hub',document.querySelectorAll('.nav-btn')[2]);switchHub('porto',document.querySelectorAll('.hub-tab')[0]);toggleAI();" style="margin-top:8px;">Buka Portofolio</button>`;
+                    `<br><br><button type="button" class="ai-btn ai-btn-primary" onclick="nav('hub',document.querySelectorAll('.nav-btn')[2]);switchHub('porto',document.querySelectorAll('.hub-tab')[0]);toggleAI();" style="margin-top:8px;">Buka Portofolio</button>`;
             }
             if (/(halo|hai|pagi|siang|sore|malam)/.test(query)) {
                 return `Halo Boss! 👋<br>Saya SobatInves AI, siap bantu cuan hari ini.<br>Ketik <b>"Analisa BBCA"</b> untuk melihat Widget AI, atau <b>"Top Buy"</b> untuk rekomendasi.`;
@@ -23685,7 +23718,10 @@ Tulis singkat (maks 200 kata): 1-2 kalimat ringkasan kondisi, poin valuasi, poin
 
         function toggleNotifType(type, btn) {
             notifSettings[type] = !notifSettings[type];
-            if (btn) btn.classList.toggle('on', notifSettings[type]);
+            if (btn) {
+                btn.classList.toggle('on', notifSettings[type]);
+                btn.setAttribute('aria-pressed', String(notifSettings[type]));
+            }
             const userNotifKey = getUserNotifKey();
             lsSet(userNotifKey, notifSettings);
             lsSet('si_notif_settings', notifSettings);
@@ -23708,7 +23744,11 @@ Tulis singkat (maks 200 kata): 1-2 kalimat ringkasan kondisi, poin valuasi, poin
                 pill.style.color = isActive ? 'var(--up)' : isConnected ? 'var(--warn)' : 'var(--t-med)';
             }
             if (masterBar) masterBar.classList.toggle('active', isActive);
-            if (masterBtn) masterBtn.classList.toggle('on', isActive);
+            if (masterBtn) {
+                masterBtn.classList.toggle('on', isActive);
+                masterBtn.setAttribute('aria-pressed', String(isActive));
+                masterBtn.setAttribute('aria-label', (isActive ? 'Nonaktifkan' : 'Aktifkan') + ' notifikasi Telegram');
+            }
             if (masterIcon) masterIcon.textContent = isActive ? '📱' : isConnected ? '📵' : '📵';
             if (masterText) masterText.textContent = 'Notifikasi Telegram';
             if (masterStatus) {
@@ -24770,10 +24810,10 @@ Tulis singkat (maks 200 kata): 1-2 kalimat ringkasan kondisi, poin valuasi, poin
                 </div>
                 ${t.note?`<div class="riwayat-note">📝 ${t.note.slice(0,150)}${t.note.length>150?'...':''}</div>`:''}
                 <div class="riwayat-actions">
-                    <button class="riwayat-action-btn btn-ripple" onclick="openEditModal(${realIdx})">✏️ Edit</button>
-                    ${t.status==='open'?`<button class="riwayat-action-btn tp btn-ripple" onclick="openCloseTradeModal('${t.id}')">✅ Tutup / TP</button>`:''}
-                    <button class="riwayat-action-btn btn-ripple" onclick="openModal('${t.ticker}')">📊 Chart</button>
-                    <button class="riwayat-action-btn del btn-ripple" onclick="deleteTradeJournal('${t.id}')">🗑 Hapus</button>
+                    <button type="button" class="riwayat-action-btn btn-ripple" onclick="openEditModal(${realIdx})">✏️ Edit</button>
+                    ${t.status==='open'?`<button type="button" class="riwayat-action-btn tp btn-ripple" onclick="openCloseTradeModal('${t.id}')">✅ Tutup / TP</button>`:''}
+                    <button type="button" class="riwayat-action-btn btn-ripple" onclick="openModal('${t.ticker}')">📊 Chart</button>
+                    <button type="button" class="riwayat-action-btn del btn-ripple" onclick="deleteTradeJournal('${t.id}')" aria-label="Hapus transaksi ${t.ticker}">🗑 Hapus</button>
                 </div>
             </div>`;
         }
@@ -24897,9 +24937,9 @@ Tulis singkat (maks 200 kata): 1-2 kalimat ringkasan kondisi, poin valuasi, poin
                 <div class="ptc-cl">${clVal}</div>
                 <!-- ACTIONS -->
                 <div class="ptc-actions">
-                    ${(t.status === 'open' && isBuy) ? `<button class="ptc-btn tp btn-ripple" onclick="event.stopPropagation();openCloseTradeModal('${t.id}')" title="Tutup / Take Profit">TP</button>` : ''}
-                    ${(t.status === 'open' && isBuy) ? `<button class="ptc-btn avgd btn-ripple" onclick="event.stopPropagation();openAvgDownModal('${t.id}')" title="Average Down">AVG↓</button>` : ''}
-                    <button class="ptc-btn del btn-ripple" onclick="event.stopPropagation();deleteTradeJournal('${t.id}')" title="Hapus">✕</button>
+                    ${(t.status === 'open' && isBuy) ? `<button type="button" class="ptc-btn tp btn-ripple" onclick="event.stopPropagation();openCloseTradeModal('${t.id}')" title="Tutup / Take Profit">TP</button>` : ''}
+                    ${(t.status === 'open' && isBuy) ? `<button type="button" class="ptc-btn avgd btn-ripple" onclick="event.stopPropagation();openAvgDownModal('${t.id}')" title="Average Down">AVG↓</button>` : ''}
+                    <button type="button" class="ptc-btn del btn-ripple" onclick="event.stopPropagation();deleteTradeJournal('${t.id}')" title="Hapus" aria-label="Hapus transaksi ${t.ticker}">✕</button>
                 </div>
             </div>
             ${noteRaw ? `<div class="ptc-note-row" id="${noteId}">
@@ -25510,7 +25550,11 @@ Tulis singkat (maks 200 kata): 1-2 kalimat ringkasan kondisi, poin valuasi, poin
                 newsAuto: 'tgToggleNewsAutoPage' };
             Object.entries(toggleMap).forEach(([k, id]) => {
                 const btn = document.getElementById(id);
-                if (btn) btn.classList.toggle('on', notifSettings[k] !== false);
+                if (btn) {
+                    const isEnabled = notifSettings[k] !== false;
+                    btn.classList.toggle('on', isEnabled);
+                    btn.setAttribute('aria-pressed', String(isEnabled));
+                }
             });
             updateTelegramStatusPage();
             updateTelegramBackendInfo();
@@ -25606,7 +25650,10 @@ Jumlah Emiten: <b>${allStocks ? allStocks.length : 0}</b>
 
         function toggleNotifTypePage(type, btn) {
             notifSettings[type] = !notifSettings[type];
-            if (btn) btn.classList.toggle('on', notifSettings[type]);
+            if (btn) {
+                btn.classList.toggle('on', notifSettings[type]);
+                btn.setAttribute('aria-pressed', String(notifSettings[type]));
+            }
             const userNotifKey = getUserNotifKey();
             lsSet(userNotifKey, notifSettings);
             lsSet('si_notif_settings', notifSettings); // backward compat
@@ -25802,7 +25849,11 @@ Jumlah Emiten: <b>${allStocks ? allStocks.length : 0}</b>
             const statusDetail = document.getElementById('tgStatusDetailPage');
             const pagePill = document.getElementById('tgPageStatusPill');
             if (masterBar) masterBar.classList.toggle('active', isActive);
-            if (masterBtn) masterBtn.classList.toggle('on', isActive);
+            if (masterBtn) {
+                masterBtn.classList.toggle('on', isActive);
+                masterBtn.setAttribute('aria-pressed', String(isActive));
+                masterBtn.setAttribute('aria-label', (isActive ? 'Nonaktifkan' : 'Aktifkan') + ' notifikasi Telegram');
+            }
             if (masterIcon) masterIcon.textContent = isActive ? '📱' : isConnected ? '📵' : '📵';
             if (masterStatus) {
                 if (isActive) { masterStatus.textContent = '✅ Aktif — notifikasi dikirim ke Chat ID Anda'; masterStatus.style.color = 'var(--up)'; }
@@ -25952,7 +26003,7 @@ Jumlah Emiten: <b>${allStocks ? allStocks.length : 0}</b>
             </div>
             <div style="display:flex;align-items:center;gap:8px;">
                 <span class="qb-badge-buy">🚀 BULLISH</span>
-                <button class="qb-close btn-ripple" onclick="closeQuickBuy()">✕</button>
+                <button type="button" class="qb-close btn-ripple" onclick="closeQuickBuy()" aria-label="Tutup pembelian cepat">✕</button>
             </div>
         </div>
         <div class="qb-body">
@@ -26017,9 +26068,9 @@ Jumlah Emiten: <b>${allStocks ? allStocks.length : 0}</b>
                 <div class="qb-input-row">
                     <span class="qb-lot-label">Lot (1 lot = 100 lembar)</span>
                     <div class="qb-lot-ctrl">
-                        <button class="qb-lot-btn btn-ripple" onclick="adjustQBLot(-1)">−</button>
+                        <button type="button" class="qb-lot-btn btn-ripple" onclick="adjustQBLot(-1)" aria-label="Kurangi jumlah lot">−</button>
                         <input type="number" class="qb-lot-inp" id="qbLotInp" value="1" min="1" max="9999" oninput="updateQBTotal()">
-                        <button class="qb-lot-btn btn-ripple" onclick="adjustQBLot(1)">+</button>
+                        <button type="button" class="qb-lot-btn btn-ripple" onclick="adjustQBLot(1)" aria-label="Tambah jumlah lot">+</button>
                     </div>
                 </div>
             </div>
@@ -26035,8 +26086,8 @@ Jumlah Emiten: <b>${allStocks ? allStocks.length : 0}</b>
 
             <!-- Action Buttons -->
             <div class="qb-btn-row">
-                <button class="qb-btn-cancel btn-ripple" onclick="closeQuickBuy()">Batal</button>
-                <button class="qb-btn-buy btn-ripple" onclick="executeQuickBuy()">
+                <button type="button" class="qb-btn-cancel btn-ripple" onclick="closeQuickBuy()">Batal</button>
+                <button type="button" class="qb-btn-buy btn-ripple" onclick="executeQuickBuy()">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
                     Beli &amp; Tambah ke Portofolio
                 </button>
@@ -26061,7 +26112,7 @@ Jumlah Emiten: <b>${allStocks ? allStocks.length : 0}</b>
                 <div class="qb-title">💰 Ubah Saldo Jurnal</div>
                 <div style="font-size:10px;color:var(--t-med);font-weight:600;margin-top:2px;">Modal awal ini dipakai untuk hitung Total Saldo &amp; performa di Jurnal Trading</div>
             </div>
-            <button class="qb-close btn-ripple" onclick="closeEditSaldoModal()">✕</button>
+            <button type="button" class="qb-close btn-ripple" onclick="closeEditSaldoModal()" aria-label="Tutup editor saldo">✕</button>
         </div>
         <div class="qb-body">
             <div>
@@ -26071,7 +26122,7 @@ Jumlah Emiten: <b>${allStocks ? allStocks.length : 0}</b>
             <div style="font-size:9.5px;color:var(--t-low);font-weight:600;line-height:1.5;">
                 ℹ️ Ini adalah <b>modal awal</b> Jurnal — Total Saldo yang tampil = nominal ini + P&amp;L Realized dari semua trade yang sudah ditutup.
             </div>
-            <button class="prof-save-btn btn-ripple" onclick="saveEditSaldoModal()">
+            <button type="button" class="prof-save-btn btn-ripple" onclick="saveEditSaldoModal()">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
                 SIMPAN SALDO
             </button>
@@ -26118,8 +26169,8 @@ Jumlah Emiten: <b>${allStocks ? allStocks.length : 0}</b>
         </div>
 
         <div class="gd-first-btnrow">
-            <button class="gd-first-btn-skip btn-ripple" onclick="gdFirstSkip()">Lewati</button>
-            <button class="gd-first-btn-next btn-ripple" id="gdFirstNextBtn" onclick="gdFirstNext()">Lanjut</button>
+            <button type="button" class="gd-first-btn-skip btn-ripple" onclick="gdFirstSkip()">Lewati</button>
+            <button type="button" class="gd-first-btn-next btn-ripple" id="gdFirstNextBtn" onclick="gdFirstNext()">Lanjut</button>
         </div>
     </div>
 </div>
