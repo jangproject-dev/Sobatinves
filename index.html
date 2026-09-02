@@ -9271,6 +9271,11 @@ async function saveIDBTelegramConfig(config) {
             width:100%; outline:none; transition:border-color 0.2s; }
         .tg-field:focus { border-color:var(--primary); }
         .tg-field::placeholder { color:var(--t-low); }
+        .tg-textarea { background:var(--input-surface); border:1px solid var(--border-light); border-radius:var(--radius-sm);
+            padding:9px 12px; font-size:12px; color:var(--t-hi); font-family:'Plus Jakarta Sans',sans-serif; font-weight:600;
+            width:100%; outline:none; transition:border-color 0.2s; resize:vertical; min-height:64px; line-height:1.5; }
+        .tg-textarea:focus { border-color:#8B5CF6; }
+        .tg-textarea::placeholder { color:var(--t-low); }
         .tg-toggle-row { display:flex; align-items:center; justify-content:space-between; padding:8px 0;
             border-bottom:1px solid var(--border-light); }
         .tg-toggle-row:last-child { border-bottom:none; padding-bottom:0; }
@@ -9294,6 +9299,25 @@ async function saveIDBTelegramConfig(config) {
             border-radius:5px; margin-top:6px; text-align:center; display:none; }
         .tg-status.ok { display:block; background:var(--up-bg); color:var(--up); border:1px solid var(--up-border); }
         .tg-status.err { display:block; background:var(--dn-bg); color:var(--dn); border:1px solid var(--dn-border); }
+
+        /* ─── v86: Berita Custom AI (Gemini) — layout dirapikan: chip contoh
+           perintah, pill jam jadwal, & kartu preview hasil AI sebelum terkirim ─── */
+        .cai-chip-row { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+        .cai-chip { font-size:10px; font-weight:700; color:var(--t-med); background:var(--bg-elevated);
+            border:1px solid var(--border-light); border-radius:20px; padding:6px 11px; cursor:pointer;
+            font-family:inherit; transition:all 0.15s; text-align:left; line-height:1.3; }
+        .cai-chip:active { transform:scale(0.96); }
+        .cai-chip:hover { border-color:#8B5CF6; color:#8B5CF6; }
+        .cai-sched-row { display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin-top:8px; }
+        .cai-sched-pill { font-size:10px; font-weight:800; font-family:'IBM Plex Mono',monospace;
+            color:#8B5CF6; background:rgba(139,92,246,0.1); border:1px solid rgba(139,92,246,0.3);
+            border-radius:20px; padding:3px 9px; }
+        .cai-preview-card { margin-top:12px; background:var(--card-bg); border:1px solid rgba(139,92,246,0.35);
+            border-radius:var(--radius-md); padding:12px 14px; display:none; }
+        .cai-preview-card.show { display:block; animation:fadeUp 0.25s ease; }
+        .cai-preview-head { display:flex; align-items:center; gap:6px; font-size:11px; font-weight:900;
+            color:#8B5CF6; margin-bottom:8px; padding-bottom:8px; border-bottom:1px dashed var(--border-light); }
+        .cai-preview-text { font-size:11.5px; line-height:1.65; color:var(--t-med); white-space:pre-line; }
 
         /* ─── FGI CHANGE BADGE ─── */
         .fgi-change-badge { font-size:9px; font-weight:900; font-family:'IBM Plex Mono',monospace;
@@ -12747,6 +12771,96 @@ async function saveIDBTelegramConfig(config) {
                     </div>
                 </div>
 
+                <!-- ── SECTION 3.5: BERITA CUSTOM AI (GEMINI) ── -->
+                <div class="prof-sec-block" style="padding:0;overflow:hidden;margin-bottom:12px;border:1px solid #8B5CF6;">
+                    <div style="background:linear-gradient(135deg,rgba(139,92,246,0.14),rgba(236,72,153,0.04));padding:12px 16px;border-bottom:1px solid var(--border-light);display:flex;align-items:center;justify-content:space-between;gap:8px;">
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2.5"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8L12 2z"/></svg>
+                            <span style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;color:var(--t-hi);text-transform:uppercase;letter-spacing:0.5px;">Berita Custom AI (Gemini)</span>
+                        </div>
+                        <span style="font-size:9px;font-weight:900;background:#8B5CF6;color:#fff;padding:2px 8px;border-radius:20px;letter-spacing:0.5px;">BARU</span>
+                    </div>
+                    <div style="padding:14px;">
+                        <div style="font-size:11px;color:var(--t-med);font-weight:600;line-height:1.6;margin-bottom:12px;">
+                            Tulis <b>perintah bebas</b> ke Gemini AI — beritanya diracik sendiri oleh AI lalu dikirim ke Telegram Anda. Berjalan di <b>server</b> memakai API key Gemini <b>milik Anda sendiri</b>, jadi tetap aktif walau app/HP ditutup.
+                        </div>
+
+                        <div class="tg-guide-steps">
+                            <div class="tg-guide-step">
+                                <div class="tg-step-num">1</div>
+                                <div class="tg-step-text">Pastikan <b>Bot Telegram</b> sudah tersambung (bagian atas halaman ini).</div>
+                            </div>
+                            <div class="tg-guide-step">
+                                <div class="tg-step-num">2</div>
+                                <div class="tg-step-text">Buka <a href="#" onclick="window.open('https://aistudio.google.com/apikey','_blank');return false;" style="color:#8B5CF6;font-weight:800;">aistudio.google.com/apikey</a> → buat key gratis → tempel di bawah.</div>
+                            </div>
+                            <div class="tg-guide-step">
+                                <div class="tg-step-num">3</div>
+                                <div class="tg-step-text">Tulis perintah/topik berita, atau ketuk salah satu contoh cepat di bawah.</div>
+                            </div>
+                            <div class="tg-guide-step">
+                                <div class="tg-step-num">4</div>
+                                <div class="tg-step-text">Nyalakan toggle → <b>Simpan ke Cloud</b> supaya jadwal otomatis aktif.</div>
+                            </div>
+                        </div>
+
+                        <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px;">
+                            <div>
+                                <div style="font-size:10px;font-weight:800;color:var(--t-med);margin-bottom:4px;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:0.5px;">GEMINI API KEY</div>
+                                <input type="password" class="tg-field" id="tgGeminiApiKeyPage" placeholder="AQ.Ab... (key baru) atau AIzaSy... (key lama)" oninput="onTgGeminiKeyInputPage()" autocomplete="off">
+                                <div style="font-size:9px;color:var(--t-low);font-weight:600;margin-top:4px;">Gratis — key biasanya diawali <b>AQ.</b> (format terbaru) atau <b>AIza</b> (format lama, masih didukung). Diambil dari <a href="#" onclick="window.open('https://aistudio.google.com/apikey','_blank');return false;" style="color:#8B5CF6;font-weight:800;">aistudio.google.com/apikey</a>.</div>
+                            </div>
+                            <div>
+                                <div style="font-size:10px;font-weight:800;color:var(--t-med);margin-bottom:4px;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:0.5px;">PERINTAH / TOPIK BERITA (BEBAS)</div>
+                                <textarea class="tg-textarea" id="tgCustomAIPromptPage" rows="3" maxlength="600" placeholder="Contoh: Ringkas berita &amp; sentimen pasar soal saham BBRI dan sektor perbankan hari ini, bahasa santai dan to the point, sertakan 1 saran arah trading jangka pendek." oninput="updateCustomAIPromptCounter()"></textarea>
+                                <div style="display:flex;justify-content:flex-end;margin-top:3px;">
+                                    <span id="tgCustomAIPromptCounter" style="font-size:9px;color:var(--t-low);font-weight:700;font-family:'IBM Plex Mono',monospace;">0/600</span>
+                                </div>
+                                <div class="cai-chip-row">
+                                    <button type="button" class="cai-chip" data-prompt="Ringkas sentimen IHSG &amp; pergerakan top gainers/losers pagi ini, bahasa santai dan to the point." onclick="fillCustomAIPromptExample(this)">📊 Sentimen IHSG pagi ini</button>
+                                    <button type="button" class="cai-chip" data-prompt="Ringkas sentimen saham BBCA &amp; sektor perbankan hari ini, sertakan 1 saran arah trading jangka pendek." onclick="fillCustomAIPromptExample(this)">🏦 Saham BBCA &amp; perbankan</button>
+                                    <button type="button" class="cai-chip" data-prompt="Ringkas berita dividen &amp; jadwal cum date saham BEI minggu ini." onclick="fillCustomAIPromptExample(this)">💰 Dividen &amp; cum date</button>
+                                    <button type="button" class="cai-chip" data-prompt="Sebutkan 3 saham BEI yang paling ramai dibicarakan hari ini beserta alasan singkatnya." onclick="fillCustomAIPromptExample(this)">🔥 Saham paling ramai</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="cai-sched-row">
+                            <span style="font-size:9.5px;color:var(--t-low);font-weight:700;">Jadwal kirim otomatis:</span>
+                            <span class="cai-sched-pill">07.00 WIB</span>
+                            <span class="cai-sched-pill">12.00 WIB</span>
+                            <span class="cai-sched-pill">16.00 WIB</span>
+                        </div>
+
+                        <div class="tg-toggle-row" style="margin-top:6px;">
+                            <div>
+                                <div class="tg-toggle-label" style="color:#8B5CF6;">🤖 Aktifkan Berita Custom AI</div>
+                                <div class="tg-toggle-sub">Kalau nonaktif, perintah tetap tersimpan tapi tidak dikirim terjadwal.</div>
+                            </div>
+                            <button class="tg-mini-toggle" id="tgToggleCustomAIPage" onclick="toggleCustomAIEnabledPage(this)"></button>
+                        </div>
+
+                        <button class="tg-save-btn btn-ripple" onclick="saveCustomAIConfigPage()" style="background:#8B5CF6;margin-top:12px;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:6px;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
+                            Simpan Pengaturan Custom AI ke Cloud
+                        </button>
+                        <button class="tg-test-btn btn-ripple" onclick="testCustomAINewsSekarang()" style="border-color:rgba(139,92,246,0.4);color:#8B5CF6;">🧪 Tes Kirim Berita Custom AI Sekarang</button>
+                        <div class="tg-status" id="tgCustomAIStatus" style="margin-top:6px;"></div>
+
+                        <div class="cai-preview-card" id="tgCustomAIPreviewWrap">
+                            <div class="cai-preview-head">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2.5"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8L12 2z"/></svg>
+                                Preview hasil AI (sudah terkirim ke Telegram)
+                            </div>
+                            <div class="cai-preview-text" id="tgCustomAIPreviewText"></div>
+                        </div>
+
+                        <div style="font-size:9px;color:var(--t-low);font-weight:600;margin-top:8px;line-height:1.5;padding:0 2px;">
+                            ℹ️ API key Gemini Anda hanya dipakai server untuk memanggil Gemini atas nama Anda &amp; tidak dibagikan ke pengguna lain. Kuota pemakaian mengikuti kuota API key masing-masing.
+                        </div>
+                    </div>
+                </div>
+
                 <!-- ── SIGNAL FLOW DIAGRAM ── -->
                 <div class="prof-sec-block" style="padding:14px;overflow:hidden;margin-bottom:12px;">
                     <div class="sfd-title">⚡ Alur Sinyal Otomatis</div>
@@ -13746,15 +13860,30 @@ async function saveIDBTelegramConfig(config) {
         // balas 404 "no longer available to new users" untuk key baru "AQ.Ab...".
         // Daftar model diperbarui ke generasi 3.x + alias 'gemini-flash-latest' tetap
         // dipertahankan sebagai fallback teratas (auto-hotswap ke rilis terbaru).
-        const GEMINI_MODELS = ['gemini-flash-latest', 'gemini-3.6-flash', 'gemini-3.5-flash-lite', 'gemini-2.5-flash'];
+        // ✅ v86 FIX — model & auth key disegarkan lagi (September 2026):
+        // 1) Gemini 3.7 Flash sudah rilis GA (workhorse terbaru Google utk coding &
+        //    agentic tasks) — dipasang sebagai pilihan eksplisit ke-2 di daftar,
+        //    tepat di bawah alias 'gemini-flash-latest'.
+        // 2) 'gemini-2.5-flash' DIHAPUS dari daftar fallback: per dokumentasi resmi
+        //    Google, lini 2.5 sudah ditutup total utk akun/key baru sejak Agustus
+        //    2026, jadi menyisakannya di sini cuma bikin 1 percobaan gagal terbuang
+        //    tiap kali fallback jalan — tidak berguna lagi, bukan cuma kurang optimal.
+        const GEMINI_MODELS = ['gemini-flash-latest', 'gemini-3.7-flash', 'gemini-3.6-flash', 'gemini-3.5-flash-lite'];
 
         function getFmpApiKey() { return lsGet('si_fmp_key', '') || ''; }
         function getGeminiApiKey() { return lsGet('si_gemini_key', '') || ''; }
         function hasFmpKey() { return getFmpApiKey().trim().length > 0; }
         function hasGeminiKey() { return getGeminiApiKey().trim().length > 0; }
+        // ✅ v86 FIX — ROOT CAUSE dari sebagian key baru "AQ." (Auth Key) balas
+        // 401 ACCESS_TOKEN_TYPE_UNSUPPORTED padahal key-nya valid & aktif: key TIDAK
+        // LAGI disisipkan di query string URL ("?key=..."). Sesuai dokumentasi resmi
+        // Gemini API (ai.google.dev/gemini-api/docs/api-key), cara yang didukung utk
+        // Auth Key MAUPUN Standard Key lama adalah lewat HEADER "x-goog-api-key" —
+        // dikirim di callGemini() di bawah, bukan lagi di URL ini. Keuntungan lain:
+        // key tidak lagi ikut ke-log di access log / proxy log server seperti kalau
+        // ditaruh di query string.
         function getGeminiUrl(model) {
-            return 'https://generativelanguage.googleapis.com/v1beta/models/' + (model || GEMINI_MODELS[0]) +
-                ':generateContent?key=' + encodeURIComponent(getGeminiApiKey());
+            return 'https://generativelanguage.googleapis.com/v1beta/models/' + (model || GEMINI_MODELS[0]) + ':generateContent';
         }
 
         const _fmpCache = {}; // cache ringan biar hemat kuota harian FMP free-tier
@@ -13863,7 +13992,7 @@ async function saveIDBTelegramConfig(config) {
                 try {
                     const res = await fetch(getGeminiUrl(model), {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': getGeminiApiKey() },
                         body: JSON.stringify({
                             contents: [{ role: 'user', parts: [{ text: prompt }] }],
                             generationConfig: {
@@ -26825,6 +26954,7 @@ Tulis singkat (maks 200 kata): 1-2 kalimat ringkasan kondisi, poin valuasi, poin
             });
             updateTelegramStatusPage();
             updateTelegramBackendInfo();
+            initCustomAISettingsPage();
         }
 
         function getUserTgKey() {
@@ -27231,6 +27361,154 @@ Jumlah Emiten: <b>${allStocks ? allStocks.length : 0}</b>
                 }
             } catch (e) {
                 if (statusEl) { statusEl.className = 'tg-status err'; statusEl.textContent = '❌ Tidak bisa hubungi server: ' + e.message + ' (pastikan script.gs sudah di-deploy)'; }
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // ✅ v64 — BERITA CUSTOM AI (GEMINI): perintah bebas dari user,
+        // diracik oleh Gemini API (pakai API key milik user sendiri),
+        // dikirim ke Telegram lewat server (script.gs) — tetap jalan
+        // walau app/HP ditutup. Lihat script.gs bagian "BERITA CUSTOM AI
+        // (GEMINI)" untuk kode backend & cara pasangnya.
+        // ═══════════════════════════════════════════════════════════════
+        function getUserCustomAIKey() {
+            const email = (currentUser && currentUser.email) ? currentUser.email : 'anonymous';
+            return 'si_custom_ai_config_' + email.replace(/[^a-zA-Z0-9]/g, '_');
+        }
+
+        function initCustomAISettingsPage() {
+            const userKey = getUserCustomAIKey();
+            const cfg = lsGet(userKey, { geminiKey: '', prompt: '', enabled: false });
+            const keyEl = document.getElementById('tgGeminiApiKeyPage');
+            const promptEl = document.getElementById('tgCustomAIPromptPage');
+            const toggleEl = document.getElementById('tgToggleCustomAIPage');
+            if (keyEl) keyEl.value = cfg.geminiKey || '';
+            if (promptEl) promptEl.value = cfg.prompt || '';
+            if (toggleEl) toggleEl.classList.toggle('on', !!cfg.enabled);
+            updateCustomAIPromptCounter();
+            const previewWrap = document.getElementById('tgCustomAIPreviewWrap');
+            if (previewWrap) previewWrap.classList.remove('show');
+        }
+
+        function onTgGeminiKeyInputPage() {
+            const inp = document.getElementById('tgGeminiApiKeyPage');
+            if (inp) inp.value = inp.value.trim();
+        }
+
+        function toggleCustomAIEnabledPage(btn) {
+            if (btn) btn.classList.toggle('on');
+        }
+
+        // ✅ v86 — UX: ketuk salah satu contoh perintah → langsung isi textarea,
+        // supaya pengguna yang bingung mau nulis apa punya titik awal yang jelas.
+        function fillCustomAIPromptExample(el) {
+            const promptEl = document.getElementById('tgCustomAIPromptPage');
+            const text = el && el.getAttribute('data-prompt');
+            if (!promptEl || !text) return;
+            promptEl.value = text;
+            updateCustomAIPromptCounter();
+            promptEl.focus();
+        }
+
+        function updateCustomAIPromptCounter() {
+            const promptEl = document.getElementById('tgCustomAIPromptPage');
+            const counterEl = document.getElementById('tgCustomAIPromptCounter');
+            if (!promptEl || !counterEl) return;
+            const max = promptEl.getAttribute('maxlength') || 600;
+            counterEl.textContent = promptEl.value.length + '/' + max;
+        }
+
+        function saveCustomAIConfigPage() {
+            const geminiKey = (document.getElementById('tgGeminiApiKeyPage') || {}).value || '';
+            const prompt = (document.getElementById('tgCustomAIPromptPage') || {}).value || '';
+            const toggleEl = document.getElementById('tgToggleCustomAIPage');
+            const enabled = !!(toggleEl && toggleEl.classList.contains('on'));
+            const statusEl = document.getElementById('tgCustomAIStatus');
+
+            const userTgKey = getUserTgKey();
+            const userTgConfig = lsGet(userTgKey, null) || telegramConfig;
+            if (!userTgConfig.token || !userTgConfig.chatId) {
+                if (statusEl) { statusEl.className = 'tg-status err'; statusEl.textContent = '⚠️ Hubungkan Bot Telegram dulu di bagian atas (Bot Token & Chat ID).'; }
+                return;
+            }
+            if (!geminiKey.trim()) {
+                if (statusEl) { statusEl.className = 'tg-status err'; statusEl.textContent = '❌ Gemini API Key wajib diisi!'; }
+                return;
+            }
+            if (!prompt.trim()) {
+                if (statusEl) { statusEl.className = 'tg-status err'; statusEl.textContent = '❌ Perintah/topik berita wajib diisi!'; }
+                return;
+            }
+
+            const cfg = { geminiKey: geminiKey.trim(), prompt: prompt.trim(), enabled };
+            lsSet(getUserCustomAIKey(), cfg);
+
+            if (statusEl) { statusEl.className = 'tg-status ok'; statusEl.textContent = '⏳ Menyimpan ke cloud...'; }
+            const email = (currentUser && currentUser.email) || 'anonymous';
+            gasCall({
+                action: 'saveCustomAIConfig',
+                email: email,
+                chatId: userTgConfig.chatId || '',
+                botToken: userTgConfig.token || '',
+                geminiApiKey: cfg.geminiKey,
+                customPrompt: cfg.prompt,
+                customAIEnabled: !!cfg.enabled
+            }).then(function (resp) {
+                if (resp && resp.ok) {
+                    if (statusEl) { statusEl.className = 'tg-status ok'; statusEl.textContent = '✅ Pengaturan Custom AI tersimpan di Cloud!'; }
+                    showToast('🤖 Berita Custom AI dikonfigurasi!', 'success');
+                    playAudioFeedback('success');
+                } else {
+                    if (statusEl) { statusEl.className = 'tg-status err'; statusEl.textContent = '❌ ' + ((resp && resp.msg) || 'Gagal simpan ke cloud — pastikan script.gs terbaru sudah dipasang.'); }
+                }
+            }).catch(function (e) {
+                if (statusEl) { statusEl.className = 'tg-status err'; statusEl.textContent = '❌ Tidak bisa hubungi server: ' + e.message; }
+            });
+        }
+
+        // Tes langsung dengan nilai yang sedang diketik (tidak wajib sudah disimpan
+        // dulu) supaya user bisa coba-coba prompt sebelum menyimpannya permanen.
+        async function testCustomAINewsSekarang() {
+            const statusEl = document.getElementById('tgCustomAIStatus');
+            const previewWrap = document.getElementById('tgCustomAIPreviewWrap');
+            const previewText = document.getElementById('tgCustomAIPreviewText');
+            const geminiKey = (document.getElementById('tgGeminiApiKeyPage') || {}).value || '';
+            const prompt = (document.getElementById('tgCustomAIPromptPage') || {}).value || '';
+            const userTgKey = getUserTgKey();
+            const userTgConfig = lsGet(userTgKey, null) || telegramConfig;
+            if (previewWrap) previewWrap.classList.remove('show'); // ✅ v86 — reset preview lama tiap kali tes baru dimulai
+            if (!userTgConfig.chatId || !userTgConfig.token) {
+                if (statusEl) { statusEl.className = 'tg-status err'; statusEl.textContent = '⚠️ Hubungkan Bot Telegram dulu (Bot Token & Chat ID)!'; }
+                return;
+            }
+            if (!geminiKey.trim() || !prompt.trim()) {
+                if (statusEl) { statusEl.className = 'tg-status err'; statusEl.textContent = '⚠️ Isi Gemini API Key & perintah berita dulu!'; }
+                return;
+            }
+            if (statusEl) { statusEl.className = 'tg-status ok'; statusEl.textContent = '⏳ Meminta Gemini meracik berita & mengirim ke Telegram...'; }
+            try {
+                const resp = await gasCall({
+                    action: 'testCustomAINews',
+                    chatId: userTgConfig.chatId,
+                    botToken: userTgConfig.token,
+                    geminiApiKey: geminiKey.trim(),
+                    customPrompt: prompt.trim()
+                });
+                if (resp && resp.ok) {
+                    if (statusEl) { statusEl.className = 'tg-status ok'; statusEl.textContent = '✅ Berhasil! Cek Telegram Anda.'; }
+                    showToast('🤖 Berita Custom AI berhasil dites!', 'success');
+                    // ✅ v86 — server (script.gs) balikin field "preview" berisi teks hasil
+                    // Gemini apa adanya, supaya user bisa langsung lihat kualitasnya di sini
+                    // tanpa harus buka Telegram dulu.
+                    if (resp.preview && previewWrap && previewText) {
+                        previewText.textContent = resp.preview;
+                        previewWrap.classList.add('show');
+                    }
+                } else {
+                    if (statusEl) { statusEl.className = 'tg-status err'; statusEl.textContent = '❌ ' + ((resp && resp.msg) || 'Gagal — pastikan script.gs terbaru sudah dipasang & API key valid.'); }
+                }
+            } catch (e) {
+                if (statusEl) { statusEl.className = 'tg-status err'; statusEl.textContent = '❌ Tidak bisa hubungi server: ' + e.message + ' (pastikan script.gs sudah di-deploy ulang)'; }
             }
         }
 
