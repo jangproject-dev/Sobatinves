@@ -12072,6 +12072,21 @@ async function saveIDBTelegramConfig(config) {
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--t-low)" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
                     </div>
 
+                    <div class="prof-menu-row btn-ripple" onclick="openProfSubPage('subpage-tiktok')">
+                        <div style="width:40px;height:40px;border-radius:12px;background:rgba(0,0,0,0.06);border:1px solid rgba(0,0,0,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--t-hi)" stroke-width="2.2"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg>
+                            <span id="ttMenuBadge" style="display:none;position:absolute;top:-4px;right:-4px;width:10px;height:10px;border-radius:50%;background:var(--up);border:2px solid var(--bg-main);"></span>
+                        </div>
+                        <div style="flex:1;min-width:0;">
+                            <div style="font-size:14px;font-weight:800;color:var(--t-hi);display:flex;align-items:center;gap:8px;">
+                                Auto-Posting TikTok
+                                <span id="ttMenuStatusPill" style="font-size:8px;font-weight:900;padding:2px 6px;border-radius:4px;background:var(--bg-elevated);color:var(--t-med);font-family:'IBM Plex Mono',monospace;flex-shrink:0;">OFF</span>
+                            </div>
+                            <div style="font-size:11px;color:var(--t-med);font-weight:600;margin-top:1px;">Rekomendasi top saham, posting sendiri tiap hari</div>
+                        </div>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--t-low)" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                    </div>
+
                     <div class="prof-menu-row btn-ripple" onclick="openProfSubPage('subpage-aikeys')">
                         <div style="width:40px;height:40px;border-radius:12px;background:rgba(155,123,255,0.12);border:1px solid rgba(155,123,255,0.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9B7BFF" stroke-width="2.2"><path d="M12 2a5 5 0 0 0-5 5c0 1.5.6 2.4 1.5 3.3L4 15.8V20h4.2l5.5-5.5c.9.9 1.8 1.5 3.3 1.5a5 5 0 1 0-5-14z"/><circle cx="15.5" cy="7.5" r="1.2" fill="#9B7BFF" stroke="none"/></svg>
@@ -12975,6 +12990,172 @@ async function saveIDBTelegramConfig(config) {
                                 <div style="flex:1;"><div style="font-weight:800;color:var(--t-hi);margin-bottom:1px;font-size:11px;">✅ Pesan Uji (Test)</div><div style="font-size:10px;color:var(--t-med);">Status pasar, IHSG FGI, jumlah emiten</div></div>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ══ SUB-PAGE: AUTO-POSTING TIKTOK ══ -->
+            <div id="subpage-tiktok" class="prof-subpage" style="display:none;">
+                <div class="prof-subpage-head">
+                    <button class="prof-back-btn btn-ripple" onclick="closeProfSubPage()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+                    </button>
+                    <span>Auto-Posting TikTok</span>
+                    <span id="ttPageStatusPill" style="margin-left:auto;font-size:9px;font-weight:900;font-family:'IBM Plex Mono',monospace;padding:2px 8px;border-radius:5px;background:var(--bg-elevated);color:var(--t-med);">OFF</span>
+                </div>
+
+                <!-- ── SECTION 0: KREDENSIAL DEVELOPER TIKTOK ── -->
+                <div style="padding:10px 12px;background:rgba(0,0,0,0.05);border:1px solid rgba(0,0,0,0.12);border-radius:12px;margin-bottom:12px;font-size:11px;color:var(--t-med);font-weight:600;line-height:1.6;">
+                    🔒 Client Key &amp; Client Secret dikirim langsung lewat HTTPS ke server dan disimpan sebagai <b>Script Properties</b> di backend Anda sendiri — <b>tidak pernah disimpan di HP/browser</b> (beda dengan key FMP/Gemini di atas yang memang sengaja cuma lokal).
+                </div>
+                <div class="prof-sec-block" style="margin-bottom:12px;">
+                    <div class="prof-sec-block-title">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--t-hi)" stroke-width="2.5"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        Kredensial Developer TikTok
+                    </div>
+                    <div class="tg-guide-steps">
+                        <div class="tg-guide-step">
+                            <div class="tg-step-num">1</div>
+                            <div class="tg-step-text">Buka <a href="https://developers.tiktok.com/apps" target="_blank" rel="noopener" style="color:var(--primary);font-weight:800;">TikTok Developer Portal</a> → buat/pilih app → aktifkan produk <b>Content Posting API</b></div>
+                        </div>
+                        <div class="tg-guide-step">
+                            <div class="tg-step-num">2</div>
+                            <div class="tg-step-text">Salin <b>Client Key</b> &amp; <b>Client Secret</b> dari app tersebut, tempel di bawah ini</div>
+                        </div>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:10px;margin-top:12px;">
+                        <div>
+                            <div style="font-size:10px;font-weight:800;color:var(--t-med);margin-bottom:4px;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:0.5px;">CLIENT KEY</div>
+                            <input type="text" class="tg-field" id="ttClientKeyPage" placeholder="aw6xxxxxxxxxxxxx..." autocomplete="off">
+                        </div>
+                        <div>
+                            <div style="font-size:10px;font-weight:800;color:var(--t-med);margin-bottom:4px;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:0.5px;">CLIENT SECRET</div>
+                            <input type="password" class="tg-field" id="ttClientSecretPage" placeholder="Tempel Client Secret di sini..." autocomplete="off">
+                        </div>
+                    </div>
+                    <button class="tg-save-btn btn-ripple" onclick="saveTiktokCredentials()" style="margin-top:12px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:6px;"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        Simpan Kredensial ke Server (Aman)
+                    </button>
+                    <div class="tg-status" id="ttCredStatusMsgPage"></div>
+                    <div style="font-size:9px;color:var(--t-low);font-weight:600;margin-top:8px;line-height:1.5;">
+                        💡 Sudah pernah simpan sebelumnya? Boleh isi <b>salah satu kolom saja</b> (Client Key ATAU Client Secret) untuk memperbarui satu di antaranya — kolom yang dikosongkan tidak akan menghapus yang sudah tersimpan.
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:6px;font-size:10px;margin-top:10px;background:var(--bg-surface);border:1px solid var(--border-light);border-radius:var(--radius-sm);padding:10px 12px;">
+                        <div style="display:flex;justify-content:space-between;">
+                            <span style="color:var(--t-med);font-weight:600;">Client Key tersimpan:</span>
+                            <span id="ttClientKeyMasked" style="color:var(--t-hi);font-weight:700;font-family:'IBM Plex Mono',monospace;">—</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;">
+                            <span style="color:var(--t-med);font-weight:600;">Client Secret tersimpan:</span>
+                            <span id="ttClientSecretStatus" style="color:var(--t-hi);font-weight:700;font-family:'IBM Plex Mono',monospace;">—</span>
+                        </div>
+                    </div>
+                    <button class="tg-disconnect-btn btn-ripple" onclick="resetTiktokCredentials()">⟲ Reset Kredensial &amp; Putus Koneksi TikTok</button>
+                </div>
+
+                <!-- ── SECTION 1: KONEKSI AKUN TIKTOK ── -->
+                <div class="prof-sec-block" style="padding:0;overflow:hidden;margin-bottom:12px;">
+                    <div style="background:linear-gradient(135deg,rgba(0,0,0,0.06),rgba(0,0,0,0.01));padding:12px 16px;border-bottom:1px solid var(--border-light);display:flex;align-items:center;gap:8px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--t-hi)" stroke-width="2.5"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg>
+                        <span style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;color:var(--t-hi);text-transform:uppercase;letter-spacing:0.5px;">Koneksi Akun TikTok</span>
+                    </div>
+                    <div style="padding:14px;">
+                        <div style="display:flex;align-items:center;gap:10px;background:var(--bg-surface);border-radius:var(--radius-sm);padding:10px 12px;border:1px solid var(--border-light);margin-bottom:12px;">
+                            <div id="ttStatusDotPage" style="width:8px;height:8px;border-radius:50%;background:var(--t-low);flex-shrink:0;"></div>
+                            <div style="flex:1;font-size:11px;color:var(--t-med);font-weight:600;">
+                                <div id="ttStatusTextPage">Belum terhubung</div>
+                                <div id="ttStatusDetailPage" style="font-size:9px;color:var(--t-low);margin-top:2px;font-family:'IBM Plex Mono',monospace;">—</div>
+                            </div>
+                        </div>
+                        <div class="tg-guide-steps">
+                            <div class="tg-guide-step">
+                                <div class="tg-step-num">1</div>
+                                <div class="tg-step-text">Buka <b>Apps Script editor</b> backend Anda → jalankan fungsi <b>tiktokAuthUrl()</b> sekali → salin URL dari Log</div>
+                            </div>
+                            <div class="tg-guide-step">
+                                <div class="tg-step-num">2</div>
+                                <div class="tg-step-text">Buka URL itu di browser → login TikTok → izinkan akses (token tersimpan otomatis di server, bukan di app ini)</div>
+                            </div>
+                            <div class="tg-guide-step">
+                                <div class="tg-step-num">3</div>
+                                <div class="tg-step-text">Jalankan <b>installDailyTiktokTrigger()</b> sekali di Apps Script → trigger harian aktif selamanya</div>
+                            </div>
+                        </div>
+                        <div style="font-size:9px;color:var(--t-low);font-weight:600;margin-top:8px;line-height:1.5;">
+                            ℹ️ Kalau akun TikTok Developer Anda belum lolos audit "Direct Post", postingan otomatis akan masuk sebagai draft di TikTok (perlu 1x tap manual publish) — bukan gagal, hanya menunggu izin publik dari TikTok.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── SECTION 2: JADWAL & AKTIF/NONAKTIF ── -->
+                <div class="prof-sec-block" style="margin-bottom:12px;">
+                    <div class="prof-sec-block-title">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        Jadwal Posting Harian
+                    </div>
+                    <div class="tg-master-toggle-bar" id="ttMasterBarPage">
+                        <div>
+                            <div class="tg-master-label">
+                                <span id="ttMasterIconPage">⏸️</span>
+                                <span>Auto-Posting TikTok</span>
+                            </div>
+                            <div class="tg-master-status" id="ttMasterStatusPage">Nonaktif — atur jadwal lalu simpan</div>
+                        </div>
+                        <button class="tg-master-btn" id="ttMasterBtnPage" onclick="tiktokMasterTogglePage()" title="ON/OFF Auto-Posting TikTok"></button>
+                    </div>
+                    <div style="margin-top:12px;">
+                        <div style="font-size:10px;font-weight:800;color:var(--t-med);margin-bottom:4px;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:0.5px;">JAM POSTING (WIB)</div>
+                        <input type="time" class="tg-field" id="ttJamPostingPage" value="16:30">
+                    </div>
+                </div>
+
+                <!-- ── SECTION 3: KONTEN & CAPTION ── -->
+                <div class="prof-sec-block" style="margin-bottom:12px;">
+                    <div class="prof-sec-block-title">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                        Konten &amp; Caption
+                    </div>
+                    <div style="display:flex;align-items:flex-start;gap:8px;background:rgba(155,123,255,0.08);border:1px solid rgba(155,123,255,0.25);border-radius:10px;padding:10px 12px;margin-bottom:12px;">
+                        <input type="checkbox" id="ttUseGeminiPage" style="width:16px;height:16px;margin-top:1px;flex-shrink:0;" checked>
+                        <label for="ttUseGeminiPage" style="font-size:11px;color:var(--t-med);font-weight:700;line-height:1.5;">✨ Pakai <b>Gemini AI</b> buat judul &amp; deskripsi otomatis — dianalisis dari data mikro (harga/skor saham) + makro (kurs Rupiah, komoditas, sentimen berita) tiap hari, gaya penulisan ala content creator. Butuh Gemini API key yang sudah disimpan di <b>Bot AI — FMP &amp; Gemini</b>.</label>
+                    </div>
+                    <div style="font-size:10px;font-weight:800;color:var(--t-med);margin-bottom:4px;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:0.5px;">TEMPLATE CADANGAN (kalau Gemini nonaktif/gagal)</div>
+                    <textarea class="tg-field" id="ttCaptionTemplatePage" rows="5" style="resize:vertical;font-family:inherit;" placeholder="📈 {{TICKER}} lagi rame hari ini!...">📈 {{TICKER}} lagi rame hari ini!
+Harga: {{HARGA}} ({{PERSEN}})
+
+Data &amp; skor lengkap ada di SobatInves, gaskan cek dulu sebelum FOMO 👀
+
+⚠️ Bukan rekomendasi resmi/ajakan jual-beli. DYOR.
+#saham #bursaefekindonesia #investasi</textarea>
+                    <div style="font-size:9px;color:var(--t-low);font-weight:600;margin-top:6px;">Token yang bisa dipakai: <b>{{TICKER}}</b>, <b>{{HARGA}}</b>, <b>{{PERSEN}}</b></div>
+                    <button class="tg-save-btn btn-ripple" onclick="saveTiktokAutoConfig()" style="margin-top:12px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:6px;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
+                        Simpan Pengaturan ke Cloud
+                    </button>
+                    <button class="tg-test-btn btn-ripple" onclick="testTiktokPostSekarang()">🎬 Tes Posting Sekarang</button>
+                    <div class="tg-status" id="ttStatusMsgPage"></div>
+                    <div class="cai-preview-card" id="ttContentPlanPreviewWrap">
+                        <div class="cai-preview-head">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2.5"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8L12 2z"/></svg>
+                            Preview content plan (JSON) hasil posting terakhir
+                        </div>
+                        <div class="cai-preview-text" id="ttContentPlanPreviewText">—</div>
+                    </div>
+                </div>
+
+                <!-- ── SECTION 4: STATUS TERAKHIR ── -->
+                <div class="prof-sec-block" style="padding:0;overflow:hidden;margin-bottom:20px;">
+                    <div style="background:linear-gradient(135deg,rgba(0,179,90,0.08),rgba(0,179,90,0.02));padding:12px 16px;border-bottom:1px solid var(--border-light);display:flex;align-items:center;gap:8px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--up)" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                        <span style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;color:var(--t-hi);text-transform:uppercase;letter-spacing:0.5px;">Riwayat Posting Server</span>
+                    </div>
+                    <div style="padding:14px;">
+                        <div style="display:flex;justify-content:space-between;font-size:10px;">
+                            <span style="color:var(--t-med);font-weight:600;">Posting Terakhir:</span>
+                            <span id="ttLastRunPage" style="color:var(--t-hi);font-weight:700;font-family:'IBM Plex Mono',monospace;">—</span>
+                        </div>
+                        <div style="font-size:10px;color:var(--t-med);font-weight:600;margin-top:4px;" id="ttLastStatusPage">Belum pernah posting.</div>
                     </div>
                 </div>
             </div>
@@ -13892,6 +14073,53 @@ async function saveIDBTelegramConfig(config) {
 
         function fmpTickerOf(ticker) { return sanitizeTicker(ticker) + '.JK'; } // format IDX di FMP = suffix .JK (sama seperti Yahoo Finance)
 
+        // ✅ v87 FIX (Sep 2026) — ROOT CAUSE dari "Gagal: Failed to fetch" di tombol "Tes Koneksi
+        // FMP": "Failed to fetch" adalah error level BROWSER/JARINGAN (TypeError bawaan fetch()),
+        // BUKAN balasan dari server FMP — artinya request bahkan tidak pernah pulang dari FMP sama
+        // sekali. fmpFetch() versi lama TIDAK PUNYA timeout ataupun retry: sekali fetch() gagal
+        // atau menggantung (internet putus-nyambung, ad-blocker/VPN/DNS custom yg blokir domain
+        // financialmodelingprep.com, firewall WiFi kantor/kampus/publik), langsung dianggap gagal
+        // total dan pesannya cuma echo mentah "Failed to fetch" — bikin user ngira key-nya salah
+        // padahal bukan. Fix di bawah: (1) retry otomatis khusus error level-jaringan dgn jeda
+        // singkat, (2) timeout 12 detik via AbortController, (3) pesan error dipecah per-penyebab
+        // (lihat friendlyNetworkErrorMessage & fmpHttpErrorMessage) supaya user tahu PERSIS harus
+        // ngapain. Helper yg sama juga dipakai callGemini() di bawah — satu titik definisi.
+        // ⚠️ CATATAN JUJUR soal "prefix key terbaru": per pengetahuan yang tersedia saat fix ini
+        // ditulis, FMP TIDAK menerbitkan key dengan prefix baku seperti Gemini ("AQ."/"AIza...") —
+        // key FMP historisnya string alfanumerik acak ±32 karakter tanpa prefix tetap. Karena itu
+        // sanitizeApiKeyInput() di bawah HANYA membersihkan whitespace/karakter tak kasat mata &
+        // mengecek kewajaran panjang secara longgar (heuristik, tidak mengunci user) — supaya kalau
+        // FMP sudah ganti skema key sejak baris ini ditulis, key barunya tetap bisa dipasang & diuji
+        // langsung lewat "Tes Koneksi FMP" alih-alih ditolak duluan oleh app berdasarkan asumsi lama.
+        function friendlyNetworkErrorMessage(err, serviceLabel) {
+            serviceLabel = serviceLabel || 'server';
+            if (err && err.name === 'AbortError') {
+                return serviceLabel + ' tidak merespon dalam waktu wajar (timeout). Coba lagi — kalau berulang terus, server ' + serviceLabel + ' kemungkinan lagi lambat/down.';
+            }
+            const msg = (err && err.message) || '';
+            if (/Failed to fetch|NetworkError|Load failed|ERR_/i.test(msg)) {
+                return 'Gagal konek ke ' + serviceLabel + ' — ini soal JARINGAN, bukan soal API key. Kemungkinan: internet mati/tidak stabil, ad-blocker/VPN/DNS custom yang memblokir domainnya, atau WiFi (kantor/kampus/publik) yang memblokir akses. Coba matikan VPN/ad-blocker atau ganti ke data seluler, lalu tes ulang.';
+            }
+            return msg || ('Gagal terhubung ke ' + serviceLabel + ' karena sebab yang tidak diketahui.');
+        }
+        function fmpHttpErrorMessage(status, path) {
+            if (status === 401 || status === 403) return 'FMP HTTP ' + status + ' — API key ditolak. Cek lagi key-nya (pastikan tersalin utuh, tanpa spasi), atau key sudah nonaktif/dicabut dari dashboard FMP.';
+            if (status === 429) return 'FMP HTTP 429 — kuota harian plan gratis FMP sudah habis. Tunggu reset harian, atau upgrade plan di dashboard FMP.';
+            if (status === 404) return 'FMP HTTP 404 — endpoint ' + path + ' tidak ditemukan. Kemungkinan FMP mengubah skema API lagi (laporkan ke dev SobatInves).';
+            if (status >= 500) return 'FMP HTTP ' + status + ' — server FMP lagi bermasalah (bukan salah key/app kita). Coba lagi beberapa saat lagi.';
+            return 'FMP HTTP ' + status + ' — ' + path;
+        }
+        // Bersihkan input key dari whitespace di ujung, newline nyasar (mis. copy-paste dari app
+        // catatan), tanda kutip yang ikut ter-copy, & karakter zero-width yang kadang nyelip dari
+        // keyboard tertentu — semua ini bikin key kelihatan "salah"/ditolak padahal sebenarnya cuma
+        // kotor, dan hasilnya sering nyasar jadi "Failed to fetch" atau 401 yang membingungkan.
+        function sanitizeApiKeyInput(raw) {
+            return (raw || '')
+                .replace(/[\u200B-\u200D\uFEFF]/g, '') // zero-width space/joiner/BOM
+                .replace(/^["'`]+|["'`]+$/g, '') // kutip nyasar di ujung
+                .trim();
+        }
+
         async function fmpFetch(path, params, ttl) {
             if (!hasFmpKey()) throw new Error('FMP_NO_KEY');
             params = params || {};
@@ -13900,13 +14128,31 @@ async function saveIDBTelegramConfig(config) {
             const url = FMP_BASE + path + (path.indexOf('?') > -1 ? '&' : '?') + qs;
             const cached = _fmpCache[url];
             if (cached && (Date.now() - cached.ts) < ttl) return cached.data;
-            const res = await fetch(url);
-            if (!res.ok) throw new Error('FMP HTTP ' + res.status + ' — ' + path);
-            const data = await res.json();
-            if (data && data['Error Message']) throw new Error(data['Error Message']);
-            if (data && data['error']) throw new Error(String(data['error']));
-            _fmpCache[url] = { data: data, ts: Date.now() };
-            return data;
+
+            const maxNetworkRetry = 2; // hanya utk error level-jaringan (lihat catatan v87 di atas)
+            let lastErr = null;
+            for (let attempt = 0; attempt <= maxNetworkRetry; attempt++) {
+                if (attempt > 0) await new Promise(r => setTimeout(r, 600 * attempt));
+                const controller = new AbortController();
+                const timer = setTimeout(() => controller.abort(), 12000);
+                try {
+                    const res = await fetch(url, { signal: controller.signal });
+                    if (!res.ok) throw Object.assign(new Error(fmpHttpErrorMessage(res.status, path)), { _fmpHttp: true });
+                    const data = await res.json();
+                    if (data && data['Error Message']) throw Object.assign(new Error(data['Error Message']), { _fmpHttp: true });
+                    if (data && data['error']) throw Object.assign(new Error(String(data['error'])), { _fmpHttp: true });
+                    _fmpCache[url] = { data: data, ts: Date.now() };
+                    return data;
+                } catch (err) {
+                    lastErr = err;
+                    if (err && err._fmpHttp) throw err; // balasan asli dari FMP — mengulang tidak akan mengubah hasil
+                    if (attempt === maxNetworkRetry) throw new Error(friendlyNetworkErrorMessage(err, 'FMP'));
+                    // selain itu: error level-jaringan & masih ada jatah retry → lanjut loop
+                } finally {
+                    clearTimeout(timer);
+                }
+            }
+            throw new Error(friendlyNetworkErrorMessage(lastErr, 'FMP')); // jaring pengaman, seharusnya tak pernah tercapai
         }
         // ✅ v67 FIX — ROOT CAUSE dari "Gagal memuat: FMP HTTP 404 — /stock-screener" (dan
         // 404 diam-diam di quote/profile/ratios/key-metrics/growth/technical juga, walau
@@ -13989,6 +14235,11 @@ async function saveIDBTelegramConfig(config) {
             let lastErr = null;
             for (let i = 0; i < GEMINI_MODELS.length; i++) {
                 const model = GEMINI_MODELS[i];
+                // ✅ v87 FIX (Sep 2026): timeout 15 detik via AbortController — sebelumnya request
+                // ke Gemini bisa menggantung tanpa batas kalau jaringan lambat, gejalanya identik
+                // dgn "Failed to fetch" tapi user harus nunggu lama dulu sebelum tahu itu gagal.
+                const controller = new AbortController();
+                const timer = setTimeout(() => controller.abort(), 15000);
                 try {
                     const res = await fetch(getGeminiUrl(model), {
                         method: 'POST',
@@ -14000,7 +14251,8 @@ async function saveIDBTelegramConfig(config) {
                                 maxOutputTokens: opts.maxTokens || 2048,
                                 topP: 0.95
                             }
-                        })
+                        }),
+                        signal: controller.signal
                     });
                     if (!res.ok) {
                         let raw = '';
@@ -14034,7 +14286,17 @@ async function saveIDBTelegramConfig(config) {
                     lastErr = fetchErr;
                     if (fetchErr && /API key Gemini salah/.test(fetchErr.message || '')) throw fetchErr;
                     continue;
+                } finally {
+                    clearTimeout(timer);
                 }
+            }
+            // ✅ v87 FIX: kalau semua model fallback habis dan penyebab TERAKHIRNYA adalah error
+            // level-jaringan asli (AbortError/"Failed to fetch"/dst., BUKAN balasan HTTP dari
+            // Google), terjemahkan jadi pesan actionable — bukan echo mentah "Failed to fetch"
+            // yang bikin user ngira key-nya salah padahal itu soal koneksi/timeout.
+            const lastMsg = (lastErr && lastErr.message) || '';
+            if ((lastErr && lastErr.name === 'AbortError') || /Failed to fetch|NetworkError|Load failed|ERR_/i.test(lastMsg)) {
+                throw new Error(friendlyNetworkErrorMessage(lastErr, 'Google Gemini'));
             }
             throw lastErr || new Error('Gemini gagal dihubungi — semua model fallback gagal.');
         }
@@ -23710,6 +23972,7 @@ Tulis singkat (maks 200 kata): 1-2 kalimat ringkasan kondisi, poin valuasi, poin
                 }
                 if (id === 'subpage-notif') renderPageNotifs();
                 if (id === 'subpage-telegram') initTelegramSettingsPage();
+                if (id === 'subpage-tiktok') initTiktokSettingsPage();
                 if (id === 'subpage-aikeys') initAiKeysSettingsPage();
 
                 if (id === 'subpage-keamanan') {
@@ -27099,25 +27362,44 @@ Jumlah Emiten: <b>${allStocks ? allStocks.length : 0}</b>
         }
 
         function saveFmpApiKeyPage() {
-            const val = ((document.getElementById('fmpApiKeyPage') || {}).value || '').trim();
+            const inputEl = document.getElementById('fmpApiKeyPage');
+            const val = sanitizeApiKeyInput((inputEl || {}).value || '');
             const statusEl = document.getElementById('fmpStatusMsgPage');
             if (!val) {
                 if (statusEl) { statusEl.className = 'tg-status err'; statusEl.textContent = '❌ Isi dulu API key-nya, bro.'; }
                 return;
             }
+            if (inputEl) inputEl.value = val; // tampilkan hasil pembersihan — biar user lihat key APA ADANYA yg dipakai
             lsSet('si_fmp_key', val);
             _fmpExplorerLoaded = false; // biar Explorer FMP narik ulang pakai key baru
             Object.keys(_fmpCache).forEach(k => delete _fmpCache[k]); // buang cache lama (key lama)
             updateAiKeysStatusPage();
-            if (statusEl) { statusEl.className = 'tg-status ok'; statusEl.textContent = '✅ Key FMP tersimpan! Coba tab "SobatInves AI" atau "Explorer FMP".'; }
-            showToast('Key FMP tersimpan ✅', 'success');
-            playAudioFeedback('success');
+            // ✅ v87: peringatan lembut (BUKAN blokir — key tetap tersimpan & tetap bisa langsung
+            // dites) kalau key kelihatan salah tempel, mis. key Gemini ("AQ."/"AIza...") ke-paste
+            // di kolom FMP. Ini murni heuristik, lihat catatan jujur di fmpFetch() soal kenapa
+            // tidak ada validasi prefix "resmi" untuk key FMP sendiri.
+            let warn = '';
+            if (/^AQ\.|^AIza/i.test(val)) warn = '⚠️ Ini kelihatan kayak key Google Gemini, bukan FMP — cek lagi kolomnya.';
+            else if (val.length < 20) warn = '⚠️ Tersimpan, tapi key ini pendek dibanding key FMP pada umumnya — pastikan tersalin utuh sebelum dites.';
+            if (statusEl) {
+                statusEl.className = 'tg-status ' + (warn ? 'err' : 'ok');
+                statusEl.textContent = warn || '✅ Key FMP tersimpan! Coba tab "SobatInves AI" atau "Explorer FMP".';
+            }
+            showToast(warn || 'Key FMP tersimpan ✅', warn ? 'warn' : 'success');
+            playAudioFeedback(warn ? 'click' : 'success');
         }
 
         async function testFmpApiKeyPage() {
             const statusEl = document.getElementById('fmpStatusMsgPage');
             if (!hasFmpKey()) {
                 if (statusEl) { statusEl.className = 'tg-status err'; statusEl.textContent = '⚠️ Simpan key dulu sebelum tes.'; }
+                return;
+            }
+            // ✅ v87: cek koneksi HP dulu sebelum nembak ke FMP — kalau HP jelas offline, error
+            // "Failed to fetch" nanti PASTI cuma soal itu, bukan soal key, jadi kasih tau langsung
+            // tanpa bikin user salah sangka ke arah key-nya.
+            if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+                if (statusEl) { statusEl.className = 'tg-status err'; statusEl.textContent = '📶 HP lo lagi offline — nyalain dulu WiFi/data seluler, baru tes lagi.'; }
                 return;
             }
             if (statusEl) { statusEl.dataset.hold = '1'; statusEl.className = 'tg-status ok'; statusEl.textContent = '⏳ Ngetes koneksi ke FMP...'; }
@@ -27129,10 +27411,12 @@ Jumlah Emiten: <b>${allStocks ? allStocks.length : 0}</b>
                     showToast('FMP terhubung ✅', 'success');
                 } else {
                     statusEl.className = 'tg-status err';
-                    statusEl.textContent = '⚠️ Key ke-detect tapi data kosong — mungkin limit plan gratis untuk emiten BEI.';
+                    statusEl.textContent = '⚠️ Key ke-detect & server FMP merespon, tapi datanya kosong — kemungkinan limit plan gratis untuk emiten BEI (BBCA.JK).';
                 }
             } catch (err) {
                 statusEl.className = 'tg-status err';
+                // fmpFetch() sudah menerjemahkan error jaringan/HTTP jadi pesan actionable —
+                // di sini tinggal ditampilkan apa adanya, tidak perlu diterjemahkan ulang.
                 statusEl.textContent = '❌ Gagal: ' + ((err && err.message) || 'periksa lagi key-nya.');
                 showToast('Tes FMP gagal', 'error');
             } finally {
@@ -27153,12 +27437,14 @@ Jumlah Emiten: <b>${allStocks ? allStocks.length : 0}</b>
         }
 
         function saveGeminiApiKeyPage() {
-            const val = ((document.getElementById('geminiApiKeyPage') || {}).value || '').trim();
+            const inputEl = document.getElementById('geminiApiKeyPage');
+            const val = sanitizeApiKeyInput((inputEl || {}).value || '');
             const statusEl = document.getElementById('geminiStatusMsgPage');
             if (!val) {
                 if (statusEl) { statusEl.className = 'tg-status err'; statusEl.textContent = '❌ Isi dulu API key-nya, bro.'; }
                 return;
             }
+            if (inputEl) inputEl.value = val; // tampilkan hasil pembersihan whitespace/kutip nyasar
             lsSet('si_gemini_key', val);
             updateAiKeysStatusPage();
             if (statusEl) { statusEl.className = 'tg-status ok'; statusEl.textContent = '✅ Key Gemini tersimpan! Mode AI canggih otomatis nyala di tab "SobatInves AI".'; }
@@ -27170,6 +27456,12 @@ Jumlah Emiten: <b>${allStocks ? allStocks.length : 0}</b>
             const statusEl = document.getElementById('geminiStatusMsgPage');
             if (!hasGeminiKey()) {
                 if (statusEl) { statusEl.className = 'tg-status err'; statusEl.textContent = '⚠️ Simpan key dulu sebelum tes.'; }
+                return;
+            }
+            // ✅ v87: sama seperti sisi FMP — cek offline dulu supaya "Failed to fetch" tidak
+            // disalahartikan sebagai key salah kalau penyebabnya cuma HP lagi tanpa koneksi.
+            if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+                if (statusEl) { statusEl.className = 'tg-status err'; statusEl.textContent = '📶 HP lo lagi offline — nyalain dulu WiFi/data seluler, baru tes lagi.'; }
                 return;
             }
             if (statusEl) { statusEl.dataset.hold = '1'; statusEl.className = 'tg-status ok'; statusEl.textContent = '⏳ Ngetes koneksi ke Gemini...'; }
@@ -27361,6 +27653,236 @@ Jumlah Emiten: <b>${allStocks ? allStocks.length : 0}</b>
                 }
             } catch (e) {
                 if (statusEl) { statusEl.className = 'tg-status err'; statusEl.textContent = '❌ Tidak bisa hubungi server: ' + e.message + ' (pastikan script.gs sudah di-deploy)'; }
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // ✅ AUTO-POSTING TIKTOK — rekomendasi top saham diposting sendiri
+        // tiap hari oleh backend GAS (script.gs), lewat trigger server-side,
+        // TIDAK butuh app ini terbuka. Kredensial TikTok (Client Key/Secret,
+        // access & refresh token) 100% disimpan di Script Properties GAS —
+        // tidak pernah dikirim/disimpan di client/localStorage. Lihat file
+        // tiktok-autopost.gs untuk kode backend & cara pasangnya.
+        // ═══════════════════════════════════════════════════════════════
+        function getTiktokConfig() {
+            return lsGet('si_tiktok_cfg', { enabled: false, jamPosting: '16:30', captionTemplate: '', useGemini: true });
+        }
+        function setTiktokConfig(cfg) { lsSet('si_tiktok_cfg', cfg); }
+
+        function initTiktokSettingsPage() {
+            const cfg = getTiktokConfig();
+            const jamEl = document.getElementById('ttJamPostingPage');
+            const capEl = document.getElementById('ttCaptionTemplatePage');
+            const geminiEl = document.getElementById('ttUseGeminiPage');
+            if (jamEl && cfg.jamPosting) jamEl.value = cfg.jamPosting;
+            if (capEl && cfg.captionTemplate) capEl.value = cfg.captionTemplate;
+            if (geminiEl) geminiEl.checked = cfg.useGemini !== false;
+            updateTiktokMasterUI(cfg.enabled);
+            // ✅ Satu panggilan server saja (getTiktokStatus) sudah cukup untuk
+            // mengisi status koneksi TikTok DAN status kredensial (Client
+            // Key/Secret tersimpan atau belum) — lihat refreshTiktokStatusUI().
+            refreshTiktokStatusUI();
+        }
+
+        // ✅ Kirim Client Key/Secret TikTok ke server (action
+        // 'saveTiktokCredentials') — TIDAK disimpan di localStorage,
+        // field dikosongkan lagi setelah berhasil tersimpan di server.
+        // ✅ v3: input dibersihkan dulu lewat sanitizeApiKeyInput() (buang
+        // spasi/newline nyasar, kutip ke-copy, karakter zero-width) —
+        // sumber paling umum kunci "kelihatan salah" padahal cuma kotor.
+        // Boleh isi salah SATU kolom saja untuk memperbarui satu di antara
+        // Client Key/Client Secret — backend (tiktok-autopost.gs) yang
+        // menentukan apakah itu valid (mis. wajib isi keduanya kalau ini
+        // penyambungan pertama kali).
+        async function saveTiktokCredentials() {
+            const keyEl = document.getElementById('ttClientKeyPage');
+            const secretEl = document.getElementById('ttClientSecretPage');
+            const statusEl = document.getElementById('ttCredStatusMsgPage');
+            const clientKey = sanitizeApiKeyInput((keyEl && keyEl.value) || '');
+            const clientSecret = sanitizeApiKeyInput((secretEl && secretEl.value) || '');
+            if (!clientKey && !clientSecret) {
+                if (statusEl) { statusEl.className = 'tg-status err'; statusEl.textContent = '⚠️ Isi minimal salah satu: Client Key atau Client Secret.'; }
+                return;
+            }
+            if (statusEl) { statusEl.className = 'tg-status ok'; statusEl.textContent = '⏳ Mengirim ke server (aman, HTTPS)...'; }
+            try {
+                const resp = await gasCall({ action: 'saveTiktokCredentials', clientKey: clientKey, clientSecret: clientSecret });
+                if (resp && resp.ok) {
+                    if (statusEl) { statusEl.className = 'tg-status ok'; statusEl.textContent = '✅ Kredensial tersimpan aman di server.'; }
+                    showToast('🔒 Kredensial TikTok tersimpan di server!', 'success');
+                    if (keyEl) keyEl.value = '';
+                    if (secretEl) secretEl.value = '';
+                    refreshTiktokStatusUI();
+                } else {
+                    if (statusEl) { statusEl.className = 'tg-status err'; statusEl.textContent = '❌ ' + ((resp && resp.msg) || 'Gagal simpan — pastikan tiktok-autopost.gs sudah dipasang.'); }
+                }
+            } catch (e) {
+                if (statusEl) { statusEl.className = 'tg-status err'; statusEl.textContent = '❌ Tidak bisa hubungi server: ' + e.message; }
+            }
+        }
+
+        // ✅ Alias lama — beberapa bagian kode memanggil nama ini. Sekarang
+        // cuma delegasi ke refreshTiktokStatusUI() supaya tidak ada 2x
+        // request ke server tiap buka halaman ini (dulu keduanya jalan
+        // terpisah, dobel network call).
+        async function refreshTiktokCredStatus() { return refreshTiktokStatusUI(); }
+
+        // ✅ Putuskan & hapus kredensial+token TikTok dari server (action
+        // 'resetTiktokCredentials') — jadwal & template caption yang sudah
+        // diatur TIDAK ikut terhapus. Berguna kalau salah isi Client
+        // Key/Secret dari awal, atau mau ganti ke akun TikTok lain.
+        async function resetTiktokCredentials() {
+            if (!confirm('Putuskan koneksi TikTok & hapus Client Key/Secret + token dari server? Anda perlu menyambungkan ulang dari awal (isi kredensial baru + tiktokAuthUrl()).')) return;
+            const statusEl = document.getElementById('ttCredStatusMsgPage');
+            if (statusEl) { statusEl.className = 'tg-status ok'; statusEl.textContent = '⏳ Memutuskan koneksi...'; }
+            try {
+                const resp = await gasCall({ action: 'resetTiktokCredentials' });
+                if (resp && resp.ok) {
+                    if (statusEl) { statusEl.className = 'tg-status ok'; statusEl.textContent = '✅ Kredensial & koneksi TikTok direset.'; }
+                    showToast('🔓 Koneksi TikTok direset', 'warn');
+                    const keyEl = document.getElementById('ttClientKeyPage');
+                    const secretEl = document.getElementById('ttClientSecretPage');
+                    if (keyEl) keyEl.value = '';
+                    if (secretEl) secretEl.value = '';
+                    const cfg = getTiktokConfig();
+                    cfg.enabled = false;
+                    setTiktokConfig(cfg);
+                    updateTiktokMasterUI(false);
+                    refreshTiktokStatusUI();
+                } else {
+                    if (statusEl) { statusEl.className = 'tg-status err'; statusEl.textContent = '❌ ' + ((resp && resp.msg) || 'Gagal reset — pastikan tiktok-autopost.gs sudah dipasang.'); }
+                }
+            } catch (e) {
+                if (statusEl) { statusEl.className = 'tg-status err'; statusEl.textContent = '❌ Tidak bisa hubungi server: ' + e.message; }
+            }
+        }
+
+        function updateTiktokMasterUI(enabled) {
+            const btn = document.getElementById('ttMasterBtnPage');
+            const statusText = document.getElementById('ttMasterStatusPage');
+            const icon = document.getElementById('ttMasterIconPage');
+            const pillMenu = document.getElementById('ttMenuStatusPill');
+            const pillPage = document.getElementById('ttPageStatusPill');
+            if (btn) btn.classList.toggle('on', !!enabled);
+            if (statusText) statusText.textContent = enabled ? 'Aktif — posting otomatis tiap hari' : 'Nonaktif — atur jadwal lalu simpan';
+            if (icon) icon.textContent = enabled ? '✅' : '⏸️';
+            [pillMenu, pillPage].forEach(p => {
+                if (!p) return;
+                p.textContent = enabled ? 'ON' : 'OFF';
+                p.style.color = enabled ? 'var(--up)' : 'var(--t-med)';
+            });
+        }
+
+        function tiktokMasterTogglePage() {
+            const cfg = getTiktokConfig();
+            cfg.enabled = !cfg.enabled;
+            setTiktokConfig(cfg);
+            updateTiktokMasterUI(cfg.enabled);
+            saveTiktokAutoConfig();
+        }
+
+        // ✅ Simpan jadwal & template ke server (script.gs) lewat action
+        // 'saveTiktokAutoConfig' — GABUNGKAN branch ini ke doPost(e) yang
+        // sudah ada di backend Anda (lihat tiktok-autopost.gs).
+        async function saveTiktokAutoConfig() {
+            const cfg = getTiktokConfig();
+            const jamEl = document.getElementById('ttJamPostingPage');
+            const capEl = document.getElementById('ttCaptionTemplatePage');
+            const geminiEl = document.getElementById('ttUseGeminiPage');
+            cfg.jamPosting = (jamEl && jamEl.value) || '16:30';
+            cfg.captionTemplate = (capEl && capEl.value) || '';
+            cfg.useGemini = geminiEl ? !!geminiEl.checked : true;
+            setTiktokConfig(cfg);
+            const statusEl = document.getElementById('ttStatusMsgPage');
+            try {
+                const resp = await gasCall({
+                    action: 'saveTiktokAutoConfig',
+                    email: (currentUser && currentUser.email) || 'anonymous',
+                    enabled: !!cfg.enabled,
+                    jamPosting: cfg.jamPosting,
+                    captionTemplate: cfg.captionTemplate,
+                    useGemini: cfg.useGemini
+                });
+                if (resp && resp.ok) {
+                    if (statusEl) { statusEl.className = 'tg-status ok'; statusEl.textContent = '✅ Pengaturan tersimpan di server.'; }
+                    showToast('✅ Pengaturan TikTok tersimpan!', 'success');
+                } else {
+                    if (statusEl) { statusEl.className = 'tg-status err'; statusEl.textContent = '❌ ' + ((resp && resp.msg) || 'Gagal simpan — pastikan tiktok-autopost.gs sudah dipasang.'); }
+                }
+            } catch (e) {
+                if (statusEl) { statusEl.className = 'tg-status err'; statusEl.textContent = '❌ Tidak bisa hubungi server: ' + e.message; }
+            }
+        }
+
+        // ✅ Minta server jalankan postTopSahamToTikTok() sekarang juga,
+        // lewat action 'testTiktokPost'.
+        async function testTiktokPostSekarang() {
+            const statusEl = document.getElementById('ttStatusMsgPage');
+            if (statusEl) { statusEl.className = 'tg-status ok'; statusEl.textContent = '⏳ Meminta server posting sekarang...'; }
+            try {
+                const resp = await gasCall({ action: 'testTiktokPost' });
+                if (resp && resp.ok) {
+                    if (statusEl) { statusEl.className = 'tg-status ok'; statusEl.textContent = '✅ Server sudah dijalankan! Cek Riwayat Posting Server di bawah / Telegram admin.'; }
+                    showToast('🎬 Tes posting TikTok dikirim ke server!', 'success');
+                    setTimeout(refreshTiktokStatusUI, 4000);
+                } else {
+                    if (statusEl) { statusEl.className = 'tg-status err'; statusEl.textContent = '❌ ' + ((resp && resp.msg) || 'Gagal — pastikan tiktok-autopost.gs sudah tersambung ke TikTok.'); }
+                }
+            } catch (e) {
+                if (statusEl) { statusEl.className = 'tg-status err'; statusEl.textContent = '❌ Tidak bisa hubungi server: ' + e.message; }
+            }
+        }
+
+        // ✅ Ambil status koneksi, kredensial, & riwayat posting terakhir
+        // dari server dalam SATU request (action 'getTiktokStatus') — dulu
+        // ini dipecah jadi 2 fungsi/2 request terpisah (refreshTiktokStatusUI
+        // + refreshTiktokCredStatus), sekarang digabung supaya lebih cepat
+        // & lebih kecil kemungkinan salah satunya gagal diam-diam.
+        async function refreshTiktokStatusUI() {
+            const lastRunEl = document.getElementById('ttLastRunPage');
+            const lastStatusEl = document.getElementById('ttLastStatusPage');
+            const statusDot = document.getElementById('ttStatusDotPage');
+            const statusText = document.getElementById('ttStatusTextPage');
+            const planWrap = document.getElementById('ttContentPlanPreviewWrap');
+            const planText = document.getElementById('ttContentPlanPreviewText');
+            const maskedEl = document.getElementById('ttClientKeyMasked');
+            const secretStatusEl = document.getElementById('ttClientSecretStatus');
+            try {
+                const resp = await gasCall({ action: 'getTiktokStatus' });
+                if (resp && resp.ok) {
+                    if (lastRunEl) lastRunEl.textContent = resp.lastRun ? new Date(resp.lastRun).toLocaleString('id-ID') : '—';
+                    if (lastStatusEl) lastStatusEl.textContent = resp.lastStatus || 'Belum pernah posting.';
+                    if (statusText) statusText.textContent = resp.connected ? 'Terhubung ke TikTok' : 'Belum terhubung';
+                    if (statusDot) statusDot.style.background = resp.connected ? 'var(--up)' : 'var(--t-low)';
+                    // ✅ Deteksi kredensial: Client Key ditampilkan disamarkan kalau
+                    // ada; Client Secret TIDAK PERNAH dikirim balik server dalam
+                    // bentuk apapun (bahkan disamarkan), jadi cuma ditampilkan
+                    // status "tersimpan/belum" dari flag clientSecretSet.
+                    if (maskedEl) maskedEl.textContent = resp.clientKeyMasked || '—';
+                    if (secretStatusEl) {
+                        secretStatusEl.textContent = resp.clientSecretSet ? '✅ Tersimpan' : '— Belum diisi';
+                        secretStatusEl.style.color = resp.clientSecretSet ? 'var(--up)' : 'var(--t-hi)';
+                    }
+                    // ✅ Content plan JSON terakhir (judul, deskripsi, data visual) —
+                    // dikirim server sbg string JSON, ditampilkan apa adanya biar
+                    // gampang dicek/diaudit tanpa perlu buka Apps Script.
+                    if (resp.lastContentPlan && planWrap && planText) {
+                        planText.textContent = resp.lastContentPlan;
+                        planWrap.classList.add('show');
+                    }
+                } else {
+                    // ✅ Server merespons tapi bilang gagal (bukan error jaringan) —
+                    // paling sering artinya tiktok-autopost.gs belum terpasang/
+                    // terhubung ke doPost() yang sedang aktif. Tampilkan ini
+                    // dengan jelas alih-alih diam saja, supaya "mendeteksi" gagal
+                    // tidak disalahartikan sebagai "belum pernah diisi".
+                    if (maskedEl) maskedEl.textContent = '⚠️ Gagal cek';
+                    if (secretStatusEl) { secretStatusEl.textContent = '⚠️ Gagal cek'; secretStatusEl.style.color = 'var(--dn)'; }
+                }
+            } catch (e) {
+                console.warn('[TikTok Status] Error:', e.message);
+                if (maskedEl) maskedEl.textContent = '⚠️ Server tidak terhubung';
+                if (secretStatusEl) { secretStatusEl.textContent = '⚠️ Server tidak terhubung'; secretStatusEl.style.color = 'var(--dn)'; }
             }
         }
 
