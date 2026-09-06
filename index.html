@@ -697,6 +697,14 @@ async function saveIDBTelegramConfig(config) {
             --toggle-track: #CBD5E1;
             --toggle-thumb: #ffffff;
             --toggle-icon: #64748B;
+            /* v89 — palet warna grafik donat "Alokasi Portofolio" (7 slot, auto ganti tema) */
+            --aloc-c1: #2D6CED;
+            --aloc-c2: #7C5CFC;
+            --aloc-c3: #0BBFAA;
+            --aloc-c4: #F79009;
+            --aloc-c5: #12B76A;
+            --aloc-c6: #EC4899;
+            --aloc-c7: #FF9143;
         }
         [data-theme="dark"] {
             --bg-main: #0A0F1D;
@@ -744,6 +752,14 @@ async function saveIDBTelegramConfig(config) {
             --toggle-track: #4D85FF;
             --toggle-thumb: #ffffff;
             --toggle-icon: #F1F5FC;
+            /* v89 — palet warna grafik donat "Alokasi Portofolio" (7 slot, auto ganti tema) */
+            --aloc-c1: #4D85FF;
+            --aloc-c2: #9B7BFF;
+            --aloc-c3: #14E4C4;
+            --aloc-c4: #FFB020;
+            --aloc-c5: #00D68F;
+            --aloc-c6: #FF6FAE;
+            --aloc-c7: #FF9143;
         }
         :root {
             --radius-sm: 10px;
@@ -9370,6 +9386,75 @@ async function saveIDBTelegramConfig(config) {
         .aloc-warn-block .aloc-narrative-title { color:#F5A623; }
         .aloc-disclaimer { margin-top:4px; padding:11px 13px; background:var(--bg-surface); border:1px dashed var(--border-light); border-radius:var(--radius-md); font-size:9.5px; color:var(--t-low); font-weight:600; line-height:1.6; }
 
+        /* ═══════════════════════════════════════════════════════════════
+           v89 — ALOKASI VISUAL: GRAFIK DONAT DUA-KUBUS (chart + detail)
+           Menggantikan tampilan list statis lama dengan dashboard interaktif
+           modern ala terminal keuangan profesional. Dua "kubus" (kotak chart
+           di satu sisi, kotak rincian di sisi lain) supaya tidak berbenturan:
+           bertumpuk rapi di layar sempit (HP), berdampingan di layar lebar
+           (tablet/desktop) — persis pola widget portofolio referensi.
+           Data & analisis TETAP 100% dari hasil AI yang sama (dana custom +
+           profil risiko), ini murni upgrade presentasi visual.
+           ═══════════════════════════════════════════════════════════════ */
+        .aloc-viz-wrap { margin-bottom: 14px; }
+        .aloc-viz-grid {
+            display: flex; flex-direction: column; gap: 4px;
+            background: var(--card-bg); border: 1px solid var(--border-light);
+            border-radius: var(--radius-lg); padding: 20px 16px 18px;
+            box-shadow: var(--shadow-sm); overflow: hidden;
+        }
+        .aloc-viz-chart-col { display: flex; flex-direction: column; align-items: center; width: 100%; }
+        .aloc-viz-svg-wrap { width: 100%; max-width: 208px; aspect-ratio: 1; margin: 0 auto 14px; }
+        .aloc-viz-svg { width: 100%; height: 100%; overflow: visible; }
+        .aloc-viz-slice { cursor: pointer; transition: transform 0.25s cubic-bezier(0.4,0,0.2,1), opacity 0.25s ease; transform-origin: 0 0; }
+        .aloc-viz-slice:active { transform: scale(0.97); }
+        .aloc-viz-slice.active { transform: scale(1.045); }
+        .aloc-viz-slice.dimmed { opacity: 0.3; }
+        .aloc-viz-slice-label { font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:800; fill:#fff; pointer-events:none; paint-order:stroke; stroke:rgba(0,0,0,0.32); stroke-width:2.5px; transition:opacity 0.25s ease; }
+        .aloc-viz-slice-label.dimmed { opacity: 0.3; }
+        .aloc-viz-center-title { font-family:'Plus Jakarta Sans',sans-serif; font-size:9.5px; font-weight:800; fill:var(--t-med); text-transform:uppercase; letter-spacing:0.4px; }
+        .aloc-viz-center-value { font-family:'Barlow Condensed',sans-serif; font-size:18px; font-weight:900; fill:var(--t-hi); }
+        .aloc-viz-legend { display:flex; flex-wrap:wrap; justify-content:center; gap:7px; width:100%; }
+        .aloc-viz-legend-item { display:flex; align-items:center; gap:6px; cursor:pointer; padding:6px 10px; border-radius:20px; border:1.5px solid var(--border-light); background:var(--bg-elevated); transition:all 0.2s; font-family:inherit; }
+        .aloc-viz-legend-item:active { transform: scale(0.96); }
+        .aloc-viz-legend-item.active { border-color: var(--primary); background: var(--primary-light); }
+        .aloc-viz-legend-item.dimmed { opacity: 0.4; }
+        .aloc-viz-legend-dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+        .aloc-viz-legend-label { font-size:10.5px; font-weight:800; color:var(--t-hi); }
+        .aloc-viz-legend-pct { font-size:10px; font-weight:900; color:var(--t-med); font-family:'IBM Plex Mono',monospace; }
+        .aloc-viz-hint { font-size:9.5px; color:var(--t-low); font-weight:700; text-align:center; margin-top:10px; }
+        /* Kubus kedua: panel rincian — tersembunyi sampai sebuah sektor diketuk */
+        .aloc-viz-detail-col { width:100%; max-height:0; opacity:0; overflow:hidden; padding:0; margin:0; transition: max-height 0.45s cubic-bezier(0.4,0,0.2,1), opacity 0.35s ease, padding 0.35s ease, margin 0.35s ease; }
+        .aloc-viz-grid.has-detail .aloc-viz-detail-col { max-height:900px; opacity:1; padding-top:16px; margin-top:12px; border-top:1px dashed var(--border-light); }
+        .aloc-viz-detail-head { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:12px; }
+        .aloc-viz-detail-title-area { display:flex; align-items:center; gap:8px; min-width:0; }
+        .aloc-viz-detail-dot { width:11px; height:11px; border-radius:50%; flex-shrink:0; }
+        .aloc-viz-detail-title { font-family:'Barlow Condensed',sans-serif; font-size:16px; font-weight:900; color:var(--t-hi); line-height:1.2; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        .aloc-viz-back-btn { display:inline-flex; align-items:center; gap:4px; background:var(--bg-elevated); border:none; padding:5px 11px; border-radius:20px; font-size:10px; font-weight:800; color:var(--t-med); cursor:pointer; flex-shrink:0; font-family:'Plus Jakarta Sans',sans-serif; }
+        .aloc-viz-back-btn:active { transform: scale(0.95); }
+        .aloc-viz-detail-meta { display:flex; align-items:center; justify-content:center; gap:22px; margin-bottom:14px; }
+        .aloc-viz-meta-item { text-align:center; }
+        .aloc-viz-meta-lbl { font-size:9px; color:var(--t-low); font-weight:700; text-transform:uppercase; letter-spacing:0.3px; margin-bottom:3px; }
+        .aloc-viz-meta-val { font-family:'IBM Plex Mono',monospace; font-size:15px; font-weight:900; color:var(--t-hi); }
+        .aloc-viz-meta-divider { width:1px; height:28px; background:var(--border-light); }
+        .aloc-viz-holdings { display:flex; flex-direction:column; gap:9px; margin-top:10px; }
+        .aloc-viz-holding-card { background:var(--bg-elevated); border-radius:var(--radius-sm); padding:9px 12px; }
+        .aloc-viz-holding-top { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:5px; }
+        .aloc-viz-holding-ticker { font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:900; color:var(--t-hi); }
+        .aloc-viz-holding-val { font-family:'IBM Plex Mono',monospace; font-size:10.5px; font-weight:800; color:var(--t-med); }
+        .aloc-viz-holding-note { font-size:9.5px; color:var(--t-low); font-weight:600; margin-bottom:7px; line-height:1.4; }
+        .aloc-viz-holding-bar-bg { height:4px; background:var(--border-light); border-radius:20px; overflow:hidden; }
+        .aloc-viz-holding-bar-fill { height:100%; border-radius:20px; }
+        .aloc-viz-holdings-caption { font-size:8.5px; color:var(--t-low); font-weight:600; font-style:italic; margin-top:8px; line-height:1.5; }
+        /* Layar lebar (tablet/desktop) — dua kubus berdampingan, tidak lagi bertumpuk */
+        @media (min-width: 560px) {
+            .aloc-viz-grid { flex-direction:row; align-items:flex-start; gap:0; padding:24px 22px; }
+            .aloc-viz-chart-col { width:44%; flex-shrink:0; }
+            .aloc-viz-detail-col { width:0; flex:0 0 0; align-self:stretch; border-top:none; padding-top:0; margin-top:0; }
+            .aloc-viz-grid.has-detail { gap:22px; }
+            .aloc-viz-grid.has-detail .aloc-viz-detail-col { width:56%; flex:0 0 56%; max-height:none; opacity:1; padding:0 0 0 22px; margin:0; border-top:none; border-left:1px dashed var(--border-light); }
+        }
+
         /* ─── FGI CHANGE BADGE ─── */
         .fgi-change-badge { font-size:9px; font-weight:900; font-family:'IBM Plex Mono',monospace;
             padding:2px 6px; border-radius:4px; display:inline-flex; align-items:center; gap:2px; margin-top:3px; }
@@ -11797,6 +11882,7 @@ async function saveIDBTelegramConfig(config) {
                     <div class="sub-tab btn-ripple" onclick="switchCalc('div',this)">Dividen</div>
                     <div class="sub-tab btn-ripple" onclick="switchCalc('mc',this)">Risk Sim</div>
                     <div class="sub-tab btn-ripple" onclick="switchCalc('scenario',this)">Skenario Makro</div>
+                    <div class="sub-tab btn-ripple" onclick="switchCalc('fx',this)">💱 FX &amp; Inflasi</div>
                 </div>
                 <div class="calc-grid-layout">
                     <div class="sub-pane active" id="calc-pl"><div class="calc-section"><div class="calc-sec-title">Profit &amp; Loss</div><div class="input-row"><div class="calc-grp"><label class="calc-lbl">Harga Beli</label><input type="number" class="calc-inp" id="pl-beli" placeholder="1000" oninput="calcPL()"></div><div class="calc-grp"><label class="calc-lbl">Harga Jual</label><input type="number" class="calc-inp" id="pl-jual" placeholder="1200" oninput="calcPL()"></div></div><div class="input-row"><div class="calc-grp"><label class="calc-lbl">Total Lot</label><input type="number" class="calc-inp" id="pl-lot" placeholder="100" oninput="calcPL()"></div><div class="calc-grp"><label class="calc-lbl">Fee % (B+J)</label><input type="number" class="calc-inp" id="pl-fee" value="0.4" oninput="calcPL()"></div></div><div class="result-box" id="res-pl-box"><div class="result-title">Profit/Loss Bersih</div><div class="result-val" id="res-pl-val">Rp 0</div><div class="result-sub"><div><div class="rsub-lbl">Persentase</div><div class="rsub-val" id="res-pl-pct">—</div></div></div></div></div></div>
@@ -11971,6 +12057,74 @@ async function saveIDBTelegramConfig(config) {
                             <div class="calc-grp" style="margin-bottom:6px;"><label class="calc-lbl">Multiplier Sensitivitas Emiten</label><select class="calc-inp" id="sc-sensitivity" onchange="calcScenario()"><option value="0.6">×0.6 — Defensif (consumer/utility)</option><option value="1" selected>×1.0 — Rata-rata pasar</option><option value="1.6">×1.6 — Sensitif (properti/perbankan/komoditas/leverage tinggi)</option></select></div>
                             <div style="font-size:9px;color:var(--t-low);margin-bottom:10px;line-height:1.5;">Angka × ini adalah <b>faktor pengali (multiplier)</b>: menentukan apakah dampak sentimen makro di atas <b>diperkuat</b> atau <b>diredam</b> saat sampai ke estimasi harga — sektor defensif meredam guncangan sentimen, sektor sensitif justru memperbesarnya.</div>
                             <div id="sc-result-wrap"></div>
+                        </div>
+                    </div>
+                    <div class="sub-pane" id="calc-fx">
+                        <div class="calc-section">
+                            <div class="calc-sec-title" style="display:flex;align-items:center;justify-content:space-between;">
+                                <span>💱 Risiko Kurs &amp; Inflasi (Real-Time)</span>
+                                <button class="btn-ripple" onclick="refreshFxRiskData()" title="Refresh data pasar" style="background:var(--bg-elevated);border:1px solid var(--border-light);border-radius:8px;padding:5px 9px;font-size:11px;cursor:pointer;color:var(--t-hi);">🔄</button>
+                            </div>
+                            <div style="font-size:9.5px;color:var(--t-low);margin-bottom:10px;line-height:1.5;">Menerjemahkan performa IHSG &amp; portofolio Anda ke Dolar AS/Singapura secara real-time, dipadukan inflasi terkini — biar kelihatan berapa besar cuan Rupiah Anda yang "digerus" pelemahan kurs &amp; inflasi dari kacamata investor asing.</div>
+
+                            <div style="display:flex;gap:6px;margin-bottom:6px;">
+                                <div class="strat-card" style="flex:1;text-align:center;padding:9px 4px;margin-bottom:0;">
+                                    <div style="font-size:8px;color:var(--t-low);font-weight:800;">🇮🇩 IHSG</div>
+                                    <div id="fx-ihsg-val" style="font-size:13px;font-weight:900;color:var(--t-hi);margin-top:3px;font-family:'IBM Plex Mono',monospace;">—</div>
+                                    <div id="fx-ihsg-chg" style="font-size:9px;font-weight:800;margin-top:2px;color:var(--t-low);">—</div>
+                                </div>
+                                <div class="strat-card" style="flex:1;text-align:center;padding:9px 4px;margin-bottom:0;">
+                                    <div style="font-size:8px;color:var(--t-low);font-weight:800;">💵 USD/IDR</div>
+                                    <div id="fx-usdidr-val" style="font-size:13px;font-weight:900;color:var(--t-hi);margin-top:3px;font-family:'IBM Plex Mono',monospace;">—</div>
+                                    <div id="fx-usdidr-chg" style="font-size:9px;font-weight:800;margin-top:2px;color:var(--t-low);">—</div>
+                                </div>
+                                <div class="strat-card" style="flex:1;text-align:center;padding:9px 4px;margin-bottom:0;">
+                                    <div style="font-size:8px;color:var(--t-low);font-weight:800;">🇸🇬 SGD/IDR</div>
+                                    <div id="fx-sgdidr-val" style="font-size:13px;font-weight:900;color:var(--t-hi);margin-top:3px;font-family:'IBM Plex Mono',monospace;">—</div>
+                                    <div id="fx-sgdidr-chg" style="font-size:9px;font-weight:800;margin-top:2px;color:var(--t-low);">—</div>
+                                </div>
+                            </div>
+                            <div id="fx-last-update" style="font-size:8px;color:var(--t-low);text-align:right;margin-bottom:12px;">Menunggu data pasar...</div>
+
+                            <div class="calc-grp" style="margin-bottom:10px;">
+                                <label class="calc-lbl">Modal Portofolio (Rp)</label>
+                                <input type="number" class="calc-inp" id="fx-modal" placeholder="10000000" oninput="this.dataset.touched='1';calcFxRisk()">
+                            </div>
+                            <div class="calc-grp" style="margin-bottom:4px;">
+                                <label class="calc-lbl">Nilai Pasar Sekarang (Rp)</label>
+                                <input type="number" class="calc-inp" id="fx-pasar" placeholder="11500000" oninput="this.dataset.touched='1';calcFxRisk()">
+                            </div>
+                            <div id="fx-portfolio-hint" style="font-size:8.5px;color:var(--t-low);margin-bottom:10px;line-height:1.5;">Portofolio kosong — isi manual di atas, atau tambah saham dulu di tab 🔥 Heatmap.</div>
+
+                            <div class="input-row">
+                                <div class="calc-grp">
+                                    <label class="calc-lbl">Kurs USD/IDR Saat Beli (opsional)</label>
+                                    <input type="number" class="calc-inp" id="fx-baseline-usd" placeholder="16000" oninput="calcFxRisk()">
+                                </div>
+                                <div class="calc-grp">
+                                    <label class="calc-lbl">Kurs SGD/IDR Saat Beli (opsional)</label>
+                                    <input type="number" class="calc-inp" id="fx-baseline-sgd" placeholder="12500" oninput="calcFxRisk()">
+                                </div>
+                            </div>
+                            <div style="font-size:8.5px;color:var(--t-low);margin-bottom:10px;line-height:1.5;">💡 Kosongkan kalau tidak ingat — sistem asumsikan kurs beli = kurs sekarang (artinya hanya efek inflasi yang dihitung, tanpa efek kurs). Isi manual untuk hasil yang akurat sesuai kurs saat Anda benar-benar masuk.</div>
+
+                            <div class="input-row">
+                                <div class="calc-grp">
+                                    <label class="calc-lbl">Inflasi Indonesia YoY (%)</label>
+                                    <input type="number" class="calc-inp" id="fx-infl-id" value="3.19" step="0.01" oninput="calcFxRisk()">
+                                </div>
+                                <div class="calc-grp">
+                                    <label class="calc-lbl">Inflasi AS YoY (%)</label>
+                                    <input type="number" class="calc-inp" id="fx-infl-usd" value="3.4" step="0.01" oninput="calcFxRisk()">
+                                </div>
+                            </div>
+                            <div class="calc-grp" style="margin-bottom:6px;">
+                                <label class="calc-lbl">Inflasi Singapura YoY (%)</label>
+                                <input type="number" class="calc-inp" id="fx-infl-sgd" value="2.2" step="0.01" oninput="calcFxRisk()">
+                            </div>
+                            <div style="font-size:8px;color:var(--t-low);margin-bottom:4px;line-height:1.5;">📌 Nilai awal dari rilis resmi terakhir (BPS/BLS/SingStat). Inflasi rilis <b>bulanan</b>, bukan real-time — update manual sesuai rilis terbaru masing-masing biro statistik.</div>
+
+                            <div id="fx-result-wrap" style="margin-top:10px;"></div>
                         </div>
                     </div>
                 </div>
@@ -20954,6 +21108,7 @@ Tulis singkat (maks 200 kata): 1-2 kalimat ringkasan kondisi, poin valuasi, poin
             if (d) d.classList.add('active');
             if (id === 'hw') populateWajarSelect();
             if (id === 'mc') populateMCSelect();
+            if (id === 'fx') initFxRisk();
             if (navigator.vibrate) navigator.vibrate(15);
         }
 
@@ -21118,6 +21273,185 @@ Tulis singkat (maks 200 kata): 1-2 kalimat ringkasan kondisi, poin valuasi, poin
                 </div>
                 <div style="padding:10px 12px;background:var(--card-bg);border:1px dashed var(--border-light);border-radius:var(--radius-md);font-size:9px;color:var(--t-low);font-weight:700;line-height:1.6;margin-top:10px;">
                     ⚠️ Ini adalah <b>heuristik edukatif</b> berbasis asumsi sensitivitas makro umum — bukan model ekonometrik resmi, bukan proyeksi analis, dan tidak memperhitungkan faktor spesifik emiten (struktur utang riil, hedging valas, dsb). Multiplier sensitivitas hanya memperbesar/memperkecil <b>besaran</b> dampak, bukan mengubah <b>arah</b> sinyalnya. Gunakan sebagai alat berpikir skenario, bukan angka pasti.
+                </div>`;
+        }
+
+        // ═══════════════════════════════════════
+        // FX & INFLATION RISK ANALYSIS — terjemahkan performa IHSG/
+        // portofolio ke USD & SGD real-time, dipadukan inflasi terkini,
+        // supaya kelihatan berapa besar risiko kurs & inflasi yang
+        // ditanggung investor asing di ekuitas Indonesia.
+        // ═══════════════════════════════════════
+        async function ensureFxMacroFresh() {
+            const jobs = [];
+            if (!isIdxCacheFresh('IDX')) jobs.push(fetchIndices('asia'));
+            if (!isIdxCacheFresh('USDIDR') || !isIdxCacheFresh('SGDIDR')) jobs.push(fetchIndices('forex'));
+            if (jobs.length) { try { await Promise.all(jobs); } catch (e) {} }
+        }
+
+        function renderFxLiveSnapshot() {
+            const cell = (valId, chgId, d) => {
+                const v = document.getElementById(valId), c = document.getElementById(chgId);
+                if (v) v.textContent = (d && d.price) ? n2(Math.round(d.price)) : '—';
+                if (c) {
+                    if (d && d.price) {
+                        const up = d.chg >= 0;
+                        c.textContent = (up ? '▲' : '▼') + Math.abs(d.chg).toFixed(2) + '%';
+                        c.style.color = up ? 'var(--up)' : 'var(--dn)';
+                    } else { c.textContent = '—'; c.style.color = 'var(--t-low)'; }
+                }
+            };
+            const ihsg = idxCache['IDX'], usdidr = idxCache['USDIDR'], sgdidr = idxCache['SGDIDR'];
+            cell('fx-ihsg-val', 'fx-ihsg-chg', ihsg);
+            cell('fx-usdidr-val', 'fx-usdidr-chg', usdidr);
+            cell('fx-sgdidr-val', 'fx-sgdidr-chg', sgdidr);
+            const ts = Math.max((ihsg && ihsg.ts) || 0, (usdidr && usdidr.ts) || 0, (sgdidr && sgdidr.ts) || 0);
+            const lu = document.getElementById('fx-last-update');
+            if (lu) lu.textContent = ts ? 'Terakhir update: ' + new Date(ts).toLocaleTimeString('id-ID') + ' WIB' : 'Menunggu data pasar...';
+        }
+
+        function populateFxRiskFromPortfolio() {
+            const modalEl = document.getElementById('fx-modal'), pasarEl = document.getElementById('fx-pasar'),
+                hint = document.getElementById('fx-portfolio-hint');
+            if (!modalEl || !pasarEl) return;
+            if (portfolio.length) {
+                let totalModal = 0, totalPasar = 0;
+                portfolio.forEach(p => {
+                    const stock = allStocks.find(s => s.ticker === p.ticker);
+                    const modal = p.harga * p.lot * 100,
+                        pasar = stock ? stock.price * p.lot * 100 : modal;
+                    totalModal += modal; totalPasar += pasar;
+                });
+                if (!modalEl.dataset.touched) modalEl.value = Math.round(totalModal);
+                if (!pasarEl.dataset.touched) pasarEl.value = Math.round(totalPasar);
+                if (hint) hint.textContent = '📊 Otomatis diambil dari Portofolio Anda (' + portfolio.length + ' saham) — bisa diedit manual.';
+            } else if (hint) {
+                hint.textContent = 'Portofolio kosong — isi manual di atas, atau tambah saham dulu di tab 🔥 Heatmap.';
+            }
+        }
+
+        function autofillFxBaseline() {
+            const bu = document.getElementById('fx-baseline-usd'), bs = document.getElementById('fx-baseline-sgd');
+            const prefs = lsGet('si_fx_risk_prefs', {});
+            if (bu && !bu.value && prefs.baselineUsd) bu.value = prefs.baselineUsd;
+            if (bs && !bs.value && prefs.baselineSgd) bs.value = prefs.baselineSgd;
+            const usdidr = idxCache['USDIDR'], sgdidr = idxCache['SGDIDR'];
+            if (bu && !bu.value && usdidr && usdidr.price) bu.value = Math.round(usdidr.price);
+            if (bs && !bs.value && sgdidr && sgdidr.price) bs.value = Math.round(sgdidr.price);
+            const fID = document.getElementById('fx-infl-id'), fUS = document.getElementById('fx-infl-usd'),
+                fSG = document.getElementById('fx-infl-sgd');
+            if (fID && prefs.inflID != null && !fID.dataset.touched) fID.value = prefs.inflID;
+            if (fUS && prefs.inflUSD != null && !fUS.dataset.touched) fUS.value = prefs.inflUSD;
+            if (fSG && prefs.inflSGD != null && !fSG.dataset.touched) fSG.value = prefs.inflSGD;
+        }
+
+        async function initFxRisk() {
+            populateFxRiskFromPortfolio();
+            renderFxLiveSnapshot();
+            await ensureFxMacroFresh();
+            renderFxLiveSnapshot();
+            autofillFxBaseline();
+            calcFxRisk();
+        }
+
+        async function refreshFxRiskData() {
+            showToast('Menarik data kurs & IHSG terbaru...', 'info');
+            if (idxCache['IDX']) idxCache['IDX'].ts = 0;
+            if (idxCache['USDIDR']) idxCache['USDIDR'].ts = 0;
+            if (idxCache['SGDIDR']) idxCache['SGDIDR'].ts = 0;
+            await ensureFxMacroFresh();
+            renderFxLiveSnapshot();
+            populateFxRiskFromPortfolio();
+            calcFxRisk();
+            showToast('Data pasar diperbarui! 🎉', 'success');
+            if (navigator.vibrate) navigator.vibrate([20, 10, 20]);
+        }
+
+        function fxRiskLevel(pp) {
+            const a = Math.abs(pp);
+            if (a < 2) return { label: 'RENDAH', color: 'var(--up)' };
+            if (a < 5) return { label: 'SEDANG', color: 'var(--warn)' };
+            return { label: 'TINGGI', color: 'var(--dn)' };
+        }
+
+        function calcFxRisk() {
+            const wrap = document.getElementById('fx-result-wrap');
+            if (!wrap) return;
+            const modal = +document.getElementById('fx-modal').value || 0,
+                pasar = +document.getElementById('fx-pasar').value || 0;
+            if (!modal || !pasar) {
+                wrap.innerHTML = '<div style="text-align:center;padding:16px;color:var(--t-med);font-size:11px;">Isi Modal &amp; Nilai Pasar (atau tambah saham ke Portofolio) untuk menjalankan analisis.</div>';
+                return;
+            }
+            const inflID = +document.getElementById('fx-infl-id').value || 0,
+                inflUSD = +document.getElementById('fx-infl-usd').value || 0,
+                inflSGD = +document.getElementById('fx-infl-sgd').value || 0;
+            const usdNow = (idxCache['USDIDR'] && idxCache['USDIDR'].price) || 0,
+                sgdNow = (idxCache['SGDIDR'] && idxCache['SGDIDR'].price) || 0;
+            const baseUsdInp = +document.getElementById('fx-baseline-usd').value || 0,
+                baseSgdInp = +document.getElementById('fx-baseline-sgd').value || 0;
+            const baseUsd = baseUsdInp || usdNow,
+                baseSgd = baseSgdInp || sgdNow;
+
+            lsSet('si_fx_risk_prefs', {
+                inflID, inflUSD, inflSGD,
+                baselineUsd: baseUsdInp || null,
+                baselineSgd: baseSgdInp || null
+            });
+
+            const nominalPct = ((pasar - modal) / modal) * 100;
+            const realIdPct = ((1 + nominalPct / 100) / (1 + inflID / 100) - 1) * 100;
+
+            const barRow = (lbl, val, color, maxBar) => {
+                const halfPct = Math.min(50, Math.abs(val) / maxBar * 50);
+                const fillStyle = val >= 0 ? `left:50%;width:${halfPct}%;` : `right:50%;width:${halfPct}%;`;
+                return `<div style="display:flex;align-items:center;gap:6px;margin-top:5px;"><div style="width:76px;font-size:8px;color:var(--t-low);font-weight:700;flex-shrink:0;">${lbl}</div><div style="flex:1;height:7px;background:var(--bg-elevated);border-radius:4px;position:relative;overflow:hidden;"><div style="position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--border-strong);"></div><div style="position:absolute;top:0;bottom:0;${fillStyle}background:${color};border-radius:2px;"></div></div><div style="width:54px;text-align:right;font-size:9px;font-weight:800;color:${color};font-family:'IBM Plex Mono',monospace;">${val>=0?'+':''}${val.toFixed(2)}%</div></div>`;
+            };
+
+            const buildCcyCard = (flag, code, now, base, inflRate) => {
+                if (!now || !base) {
+                    return `<div class="strat-card" style="padding:14px;"><div style="font-size:11px;font-weight:800;color:var(--t-hi);margin-bottom:4px;">${flag} Dalam ${code}</div><div style="font-size:10px;color:var(--t-low);">Data kurs ${code}/IDR belum tersedia — tekan 🔄 di atas.</div></div>`;
+                }
+                const fxChgPct = ((now - base) / base) * 100; // + = Rupiah melemah terhadap ccy ini
+                const returnCcyPct = ((1 + nominalPct / 100) * (base / now) - 1) * 100;
+                const realCcyPct = ((1 + returnCcyPct / 100) / (1 + inflRate / 100) - 1) * 100;
+                const contribPp = returnCcyPct - nominalPct; // dampak kurs, dalam poin persentase
+                const risk = fxRiskLevel(contribPp);
+                const pasarCcy = pasar / now, modalCcy = modal / base;
+                const maxBar = Math.max(Math.abs(nominalPct), Math.abs(contribPp), Math.abs(returnCcyPct), 1);
+                return `<div class="strat-card" style="padding:14px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;gap:8px;">
+                        <div style="font-size:11px;font-weight:900;color:var(--t-hi);">${flag} Dalam ${code}</div>
+                        <div style="font-size:8px;font-weight:900;padding:2px 7px;border-radius:20px;background:${risk.color};color:#fff;white-space:nowrap;">RISIKO KURS: ${risk.label}</div>
+                    </div>
+                    <div style="font-size:8.5px;color:var(--t-low);margin-bottom:6px;">Kurs beli ${n2(Math.round(base))} → sekarang ${n2(Math.round(now))} (${fxChgPct>=0?'Rupiah melemah':'Rupiah menguat'} ${Math.abs(fxChgPct).toFixed(2)}%)</div>
+                    <div style="display:flex;gap:14px;margin-bottom:8px;">
+                        <div><div style="font-size:8px;color:var(--t-low);font-weight:700;">MODAL</div><div style="font-size:11px;font-weight:800;color:var(--t-hi);font-family:'IBM Plex Mono',monospace;">${code} ${modalCcy.toLocaleString('en-US',{maximumFractionDigits:2})}</div></div>
+                        <div><div style="font-size:8px;color:var(--t-low);font-weight:700;">NILAI SEKARANG</div><div style="font-size:11px;font-weight:800;color:var(--t-hi);font-family:'IBM Plex Mono',monospace;">${code} ${pasarCcy.toLocaleString('en-US',{maximumFractionDigits:2})}</div></div>
+                    </div>
+                    ${barRow('Return (Rp)', nominalPct, 'var(--t-med)', maxBar)}
+                    ${barRow('Efek Kurs', contribPp, contribPp>=0?'var(--up)':'var(--dn)', maxBar)}
+                    ${barRow('Return ('+code+')', returnCcyPct, returnCcyPct>=0?'var(--up)':'var(--dn)', maxBar)}
+                    <div style="margin-top:8px;padding-top:8px;border-top:1px dashed var(--border-light);display:flex;justify-content:space-between;align-items:center;gap:8px;">
+                        <div style="font-size:8.5px;color:var(--t-low);font-weight:700;">Return Riil ${code} (disesuaikan inflasi ${inflRate}%)</div>
+                        <div style="font-size:12px;font-weight:900;color:${realCcyPct>=0?'var(--up)':'var(--dn)'};font-family:'IBM Plex Mono',monospace;white-space:nowrap;">${realCcyPct>=0?'+':''}${realCcyPct.toFixed(2)}%</div>
+                    </div>
+                </div>`;
+            };
+
+            const usdCard = buildCcyCard('💵', 'USD', usdNow, baseUsd, inflUSD);
+            const sgdCard = buildCcyCard('🇸🇬', 'SGD', sgdNow, baseSgd, inflSGD);
+
+            wrap.innerHTML = `
+                <div class="result-box">
+                    <div class="result-title">Return Nominal (Rupiah)</div>
+                    <div class="result-val" style="color:${nominalPct>=0?'var(--up)':'var(--dn)'};">${nominalPct>=0?'+':''}${nominalPct.toFixed(2)}%</div>
+                    <div class="result-sub"><div><div class="rsub-lbl">Return Riil (disesuaikan inflasi ID ${inflID}%)</div><div class="rsub-val" style="color:${realIdPct>=0?'var(--up)':'var(--dn)'};">${realIdPct>=0?'+':''}${realIdPct.toFixed(2)}%</div></div></div>
+                </div>
+                <div style="margin-top:10px;">${usdCard}</div>
+                <div style="margin-top:10px;">${sgdCard}</div>
+                <div style="padding:10px 12px;background:var(--card-bg);border:1px dashed var(--border-light);border-radius:var(--radius-md);font-size:9px;color:var(--t-low);font-weight:700;line-height:1.6;margin-top:10px;">
+                    ⚠️ "Efek Kurs" dihitung dari selisih Kurs Beli vs kurs saat ini — kosongkan Kurs Beli dan efek kurs otomatis 0% (murni menampilkan efek inflasi). Return Riil pakai rumus Fisher: (1+return)/(1+inflasi)−1. Data IHSG/kurs real-time dari TradingView, inflasi diisi manual berdasar rilis resmi terakhir — bukan nasihat keuangan.
                 </div>`;
         }
 
@@ -24165,6 +24499,205 @@ Total seluruh "persen" di array alokasi ditambah "kasSiagaPersen" harus PERSIS 1
             }
         }
 
+        // ═══════════════════════════════════════════════════════════════
+        // ALOKASI VISUAL — v89: Grafik donat interaktif dua-kubus (chart +
+        // detail), menggantikan tampilan list statis lama dengan dashboard
+        // modern ala terminal keuangan profesional. Nominal per sektor tetap
+        // dihitung dari dana custom yang sama & profil risiko yang sama —
+        // ini murni upgrade CARA MENAMPILKAN hasil AI, bukan mengubah logika
+        // AI-nya sama sekali, supaya analisisnya tetap konsisten dengan versi
+        // sebelumnya (hanya lebih enak dilihat & lebih mudah dieksplorasi).
+        // ═══════════════════════════════════════════════════════════════
+        let alocVizCats = [];
+        let alocVizActiveKey = null;
+        const ALOC_VIZ_COLOR_VARS = ['--aloc-c1', '--aloc-c2', '--aloc-c3', '--aloc-c4', '--aloc-c5', '--aloc-c6', '--aloc-c7'];
+
+        function alocVizArcPath(startAngle, endAngle, innerR, outerR) {
+            const x1 = outerR * Math.cos(startAngle), y1 = outerR * Math.sin(startAngle);
+            const x2 = outerR * Math.cos(endAngle), y2 = outerR * Math.sin(endAngle);
+            const x3 = innerR * Math.cos(endAngle), y3 = innerR * Math.sin(endAngle);
+            const x4 = innerR * Math.cos(startAngle), y4 = innerR * Math.sin(startAngle);
+            const largeArc = (endAngle - startAngle) > Math.PI ? 1 : 0;
+            return `M ${x1.toFixed(2)} ${y1.toFixed(2)} A ${outerR} ${outerR} 0 ${largeArc} 1 ${x2.toFixed(2)} ${y2.toFixed(2)} L ${x3.toFixed(2)} ${y3.toFixed(2)} A ${innerR} ${innerR} 0 ${largeArc} 0 ${x4.toFixed(2)} ${y4.toFixed(2)} Z`;
+        }
+
+        function alocVizFmtRp(n) { return rp(Math.round(n || 0)); }
+
+        // Susun struktur kategori (sektor + kas siaga) dari hasil AI yang sama persis
+        // dengan yang sudah ada — lalu render sebagai grafik donat SVG + legenda.
+        function buildAlokasiVizHtml(data, meta) {
+            const dana = Number(meta.dana) || 0;
+            const cats = [];
+            (data.alokasi || []).forEach((sec, i) => {
+                const pct = Math.max(0, Number(sec.persen) || 0);
+                if (pct <= 0) return;
+                const stocks = Array.isArray(sec.sahamUnggulan) ? sec.sahamUnggulan : [];
+                const value = dana * (pct / 100);
+                const perStock = stocks.length ? value / stocks.length : 0;
+                cats.push({
+                    key: 'sec' + i,
+                    label: sec.sektor || ('Sektor ' + (i + 1)),
+                    pct, value,
+                    colorVar: ALOC_VIZ_COLOR_VARS[i % ALOC_VIZ_COLOR_VARS.length],
+                    horizonLabel: sec.horizonLabel, trenLabel: sec.trenLabel, alasan: sec.alasan,
+                    holdings: stocks.map(s => ({ ticker: s.ticker || '', catatan: s.catatan || '', value: perStock }))
+                });
+            });
+            const cashPct = Math.max(0, Number(data.kasSiagaPersen) || 0);
+            if (cashPct > 0) {
+                cats.push({
+                    key: 'cash', label: 'Kas Siaga (Cash Reserve)', pct: cashPct, value: dana * (cashPct / 100),
+                    colorVar: null, colorFixed: 'var(--t-med)',
+                    alasan: data.kasSiagaAlasan || 'Porsi dana yang sengaja tidak diinvestasikan dulu, disimpan sebagai amunisi cadangan.',
+                    holdings: []
+                });
+            }
+            if (!cats.length) return '';
+            alocVizCats = cats;
+            alocVizActiveKey = null;
+
+            // Normalisasi ke 100% berdasarkan total persen aktual (jaga-jaga kalau AI
+            // sedikit meleset dari 100 akibat pembulatan) supaya grafik selalu utuh 1 lingkaran.
+            const totalPctSum = cats.reduce((s, c) => s + c.pct, 0) || 100;
+            const outerR = 108, innerR = 76, labelR = 128, gap = 0.035;
+            let angle = -Math.PI / 2;
+            let slicesSvg = '', labelsSvg = '';
+            cats.forEach(cat => {
+                const frac = cat.pct / totalPctSum;
+                const sliceAngle = frac * Math.PI * 2;
+                const start = angle + (sliceAngle > gap ? gap / 2 : 0);
+                const end = angle + sliceAngle - (sliceAngle > gap ? gap / 2 : 0);
+                const color = cat.colorFixed || `var(${cat.colorVar})`;
+                slicesSvg += `<path d="${alocVizArcPath(start, end, innerR, outerR)}" fill="${color}" class="aloc-viz-slice" data-key="${cat.key}" onclick="alocVizSelect('${cat.key}')"></path>`;
+                if (frac * 100 >= 5) {
+                    const mid = (start + end) / 2;
+                    const lx = (labelR * Math.cos(mid)).toFixed(1), ly = (labelR * Math.sin(mid)).toFixed(1);
+                    labelsSvg += `<text x="${lx}" y="${ly}" class="aloc-viz-slice-label" data-key="${cat.key}" text-anchor="middle" dominant-baseline="middle">${Math.round(cat.pct)}%</text>`;
+                }
+                angle += sliceAngle;
+            });
+
+            const legendHtml = cats.map(cat => {
+                const color = cat.colorFixed || `var(${cat.colorVar})`;
+                return `<div class="aloc-viz-legend-item" data-key="${cat.key}" onclick="alocVizSelect('${cat.key}')">
+                    <span class="aloc-viz-legend-dot" style="background:${color};"></span>
+                    <span class="aloc-viz-legend-label">${escapeHtmlAloc(cat.label)}</span>
+                    <span class="aloc-viz-legend-pct">${Math.round(cat.pct)}%</span>
+                </div>`;
+            }).join('');
+
+            return `<div class="aloc-viz-wrap">
+                <div class="aloc-viz-grid" id="alocVizGrid">
+                    <div class="aloc-viz-chart-col">
+                        <div class="aloc-viz-svg-wrap">
+                            <svg class="aloc-viz-svg" viewBox="-140 -140 280 280">
+                                <g id="alocVizSlices">${slicesSvg}</g>
+                                <g aria-hidden="true" id="alocVizLabels">${labelsSvg}</g>
+                                <g>
+                                    <text class="aloc-viz-center-title" x="0" y="-6" text-anchor="middle" id="alocVizCenterTitle">Total Dialokasikan</text>
+                                    <text class="aloc-viz-center-value" x="0" y="18" text-anchor="middle" id="alocVizCenterVal">${escapeHtmlAloc(alocVizFmtRp(dana))}</text>
+                                </g>
+                            </svg>
+                        </div>
+                        <div class="aloc-viz-legend" id="alocVizLegend">${legendHtml}</div>
+                        <div class="aloc-viz-hint" id="alocVizHint">👆 Ketuk salah satu sektor untuk lihat rincian nominal &amp; saham unggulannya</div>
+                    </div>
+                    <div class="aloc-viz-detail-col" id="alocVizDetailCol"></div>
+                </div>
+            </div>`;
+        }
+
+        // Ketuk slice/legenda → buka "kubus" kedua (panel rincian) berisi nominal
+        // persis, bobot %, horizon/tren, alasan AI, & saham unggulan (nominal per
+        // saham dibagi rata dari total sektor, dilabeli jelas supaya tidak disalahartikan
+        // sebagai rekomendasi bobot per saham dari AI).
+        function alocVizSelect(key) {
+            try {
+                if (alocVizActiveKey === key) { alocVizReset(); return; }
+                const cat = alocVizCats.find(c => c.key === key);
+                if (!cat) return;
+                alocVizActiveKey = key;
+                if (typeof playAudioFeedback === 'function') playAudioFeedback('click');
+
+                document.querySelectorAll('#alocVizSlices .aloc-viz-slice').forEach(s => {
+                    const active = s.getAttribute('data-key') === key;
+                    s.classList.toggle('active', active);
+                    s.classList.toggle('dimmed', !active);
+                });
+                document.querySelectorAll('#alocVizLabels .aloc-viz-slice-label').forEach(l => {
+                    l.classList.toggle('dimmed', l.getAttribute('data-key') !== key);
+                });
+                document.querySelectorAll('#alocVizLegend .aloc-viz-legend-item').forEach(l => {
+                    const active = l.getAttribute('data-key') === key;
+                    l.classList.toggle('active', active);
+                    l.classList.toggle('dimmed', !active);
+                });
+
+                const centerTitle = document.getElementById('alocVizCenterTitle');
+                const centerVal = document.getElementById('alocVizCenterVal');
+                if (centerTitle) centerTitle.textContent = cat.label.length > 20 ? cat.label.slice(0, 18) + '…' : cat.label;
+                if (centerVal) centerVal.textContent = alocVizFmtRp(cat.value);
+
+                const hint = document.getElementById('alocVizHint');
+                if (hint) hint.style.display = 'none';
+
+                const color = cat.colorFixed || `var(${cat.colorVar})`;
+                const holdingsHtml = cat.holdings.length ? `<div class="aloc-viz-holdings">
+                    ${cat.holdings.map(h => `<div class="aloc-viz-holding-card">
+                        <div class="aloc-viz-holding-top"><span class="aloc-viz-holding-ticker">${escapeHtmlAloc(h.ticker)}</span><span class="aloc-viz-holding-val">${alocVizFmtRp(h.value)}</span></div>
+                        ${h.catatan ? `<div class="aloc-viz-holding-note">${escapeHtmlAloc(h.catatan)}</div>` : ''}
+                        <div class="aloc-viz-holding-bar-bg"><div class="aloc-viz-holding-bar-fill" style="width:100%;background:${color};"></div></div>
+                    </div>`).join('')}
+                    <div class="aloc-viz-holdings-caption">💡 Nominal per saham di atas dibagi rata dari total sektor ini (bukan bobot spesifik dari AI) — sesuaikan sendiri porsi antar saham sesuai keyakinanmu.</div>
+                </div>` : '';
+
+                const detailHtml = `
+                    <div class="aloc-viz-detail-head">
+                        <div class="aloc-viz-detail-title-area">
+                            <span class="aloc-viz-detail-dot" style="background:${color};"></span>
+                            <span class="aloc-viz-detail-title">${escapeHtmlAloc(cat.label)}</span>
+                        </div>
+                        <button type="button" class="aloc-viz-back-btn btn-ripple" onclick="alocVizReset()">✕ Tutup</button>
+                    </div>
+                    <div class="aloc-viz-detail-meta">
+                        <div class="aloc-viz-meta-item"><div class="aloc-viz-meta-lbl">Nominal</div><div class="aloc-viz-meta-val">${alocVizFmtRp(cat.value)}</div></div>
+                        <div class="aloc-viz-meta-divider"></div>
+                        <div class="aloc-viz-meta-item"><div class="aloc-viz-meta-lbl">Bobot</div><div class="aloc-viz-meta-val">${Math.round(cat.pct)}%</div></div>
+                    </div>
+                    ${(cat.horizonLabel || cat.trenLabel) ? `<div class="aloc-sector-tags" style="justify-content:center;margin-bottom:10px;">
+                        ${cat.horizonLabel ? `<span class="aloc-horizon-badge">⏳ ${escapeHtmlAloc(cat.horizonLabel)}</span>` : ''}
+                        ${cat.trenLabel ? `<span class="aloc-tren-badge">${escapeHtmlAloc(cat.trenLabel)}</span>` : ''}
+                    </div>` : ''}
+                    ${cat.alasan ? `<div class="aloc-sector-reason">${escapeHtmlAloc(cat.alasan)}</div>` : ''}
+                    ${holdingsHtml}
+                `;
+                const detailCol = document.getElementById('alocVizDetailCol');
+                if (detailCol) detailCol.innerHTML = detailHtml;
+                const grid = document.getElementById('alocVizGrid');
+                if (grid) grid.classList.add('has-detail');
+            } catch (e) { console.warn('alocVizSelect error:', e); }
+        }
+
+        function alocVizReset() {
+            try {
+                alocVizActiveKey = null;
+                document.querySelectorAll('#alocVizSlices .aloc-viz-slice').forEach(s => s.classList.remove('active', 'dimmed'));
+                document.querySelectorAll('#alocVizLabels .aloc-viz-slice-label').forEach(l => l.classList.remove('dimmed'));
+                document.querySelectorAll('#alocVizLegend .aloc-viz-legend-item').forEach(l => l.classList.remove('active', 'dimmed'));
+                const grid = document.getElementById('alocVizGrid');
+                if (grid) grid.classList.remove('has-detail');
+                const hint = document.getElementById('alocVizHint');
+                if (hint) hint.style.display = '';
+                const centerTitle = document.getElementById('alocVizCenterTitle');
+                const centerVal = document.getElementById('alocVizCenterVal');
+                const dana = alocVizCats.reduce((s, c) => s + c.value, 0);
+                if (centerTitle) centerTitle.textContent = 'Total Dialokasikan';
+                if (centerVal) centerVal.textContent = alocVizFmtRp(dana);
+                const detailCol = document.getElementById('alocVizDetailCol');
+                if (detailCol) detailCol.innerHTML = '';
+            } catch (e) {}
+        }
+
         function renderAlokasiResult(data, meta) {
             const resultBox = document.getElementById('alocResultBox');
             if (!resultBox) return;
@@ -24175,36 +24708,18 @@ Total seluruh "persen" di array alokasi ditambah "kasSiagaPersen" harus PERSIS 1
             let html = '';
             html += `<div class="aloc-result-meta"><span>💼 ${escapeHtmlAloc(danaFmt)} · Profil ${escapeHtmlAloc(meta.risk || '')}</span><span>${escapeHtmlAloc(tsFmt)}</span></div>`;
 
+            // v89: grafik donat interaktif dua-kubus — chart di satu sisi, rincian
+            // sektor + saham unggulan muncul di sisi lain saat diketuk. Menggantikan
+            // deretan kartu sektor statis lama supaya lebih ringkas & modern, tanpa
+            // kehilangan satu pun informasi (alasan, horizon, tren, saham unggulan
+            // semua tetap ada, hanya dipindah ke panel rincian).
+            html += buildAlokasiVizHtml(data, meta);
+
             if (data.filosofi) {
                 html += `<div class="aloc-narrative-block"><div class="aloc-narrative-title">🧭 Filosofi Alokasi</div><div class="aloc-sector-reason">${escapeHtmlAloc(data.filosofi)}</div></div>`;
             }
 
-            let totalPct = Number(data.kasSiagaPersen) || 0;
-            if (data.kasSiagaPersen != null) {
-                html += `<div class="aloc-cash-row">
-                    <div><div class="aloc-cash-label">💵 Kas Siaga (Cash Reserve)</div><div class="aloc-cash-sub">${escapeHtmlAloc(data.kasSiagaAlasan || '')}</div></div>
-                    <div class="aloc-cash-pct">${Math.round(Number(data.kasSiagaPersen) || 0)}%</div>
-                </div>`;
-            }
-
-            (data.alokasi || []).forEach(sec => {
-                const pctRaw = Number(sec.persen) || 0;
-                totalPct += pctRaw;
-                const pct = Math.max(0, Math.min(100, Math.round(pctRaw)));
-                const stockChips = (sec.sahamUnggulan || []).map(s =>
-                    `<div class="aloc-stock-chip"><span class="aloc-stock-ticker">${escapeHtmlAloc(s.ticker || '')}</span>${s.catatan ? `<span class="aloc-stock-note">${escapeHtmlAloc(s.catatan)}</span>` : ''}</div>`
-                ).join('');
-                html += `<div class="aloc-sector-card">
-                    <div class="aloc-sector-top"><span class="aloc-sector-name">${escapeHtmlAloc(sec.sektor || '')}</span><span class="aloc-sector-pct">${pct}%</span></div>
-                    <div class="strat-card-bar-track"><div class="strat-card-bar-fill" style="background:#9B7BFF;left:0;width:${pct}%;"></div></div>
-                    <div class="aloc-sector-tags" style="margin-top:8px;">
-                        ${sec.horizonLabel ? `<span class="aloc-horizon-badge">⏳ ${escapeHtmlAloc(sec.horizonLabel)}</span>` : ''}
-                        ${sec.trenLabel ? `<span class="aloc-tren-badge">${escapeHtmlAloc(sec.trenLabel)}</span>` : ''}
-                    </div>
-                    ${sec.alasan ? `<div class="aloc-sector-reason">${escapeHtmlAloc(sec.alasan)}</div>` : ''}
-                    ${stockChips ? `<div class="aloc-stock-list">${stockChips}</div>` : ''}
-                </div>`;
-            });
+            const totalPct = (Number(data.kasSiagaPersen) || 0) + (data.alokasi || []).reduce((s, sec) => s + (Number(sec.persen) || 0), 0);
 
             if (data.ringkasanStrategi) {
                 html += `<div class="aloc-narrative-block"><div class="aloc-narrative-title">📋 Ringkasan Strategi</div><div class="aloc-sector-reason">${escapeHtmlAloc(data.ringkasanStrategi)}</div></div>`;
@@ -24213,7 +24728,7 @@ Total seluruh "persen" di array alokasi ditambah "kasSiagaPersen" harus PERSIS 1
                 html += `<div class="aloc-narrative-block aloc-warn-block"><div class="aloc-narrative-title">⚠️ Peringatan Risiko</div><div class="aloc-sector-reason">${escapeHtmlAloc(data.peringatanRisiko)}</div></div>`;
             }
             if (Math.abs(totalPct - 100) > 2) {
-                html += `<div class="aloc-dana-hint" style="text-align:center;margin-bottom:8px;">ℹ️ Total alokasi ±${Math.round(totalPct)}% (sedikit meleset karena pembulatan AI, bukan bug — sesuaikan proporsinya sendiri kalau perlu).</div>`;
+                html += `<div class="aloc-dana-hint" style="text-align:center;margin-bottom:8px;">ℹ️ Total alokasi mentah dari AI ±${Math.round(totalPct)}% (sedikit meleset karena pembulatan, bukan bug) — grafik di atas otomatis dinormalisasi ke 100% supaya tetap konsisten & mudah dibaca.</div>`;
             }
 
             html += `<button class="ai-regen-btn btn-ripple" onclick="generateAlokasiAI()">🔄 Buat Ulang Alokasi</button>`;
