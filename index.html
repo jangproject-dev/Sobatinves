@@ -9342,6 +9342,51 @@ async function saveIDBTelegramConfig(config) {
             color:#8B5CF6; margin-bottom:8px; padding-bottom:8px; border-bottom:1px dashed var(--border-light); }
         .cai-preview-text { font-size:11.5px; line-height:1.65; color:var(--t-med); white-space:pre-line; }
 
+        /* ─── v91: PORTFOLIO STRESS TESTING — kartu simulasi skenario penurunan/kenaikan
+           IHSG di Kalkulator Pro, dengan chip preset & badge sensitivitas sektor per aset. ─── */
+        .pst-chip-row { display:flex; flex-wrap:wrap; gap:6px; margin:2px 0 14px; }
+        .pst-chip { font-size:10px; font-weight:800; color:var(--t-med); background:var(--bg-elevated);
+            border:1px solid var(--border-light); border-radius:20px; padding:7px 12px; cursor:pointer;
+            font-family:inherit; transition:all 0.15s; }
+        .pst-chip:active { transform:scale(0.96); }
+        .pst-chip:hover { border-color:var(--dn); color:var(--dn); }
+        .pst-chip.active { background:var(--dn); color:#fff; border-color:var(--dn); box-shadow:0 3px 10px rgba(255,77,94,0.3); }
+        .pst-slider-scale { display:flex; justify-content:space-between; font-size:8px; color:var(--t-low);
+            font-weight:700; margin:-2px 0 14px; }
+        .pst-asset-card { background:var(--card-bg); border:1px solid var(--border-light);
+            border-radius:var(--radius-md); padding:10px 12px; transition:all 0.2s; }
+        .pst-asset-card:hover { border-color:var(--border-strong); }
+        .pst-sens-badge { font-size:7.5px; font-weight:900; padding:2px 7px; border-radius:20px; color:#fff;
+            letter-spacing:0.2px; white-space:nowrap; }
+        .pst-bar-track { flex:1; height:6px; background:var(--bg-elevated); border-radius:3px; overflow:hidden; margin-right:10px; }
+        .pst-bar-fill { height:100%; border-radius:3px; transition:width 0.3s; }
+
+        /* ─── v92: KELOLA PORTOFOLIO INLINE di Portfolio Stress Testing — supaya bisa
+           tambah/hapus aset langsung di halaman ini tanpa pindah ke Beli Cepat. ─── */
+        .pst-mgr { background:var(--bg-elevated); border:1px dashed var(--border-light);
+            border-radius:var(--radius-md); padding:12px 12px 10px; margin:2px 0 14px; }
+        .pst-mgr-list { display:flex; flex-direction:column; gap:6px; margin-bottom:10px; }
+        .pst-mgr-item { display:flex; align-items:center; justify-content:space-between; gap:8px;
+            padding:7px 10px; background:var(--card-bg); border:1px solid var(--border-light);
+            border-radius:var(--radius-sm); }
+        .pst-mgr-add-row { display:flex; gap:6px; flex-wrap:wrap; }
+        .pst-mgr-inp { flex:1; min-width:70px; padding:9px 10px; background:var(--input-surface);
+            border:1px solid var(--border-light); border-radius:var(--radius-sm); color:var(--t-hi);
+            font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:700; outline:none; }
+        .pst-mgr-inp:focus { border-color:var(--primary); }
+        .pst-mgr-add-btn { padding:9px 14px; border-radius:var(--radius-sm); background:var(--primary);
+            color:#fff; border:none; font-family:'Barlow Condensed',sans-serif; font-size:13px;
+            font-weight:900; cursor:pointer; white-space:nowrap; transition:opacity 0.15s; }
+        .pst-mgr-add-btn:hover { opacity:0.88; }
+        .pst-mgr-add-btn:active { transform:scale(0.96); }
+
+        /* ─── v92: MINI TREND EKUITAS JURNAL — sparkline harian di Equity Hero, bergerak
+           mengikuti P&L belum-realisasi posisi open + P&L realized dari posisi ditutup. ─── */
+        .eh2-spark-wrap { margin:0 0 12px; }
+        .eh2-spark-label { display:flex; align-items:center; justify-content:space-between;
+            font-size:8px; font-weight:800; color:rgba(255,255,255,0.45); font-family:'IBM Plex Mono',monospace;
+            text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px; }
+
         /* ─── v88: ALOKASI PORTOFOLIO AI — kartu di Akun, rekomendasi alokasi dana ala hedge fund ─── */
         .aloc-risk-row { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:8px; }
         .aloc-risk-chip { padding:10px 6px; border-radius:var(--radius-md); border:1.5px solid var(--border-light);
@@ -10918,6 +10963,12 @@ async function saveIDBTelegramConfig(config) {
                     <div class="eh2-equity" id="journalTotalEquity" style="font-size:26px;">Rp 0</div>
                     <div id="journalPLPill" class="eh2-change-pill neutral" style="margin-bottom:0;">—</div>
                 </div>
+                <!-- ✅ v92: Mini trend ekuitas — bergerak harian mengikuti P&L belum-realisasi
+                     posisi open (kalau ada posisi open) + P&L realized (saat posisi ditutup). -->
+                <div class="eh2-spark-wrap">
+                    <div class="eh2-spark-label"><span>📈 Trend Ekuitas Harian</span><span id="journalEquitySparkPct"></span></div>
+                    <div id="journalEquitySpark"></div>
+                </div>
                 <div class="eh2-stats-row" style="grid-template-columns:repeat(4,1fr);gap:5px;">
                     <div class="eh2-stat" style="padding:6px;">
                         <div class="eh2-stat-lbl">Modal</div>
@@ -11698,47 +11749,6 @@ async function saveIDBTelegramConfig(config) {
             </div>
         </div>
 
-        <!-- ══════════ SCREENER ══════════ -->
-        <div class="page" id="page-screener">
-            <div class="sec-head">
-                <div class="sec-title">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
-                    Screener Pro
-                </div>
-                <div class="sec-sub">Filter Bandarmologi, Teknikal &amp; Fundamental</div>
-            </div>
-            <div style="background:var(--card-bg);border:1px solid var(--border-light);padding:18px;border-radius:var(--radius-xl);margin-bottom:16px;box-shadow:var(--shadow-sm);">
-                <div class="filter-grid">
-                    <div class="col2">
-                        <label class="ctrl-lbl">Grup Konglomerat (Top 10 Terkaya)</label>
-                        <select class="ctrl-select" id="scOwner" onchange="updateKongInfo(this.value)">
-                            <option value="all">Semua Emiten (Bebas)</option>
-                            <option value="Prajogo Pangestu">1. Prajogo Pangestu</option>
-                            <option value="Low Tuck Kwong">2. Low Tuck Kwong</option>
-                            <option value="Hartono Bersaudara">3. R. Budi &amp; Michael Hartono</option>
-                            <option value="Widjaja Family">4. Keluarga Widjaja (Sinar Mas)</option>
-                            <option value="Anthoni Salim">5. Anthoni Salim (Salim Group)</option>
-                            <option value="Sri Prakash Lohia">6. Sri Prakash Lohia (Indorama)</option>
-                            <option value="Chairul Tanjung">7. Chairul Tanjung (CT Corp)</option>
-                            <option value="Susilo Wonowidjojo">8. Susilo Wonowidjojo (Gudang Garam)</option>
-                            <option value="Garibaldi Thohir">9. Garibaldi Thohir (Adaro)</option>
-                            <option value="Tahir">10. Dato' Sri Tahir (Mayapada)</option>
-                            <option value="BUMN">★ BUMN / Pemerintah RI</option>
-                        </select>
-                        <div id="scKongInfo" class="sc-kong-info"></div>
-                    </div>
-                    <div><label class="ctrl-lbl">Skor AI</label><select class="ctrl-select" id="scScore"><option value="0">Semua</option><option value="7" selected>≥ 7 (Buy)</option><option value="9">≥ 9 (Excellent)</option></select></div>
-                    <div><label class="ctrl-lbl">Bandarmologi</label><select class="ctrl-select" id="scBandar"><option value="all">Semua</option><option value="acc">Akumulasi</option><option value="dist">Distribusi</option></select></div>
-                    <div><label class="ctrl-lbl">Pola Candle</label><select class="ctrl-select" id="scCandle"><option value="all">Semua Pola</option><option value="hammer">Hammer / Reversal</option><option value="marubozu_bull">Bullish Marubozu</option></select></div>
-                    <div><label class="ctrl-lbl">MACD</label><select class="ctrl-select" id="scMACD"><option value="all">Semua</option><option value="bull">Bullish Cross</option></select></div>
-                    <div><label class="ctrl-lbl">Tren (MA20)</label><select class="ctrl-select" id="scMA"><option value="all">Semua</option><option value="above">Uptrend</option></select></div>
-                    <div><label class="ctrl-lbl">RSI</label><select class="ctrl-select" id="scRSI"><option value="all">Semua</option><option value="oversold">Oversold &lt;40</option></select></div>
-                </div>
-            </div>
-            <button class="run-btn btn-ripple" onclick="runScreener()">JALANKAN SCREENER</button>
-            <div style="margin-top:20px"><div id="scCount" style="font-size:13px;color:var(--primary);font-weight:800;margin-bottom:14px;text-transform:uppercase;letter-spacing:1px;"></div><div class="stock-list" id="scResults"></div></div>
-        </div>
-
         <!-- ══════════ HUB ══════════ -->
         <div class="page" id="page-hub">
             <div class="sec-head">
@@ -11825,6 +11835,7 @@ async function saveIDBTelegramConfig(config) {
                         <div><label class="ctrl-lbl">MACD</label><select class="ctrl-select" id="scMACDHub"><option value="all">Semua</option><option value="bull">Bullish</option></select></div>
                         <div><label class="ctrl-lbl">Tren (MA20)</label><select class="ctrl-select" id="scMAHub"><option value="all">Semua</option><option value="above">Uptrend</option></select></div>
                         <div><label class="ctrl-lbl">RSI</label><select class="ctrl-select" id="scRSIHub"><option value="all">Semua</option><option value="oversold">Oversold &lt;40</option></select></div>
+                        <div><label class="ctrl-lbl" title="Harga vs proksi arus dana (bandarmologi) berlawanan arah — sinyal dini potensi pembalikan">Divergensi</label><select class="ctrl-select" id="scDivergHub"><option value="all">Semua</option><option value="bullish">👀 Bullish Divergen</option><option value="bearish">⚠️ Bearish Divergen</option></select></div>
                     </div>
                 </div>
                 <button class="run-btn btn-ripple" onclick="runScreenerHub()">JALANKAN SCREENER</button>
@@ -11882,6 +11893,7 @@ async function saveIDBTelegramConfig(config) {
                     <div class="sub-tab btn-ripple" onclick="switchCalc('div',this)">Dividen</div>
                     <div class="sub-tab btn-ripple" onclick="switchCalc('mc',this)">Risk Sim</div>
                     <div class="sub-tab btn-ripple" onclick="switchCalc('scenario',this)">Skenario Makro</div>
+                    <div class="sub-tab btn-ripple" onclick="switchCalc('stress',this)">📉 Stress Test Porto</div>
                     <div class="sub-tab btn-ripple" onclick="switchCalc('fx',this)">💱 FX &amp; Inflasi</div>
                 </div>
                 <div class="calc-grid-layout">
@@ -12057,6 +12069,52 @@ async function saveIDBTelegramConfig(config) {
                             <div class="calc-grp" style="margin-bottom:6px;"><label class="calc-lbl">Multiplier Sensitivitas Emiten</label><select class="calc-inp" id="sc-sensitivity" onchange="calcScenario()"><option value="0.6">×0.6 — Defensif (consumer/utility)</option><option value="1" selected>×1.0 — Rata-rata pasar</option><option value="1.6">×1.6 — Sensitif (properti/perbankan/komoditas/leverage tinggi)</option></select></div>
                             <div style="font-size:9px;color:var(--t-low);margin-bottom:10px;line-height:1.5;">Angka × ini adalah <b>faktor pengali (multiplier)</b>: menentukan apakah dampak sentimen makro di atas <b>diperkuat</b> atau <b>diredam</b> saat sampai ke estimasi harga — sektor defensif meredam guncangan sentimen, sektor sensitif justru memperbesarnya.</div>
                             <div id="sc-result-wrap"></div>
+                        </div>
+                    </div>
+                    <div class="sub-pane" id="calc-stress">
+                        <div class="calc-section">
+                            <div class="calc-sec-title" style="display:flex;align-items:center;justify-content:space-between;">
+                                <span>📉 Portfolio Stress Testing</span>
+                                <button class="btn-ripple" onclick="refreshPortfolioStressTest()" title="Refresh harga pasar" style="background:var(--bg-elevated);border:1px solid var(--border-light);border-radius:8px;padding:5px 9px;font-size:11px;cursor:pointer;color:var(--t-hi);">🔄</button>
+                            </div>
+                            <div style="font-size:9.5px;color:var(--t-low);margin-bottom:14px;line-height:1.5;">Simulasikan skenario <b>IHSG anjlok</b> (atau rebound) lewat kolom di bawah — sistem akan menghitung estimasi dampaknya ke <b>setiap aset di Portofolio Anda</b>, berdasarkan harga beli, jumlah lot, dan harga pasar terkini yang sudah tersimpan, dikombinasikan dengan estimasi <b>sensitivitas sektor</b> (mirip konsep Beta) terhadap pasar. 100% dihitung lokal di perangkat — heuristik edukatif, bukan model risiko institusional (VaR) resmi.</div>
+
+                            <div class="calc-grp" style="margin-bottom:10px;">
+                                <label class="calc-lbl">Skenario Penurunan IHSG (%)</label>
+                                <input type="number" class="calc-inp" id="pst-ihsg-input" placeholder="-20" value="-20" step="1" oninput="pstSyncFromInput()">
+                            </div>
+                            <input type="range" min="-70" max="20" step="1" value="-20" id="pst-ihsg-slider" style="width:100%;margin-bottom:4px;accent-color:var(--dn);" oninput="pstSyncFromSlider()">
+                            <div class="pst-slider-scale"><span>-70%</span><span>Geser untuk simulasi cepat</span><span>+20%</span></div>
+
+                            <div class="pst-chip-row">
+                                <button type="button" class="pst-chip btn-ripple" data-val="-10" onclick="pstSetPreset(-10)">🟡 -10% Koreksi Wajar</button>
+                                <button type="button" class="pst-chip btn-ripple" data-val="-20" onclick="pstSetPreset(-20)">🟠 -20% Bear Market</button>
+                                <button type="button" class="pst-chip btn-ripple" data-val="-35" onclick="pstSetPreset(-35)">🔴 -35% Krisis (ala Covid-19)</button>
+                                <button type="button" class="pst-chip btn-ripple" data-val="-50" onclick="pstSetPreset(-50)">⚫ -50% Krisis Berat (ala 2008)</button>
+                            </div>
+
+                            <!-- ✅ v92: Kelola Portofolio langsung di halaman ini — tambah/hapus aset
+                                 tanpa perlu pindah ke Beli Cepat, biar simulasi bisa langsung jalan. -->
+                            <div class="pst-mgr" id="pst-mgr">
+                                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                                    <div style="font-size:11px;font-weight:800;color:var(--t-hi);text-transform:uppercase;letter-spacing:.5px;">📋 Portofolio Anda</div>
+                                    <span id="pst-mgr-count" style="font-size:9px;color:var(--t-low);font-weight:700;"></span>
+                                </div>
+                                <div class="pst-mgr-list" id="pst-mgr-list"></div>
+                                <div class="pst-mgr-add-row">
+                                    <input type="text" id="pst-add-ticker" class="pst-mgr-inp" style="text-transform:uppercase;max-width:96px;" placeholder="Kode, mis BBCA" maxlength="8" oninput="this.value=this.value.toUpperCase()" onblur="pstAutofillHarga()" onkeydown="if(event.key==='Enter'){pstAutofillHarga();document.getElementById('pst-add-lot').focus();}">
+                                    <input type="number" id="pst-add-lot" class="pst-mgr-inp" style="max-width:60px;" placeholder="Lot" min="1" onkeydown="if(event.key==='Enter')document.getElementById('pst-add-harga').focus()">
+                                    <input type="number" id="pst-add-harga" class="pst-mgr-inp" style="max-width:100px;" placeholder="Harga beli" onkeydown="if(event.key==='Enter')pstAddToPortfolio()">
+                                    <button type="button" class="pst-mgr-add-btn btn-ripple" onclick="pstAddToPortfolio()">+ Tambah</button>
+                                </div>
+                            </div>
+
+                            <div id="pst-summary-wrap"></div>
+                            <div id="pst-table-wrap"></div>
+
+                            <div style="font-size:9px;color:var(--t-low);margin-top:14px;line-height:1.6;padding:10px 12px;background:var(--card-bg);border:1px dashed var(--border-light);border-radius:var(--radius-md);">
+                                ⚠️ <b>Sensitivitas sektor</b> di sini adalah <b>heuristik umum</b> (Keuangan/Tambang/Energi/Infrastruktur = ×1.6 Sensitif, Konsumer/Kesehatan = ×0.6 Defensif, sektor lain = ×1.0 Netral) — <b>bukan Beta historis riil</b> per saham, dan mengasumsikan seluruh portofolio bergerak searah pasar. Kondisi aktual tiap emiten bisa sangat berbeda tergantung berita spesifik, likuiditas, dan fundamentalnya sendiri. Gunakan sebagai alat bantu manajemen risiko, bukan dasar keputusan tunggal.
+                            </div>
                         </div>
                     </div>
                     <div class="sub-pane" id="calc-fx">
@@ -12323,6 +12381,17 @@ async function saveIDBTelegramConfig(config) {
                             <div style="font-size:11px;color:var(--t-med);font-weight:600;margin-top:1px;">Versi, lisensi, disclaimer</div>
                         </div>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--t-low)" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                    </div>
+
+                    <div class="prof-menu-row btn-ripple" onclick="openProfSubPage('subpage-bantuan')" style="background:linear-gradient(135deg,rgba(20,184,166,0.08),transparent);border-color:rgba(20,184,166,0.25);">
+                        <div style="width:40px;height:40px;border-radius:12px;background:#14B8A6;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 14px rgba(20,184,166,0.35);">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="4.93" y1="4.93" x2="9.17" y2="9.17"/><line x1="14.83" y1="14.83" x2="19.07" y2="19.07"/><line x1="14.83" y1="9.17" x2="19.07" y2="4.93"/><line x1="4.93" y1="19.07" x2="9.17" y2="14.83"/></svg>
+                        </div>
+                        <div style="flex:1;min-width:0;">
+                            <div style="font-size:14px;font-weight:800;color:var(--t-hi);">Bantuan &amp; Pengaduan</div>
+                            <div style="font-size:11px;color:var(--t-med);font-weight:600;margin-top:1px;">Telegram, WhatsApp &amp; Customer Service</div>
+                        </div>
+                        <span style="background:#14B8A6;color:#fff;font-size:8px;font-weight:900;padding:3px 8px;border-radius:5px;font-family:'IBM Plex Mono',monospace;flex-shrink:0;">BARU</span>
                     </div>
 
                     <div class="prof-menu-row btn-ripple" onclick="openProfSubPage('subpage-dukungan')">
@@ -12823,15 +12892,26 @@ async function saveIDBTelegramConfig(config) {
                         </div>
                     </div>
                     <div style="margin-top:12px;">
-                        <div style="font-size:10px;font-weight:800;color:var(--t-med);margin-bottom:4px;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:0.5px;">GEMINI API KEY</div>
-                        <input type="text" class="tg-field" id="geminiApiKeyPage" placeholder="Tempel API key Gemini di sini..." oninput="onApiKeyInputPage('gemini')">
+                        <div style="font-size:10px;font-weight:800;color:var(--t-med);margin-bottom:4px;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:0.5px;">GEMINI API KEY — UTAMA</div>
+                        <input type="text" class="tg-field" id="geminiApiKeyPage" placeholder="Tempel API key Gemini utama di sini..." oninput="onApiKeyInputPage('gemini')">
+                    </div>
+                    <div style="margin-top:10px;">
+                        <div style="font-size:10px;font-weight:800;color:var(--t-med);margin-bottom:4px;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:0.5px;">GEMINI API KEY — CADANGAN 1 <span style="opacity:0.6;text-transform:none;letter-spacing:0;">(opsional)</span></div>
+                        <input type="text" class="tg-field" id="geminiApiKeyPage2" placeholder="Tempel API key Gemini cadangan 1..." oninput="onApiKeyInputPage('gemini2')">
+                    </div>
+                    <div style="margin-top:10px;">
+                        <div style="font-size:10px;font-weight:800;color:var(--t-med);margin-bottom:4px;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:0.5px;">GEMINI API KEY — CADANGAN 2 <span style="opacity:0.6;text-transform:none;letter-spacing:0;">(opsional)</span></div>
+                        <input type="text" class="tg-field" id="geminiApiKeyPage3" placeholder="Tempel API key Gemini cadangan 2..." oninput="onApiKeyInputPage('gemini3')">
+                    </div>
+                    <div style="margin-top:9px;padding:9px 11px;background:var(--bg-surface);border:1px dashed var(--border-light);border-radius:10px;font-size:10px;color:var(--t-low);font-weight:600;line-height:1.55;">
+                        ♻️ Kalau key utama kena limit harian/menit (umum di akun gratis), aplikasi <b>otomatis lompat ke key cadangan</b> — tidak perlu ganti manual. Daftarkan tiap key dari akun Google terpisah supaya jatah gratisnya independen satu sama lain.
                     </div>
                     <button class="tg-save-btn btn-ripple" onclick="saveGeminiApiKeyPage()" style="margin-top:12px;">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:6px;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
                         Simpan Key Gemini
                     </button>
                     <button class="tg-test-btn btn-ripple" onclick="testGeminiApiKeyPage()">✨ Tes Koneksi Gemini</button>
-                    <button class="tg-disconnect-btn btn-ripple" onclick="disconnectGeminiApiKeyPage()">✕ Hapus Key Gemini</button>
+                    <button class="tg-disconnect-btn btn-ripple" onclick="disconnectGeminiApiKeyPage()">✕ Hapus Semua Key Gemini</button>
                     <div class="tg-status" id="geminiStatusMsgPage"></div>
                 </div>
 
@@ -12872,7 +12952,7 @@ async function saveIDBTelegramConfig(config) {
                     <div class="prof-sec-block-title">💰 Dana Yang Dialokasikan</div>
                     <div class="aloc-dana-row">
                         <span class="aloc-dana-prefix">Rp</span>
-                        <input type="number" inputmode="numeric" class="aloc-dana-input" id="alocDanaInput" placeholder="0" min="0" step="100000">
+                        <input type="text" inputmode="numeric" class="aloc-dana-input" id="alocDanaInput" placeholder="0" oninput="formatRibuanInput(this)">
                     </div>
                     <div class="aloc-dana-hint">Default diambil dari Total Saldo Jurnal kamu — bisa diubah bebas sesuai dana yang mau dialokasikan.</div>
                 </div>
@@ -13110,9 +13190,12 @@ async function saveIDBTelegramConfig(config) {
                         </div>
 
                         <div style="margin-top:6px;">
-                            <div style="font-size:10px;font-weight:800;color:var(--t-med);margin-bottom:4px;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:0.5px;">GEMINI API KEY (dipakai bersama kedua sesi)</div>
+                            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px;">
+                                <div style="font-size:10px;font-weight:800;color:var(--t-med);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:0.5px;">GEMINI API KEY (dipakai bersama kedua sesi)</div>
+                                <button type="button" class="btn-ripple" onclick="copyMainGeminiKeyToBrief()" style="flex-shrink:0;font-size:9px;font-weight:800;color:#8B5CF6;background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.3);border-radius:6px;padding:3px 8px;cursor:pointer;white-space:nowrap;">↺ Pakai key Bot AI</button>
+                            </div>
                             <input type="password" class="tg-field" id="tgGeminiApiKeyPage" placeholder="AQ.Ab... (key baru) atau AIzaSy... (key lama)" oninput="onTgGeminiKeyInputPage()" autocomplete="off">
-                            <div style="font-size:9px;color:var(--t-low);font-weight:600;margin-top:4px;">Gratis — key biasanya diawali <b>AQ.</b> (format terbaru) atau <b>AIza</b> (format lama, masih didukung). Wajib diisi utk sesi Pembukaan; opsional utk komentar AI di sesi Penutupan.</div>
+                            <div style="font-size:9px;color:var(--t-low);font-weight:600;margin-top:4px;">Gratis — key biasanya diawali <b>AQ.</b> (format terbaru) atau <b>AIza</b> (format lama, masih didukung). Wajib diisi utk sesi Pembukaan; opsional utk komentar AI di sesi Penutupan. <b>Sengaja terpisah</b> dari key di Akun → Bot AI karena key ini dikirim ke server (Google Sheets) supaya briefing tetap jalan walau HP mati — tap tombol di atas buat isi otomatis pakai key utama yang sama.</div>
                         </div>
 
                         <div style="margin-top:10px;">
@@ -13685,6 +13768,87 @@ async function saveIDBTelegramConfig(config) {
                 </div>
             </div>
 
+            <!-- ══ SUB-PAGE: BANTUAN & PENGADUAN (v93) ══ -->
+            <div id="subpage-bantuan" class="prof-subpage" style="display:none;">
+                <div class="prof-subpage-head">
+                    <button class="prof-back-btn btn-ripple" onclick="closeProfSubPage()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+                    </button>
+                    <span>Bantuan &amp; Pengaduan</span>
+                </div>
+
+                <div style="padding-bottom:30px;">
+                    <div class="gd-intro-card" style="background:linear-gradient(160deg,#0D9488 0%,#0F766E 60%,#14B8A6 100%);">
+                        <div class="gd-intro-title">🙋 Butuh Bantuan?</div>
+                        <div class="gd-intro-desc">Gabung saluran &amp; grup resmi untuk update dan diskusi, atau langsung hubungi Customer Service kalau ada bug, error, atau pertanyaan cara pakai.</div>
+                    </div>
+
+                    <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:900;color:var(--t-hi);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">Kanal Resmi</div>
+
+                    <div class="support-tier btn-ripple" onclick="openHelpTelegramChannel()">
+                        <div class="support-tier-badge" style="background:rgba(44,165,224,0.12);border:1px solid rgba(44,165,224,0.25);">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2CA5E0" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.11 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21 16a2 2 0 0 1 1 .92z"/></svg>
+                        </div>
+                        <div style="flex:1;">
+                            <div style="font-size:14px;font-weight:800;color:var(--t-hi);">Saluran Telegram</div>
+                            <div style="font-size:11px;color:var(--t-med);margin-top:2px;">Update fitur, alert &amp; pengumuman resmi</div>
+                        </div>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2CA5E0" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                    </div>
+
+                    <div class="support-tier btn-ripple" onclick="openHelpWhatsAppGroup()">
+                        <div class="support-tier-badge" style="background:rgba(37,211,102,0.12);border:1px solid rgba(37,211,102,0.25);">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="#25D366" stroke="none"><path d="M12.04 2c-5.52 0-10 4.48-10 10 0 1.77.46 3.45 1.27 4.9L2 22l5.25-1.38a9.96 9.96 0 0 0 4.79 1.22h.01c5.52 0 10-4.48 10-10s-4.48-10-10.01-10zm5.86 14.29c-.25.7-1.24 1.29-1.98 1.44-.53.11-1.22.2-3.55-.76-2.98-1.23-4.9-4.24-5.05-4.44-.15-.2-1.21-1.61-1.21-3.07s.75-2.17 1.02-2.47c.25-.28.55-.35.73-.35.18 0 .37 0 .53.01.17.01.4-.06.62.48.25.6.85 2.07.92 2.22.07.15.12.33.02.53-.13.28-.2.45-.4.7-.2.24-.42.54-.6.72-.2.2-.41.42-.18.82.24.4 1.05 1.72 2.24 2.79 1.55 1.38 2.85 1.81 3.26 2.01.4.2.64.17.87-.1.24-.28.99-1.15 1.26-1.55.26-.4.53-.33.9-.2.36.13 2.31 1.09 2.71 1.29.4.2.66.3.76.46.1.17.1.94-.24 1.86z"/></svg>
+                        </div>
+                        <div style="flex:1;">
+                            <div style="font-size:14px;font-weight:800;color:var(--t-hi);">Grup WhatsApp</div>
+                            <div style="font-size:11px;color:var(--t-med);margin-top:2px;">Diskusi &amp; tanya jawab bareng sesama pengguna</div>
+                        </div>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#25D366" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                    </div>
+
+                    <div class="support-tier btn-ripple" onclick="openHelpCS()" style="border-color:rgba(37,211,102,0.35);background:rgba(37,211,102,0.04);">
+                        <div class="support-tier-badge" style="background:rgba(37,211,102,0.18);border:1px solid rgba(37,211,102,0.35);">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#25D366" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11a9 9 0 0 1 18 0v6a3 3 0 0 1-3 3h-1"/><path d="M21 11v3a2 2 0 0 1-2 2h-1v-6h1a2 2 0 0 1 2 1z"/><path d="M3 11v3a2 2 0 0 0 2 2h1v-6H5a2 2 0 0 0-2 1z"/></svg>
+                        </div>
+                        <div style="flex:1;">
+                            <div style="font-size:14px;font-weight:800;color:var(--t-hi);">Customer Service</div>
+                            <div style="font-size:11px;color:var(--t-med);margin-top:2px;">Chat langsung untuk bantuan cepat</div>
+                        </div>
+                        <span style="background:rgba(37,211,102,0.18);color:#25D366;font-size:8px;font-weight:900;padding:2px 7px;border-radius:4px;font-family:'IBM Plex Mono',monospace;">CHAT WA</span>
+                    </div>
+
+                    <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:900;color:var(--t-hi);text-transform:uppercase;letter-spacing:0.5px;margin:20px 0 10px;display:flex;align-items:center;gap:7px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+                        Laporkan Masalah
+                    </div>
+
+                    <div style="background:var(--card-bg);border:1px solid var(--border-light);border-radius:var(--radius-lg);padding:14px 16px;">
+                        <div style="font-size:11px;color:var(--t-med);font-weight:600;line-height:1.55;margin-bottom:12px;">Pilih kategori, ceritakan masalahnya, lalu kirim langsung ke Customer Service via WhatsApp — lengkap dengan info waktu &amp; perangkat Anda supaya lebih cepat ditangani.</div>
+
+                        <div class="gd-quicklinks" id="helpCatChips" style="margin-bottom:12px;">
+                            <span class="gd-quicklink" onclick="helpSelectCategory('bug', this)">🐛 Bug / Error</span>
+                            <span class="gd-quicklink" onclick="helpSelectCategory('howto', this)">❓ Cara Penggunaan</span>
+                            <span class="gd-quicklink" onclick="helpSelectCategory('saran', this)">💡 Saran Fitur</span>
+                            <span class="gd-quicklink" onclick="helpSelectCategory('lain', this)">📋 Lainnya</span>
+                        </div>
+
+                        <label class="trade-inp-lbl">Ceritakan Detailnya</label>
+                        <textarea class="trade-inp" id="helpReportDesc" placeholder="Contoh: Chart BBCA tidak muncul, sudah dicoba refresh tapi tetap blank..." rows="4" style="resize:vertical;min-height:90px;font-family:inherit;margin-bottom:12px;"></textarea>
+
+                        <button class="tg-save-btn btn-ripple" onclick="helpSubmitReport('wa')" style="background:#25D366;display:flex;align-items:center;justify-content:center;gap:8px;">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="#fff" stroke="none"><path d="M12.04 2c-5.52 0-10 4.48-10 10 0 1.77.46 3.45 1.27 4.9L2 22l5.25-1.38a9.96 9.96 0 0 0 4.79 1.22h.01c5.52 0 10-4.48 10-10s-4.48-10-10.01-10zm5.86 14.29c-.25.7-1.24 1.29-1.98 1.44-.53.11-1.22.2-3.55-.76-2.98-1.23-4.9-4.24-5.05-4.44-.15-.2-1.21-1.61-1.21-3.07s.75-2.17 1.02-2.47c.25-.28.55-.35.73-.35.18 0 .37 0 .53.01.17.01.4-.06.62.48.25.6.85 2.07.92 2.22.07.15.12.33.02.53-.13.28-.2.45-.4.7-.2.24-.42.54-.6.72-.2.2-.41.42-.18.82.24.4 1.05 1.72 2.24 2.79 1.55 1.38 2.85 1.81 3.26 2.01.4.2.64.17.87-.1.24-.28.99-1.15 1.26-1.55.26-.4.53-.33.9-.2.36.13 2.31 1.09 2.71 1.29.4.2.66.3.76.46.1.17.1.94-.24 1.86z"/></svg>
+                            Kirim Laporan via WhatsApp
+                        </button>
+                        <button class="tg-test-btn btn-ripple" onclick="helpSubmitReport('copy')">📋 Salin Teks Laporan</button>
+                    </div>
+
+                    <div style="text-align:center;margin-top:14px;font-size:10px;color:var(--t-low);font-weight:600;line-height:1.6;padding:0 10px;">
+                        Laporan otomatis dilengkapi kategori, waktu, dan info perangkat Anda — supaya tim SobatInves bisa membantu lebih cepat &amp; akurat.
+                    </div>
+                </div>
+            </div>
+
         </div>
     </main>
 
@@ -14192,7 +14356,15 @@ async function saveIDBTelegramConfig(config) {
         function getFmpApiKey() { return lsGet('si_fmp_key', '') || ''; }
         function getGeminiApiKey() { return lsGet('si_gemini_key', '') || ''; }
         function hasFmpKey() { return getFmpApiKey().trim().length > 0; }
-        function hasGeminiKey() { return getGeminiApiKey().trim().length > 0; }
+        // ✅ v90: Gemini kini bisa punya sampai 3 API key (1 utama + 2 cadangan), disimpan
+        // terpisah supaya kalau key utama kena limit harian/menit (umum di free tier),
+        // callGemini() otomatis lompat ke key cadangan berikutnya tanpa perlu campur tangan
+        // pengguna. GEMINI_KEY_STORAGE_KEYS urutannya = prioritas pemakaian.
+        const GEMINI_KEY_STORAGE_KEYS = ['si_gemini_key', 'si_gemini_key_2', 'si_gemini_key_3'];
+        function getGeminiApiKeys() {
+            return GEMINI_KEY_STORAGE_KEYS.map(k => (lsGet(k, '') || '').trim()).filter(Boolean);
+        }
+        function hasGeminiKey() { return getGeminiApiKeys().length > 0; }
         // ✅ v86 FIX — ROOT CAUSE dari sebagian key baru "AQ." (Auth Key) balas
         // 401 ACCESS_TOKEN_TYPE_UNSUPPORTED padahal key-nya valid & aktif: key TIDAK
         // LAGI disisipkan di query string URL ("?key=..."). Sesuai dokumentasi resmi
@@ -14301,61 +14473,76 @@ async function saveIDBTelegramConfig(config) {
             return t.trim();
         }
 
+        // ✅ v90: callGemini() sekarang failover dua lapis — untuk TIAP key Gemini yang
+        // terpasang (utama → cadangan 1 → cadangan 2), coba semua model fallback di
+        // GEMINI_MODELS satu-satu. Kalau sebuah key balas 401/403 (key salah/nonaktif),
+        // langsung lompat ke key berikutnya (percuma coba model lain dgn key yang sama).
+        // Kalau balas 429/404/5xx, tetap coba model lain dulu dgn key yang sama sebelum
+        // pindah key — supaya kuota key yang masih valid tidak boros dilompati sia-sia.
         async function callGemini(prompt, opts) {
             opts = opts || {};
-            if (!hasGeminiKey()) throw new Error('Belum ada API key Gemini. Pasang dulu di Akun → Bot AI — FMP & Gemini.');
+            const keys = getGeminiApiKeys();
+            if (!keys.length) throw new Error('Belum ada API key Gemini. Pasang dulu di Akun → Bot AI — FMP & Gemini.');
 
             let lastErr = null;
-            for (let i = 0; i < GEMINI_MODELS.length; i++) {
-                const model = GEMINI_MODELS[i];
-                try {
-                    const res = await fetch(getGeminiUrl(model), {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': getGeminiApiKey() },
-                        body: JSON.stringify({
-                            contents: [{ role: 'user', parts: [{ text: prompt }] }],
-                            generationConfig: {
-                                temperature: opts.temperature != null ? opts.temperature : 0.85,
-                                maxOutputTokens: opts.maxTokens || 2048,
-                                topP: 0.95
+            for (let k = 0; k < keys.length; k++) {
+                const apiKey = keys[k];
+                const keyTag = keys.length > 1 ? ' (key #' + (k + 1) + ' dari ' + keys.length + ')' : '';
+                let keyInvalid = false;
+                for (let i = 0; i < GEMINI_MODELS.length; i++) {
+                    const model = GEMINI_MODELS[i];
+                    try {
+                        const res = await fetch(getGeminiUrl(model), {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
+                            body: JSON.stringify({
+                                contents: [{ role: 'user', parts: [{ text: prompt }] }],
+                                generationConfig: {
+                                    temperature: opts.temperature != null ? opts.temperature : 0.85,
+                                    maxOutputTokens: opts.maxTokens || 2048,
+                                    topP: 0.95
+                                }
+                            })
+                        });
+                        if (!res.ok) {
+                            let raw = '';
+                            try { raw = (await res.json()).error?.message || ''; } catch (e) {}
+                            // Terjemahkan status HTTP jadi pesan yang benar-benar menjelaskan akar masalah,
+                            // bukan cuma angka status mentah.
+                            let friendly;
+                            if (res.status === 401 || res.status === 403) {
+                                friendly = 'API key Gemini' + keyTag + ' salah / tidak valid / belum diaktifkan untuk Generative Language API. Cek lagi key-nya di Google AI Studio.';
+                            } else if (res.status === 404) {
+                                friendly = 'Model "' + model + '" tidak tersedia untuk key' + keyTag + ' (mungkin baru dipensiunkan Google).';
+                            } else if (res.status === 429) {
+                                friendly = 'Kuota/rate-limit Gemini' + keyTag + ' untuk model "' + model + '" habis untuk saat ini (free tier punya limit request per menit & per hari).';
+                            } else if (res.status >= 500) {
+                                friendly = 'Server Gemini sedang bermasalah (model "' + model + '").';
+                            } else {
+                                friendly = 'Gemini HTTP ' + res.status + (raw ? (' — ' + raw) : '');
                             }
-                        })
-                    });
-                    if (!res.ok) {
-                        let raw = '';
-                        try { raw = (await res.json()).error?.message || ''; } catch (e) {}
-                        // Terjemahkan status HTTP jadi pesan yang benar-benar menjelaskan akar masalah,
-                        // bukan cuma angka status mentah.
-                        let friendly;
-                        if (res.status === 401 || res.status === 403) {
-                            friendly = 'API key Gemini salah / tidak valid / belum diaktifkan untuk Generative Language API. Cek lagi key-nya di Google AI Studio.';
-                        } else if (res.status === 404) {
-                            friendly = 'Model "' + model + '" tidak tersedia untuk key ini (mungkin baru dipensiunkan Google).';
-                        } else if (res.status === 429) {
-                            friendly = 'Kuota/rate-limit Gemini untuk model "' + model + '" habis untuk saat ini (free tier punya limit request per menit & per hari).';
-                        } else if (res.status >= 500) {
-                            friendly = 'Server Gemini sedang bermasalah (model "' + model + '").';
-                        } else {
-                            friendly = 'Gemini HTTP ' + res.status + (raw ? (' — ' + raw) : '');
+                            lastErr = new Error(friendly + (raw && res.status !== 401 && res.status !== 403 ? ' (' + raw + ')' : ''));
+                            // 401/403 = key ini benar-benar salah, tidak ada gunanya coba model lain dengan
+                            // key yang sama — tandai supaya langsung lompat ke key berikutnya (kalau ada).
+                            if (res.status === 401 || res.status === 403) { keyInvalid = true; break; }
+                            continue; // 404/429/5xx → coba model fallback berikutnya dulu dgn key yang sama
                         }
-                        lastErr = new Error(friendly + (raw && res.status !== 401 && res.status !== 403 ? ' (' + raw + ')' : ''));
-                        // 401/403 = key benar-benar salah, tidak ada gunanya coba model lain dengan key yang sama
-                        if (res.status === 401 || res.status === 403) throw lastErr;
-                        continue; // 404/429/5xx → coba model fallback berikutnya
+                        const data = await res.json();
+                        const cand = data && data.candidates && data.candidates[0];
+                        if (cand && cand.finishReason === 'SAFETY') throw new Error('Respons diblokir filter keamanan Gemini.');
+                        const text = cand && cand.content && cand.content.parts ? cand.content.parts.map(p => p.text || '').join('\n') : '';
+                        if (!text) { lastErr = new Error('Model "' + model + '" tidak mengembalikan teks (kemungkinan output token habis — coba lagi).'); continue; }
+                        if (k > 0) console.info('[Gemini] Key utama gagal/limit — berhasil pakai key cadangan #' + k + '.');
+                        return normalizeAiText(text); // ✅ v82 FIX — beberapa model Gemini kadang balikin baris baru sebagai teks literal "\n" (2 karakter: backslash+n) alih-alih karakter newline asli, terutama kalau modelnya "kebiasaan" mikir gaya JSON. Kalau ini tidak dinormalisasi, extractAiVerdictTag() & renderLiteMarkdown() (yang keduanya split/cari berdasar newline ASLI) gagal total: seluruh respons ketarik jadi SATU baris raksasa dan tampil sebagai teks "\n" mentah di kotak Kesimpulan Tindakan (persis bug yang dilaporkan pengguna). normalizeAiText() didefinisikan di bawah, dipanggil di SINI (satu titik) supaya semua pemakai aiText (verdict box, markdown, copy, PDF, TTS) otomatis kebagian teks yang sudah bersih.
+                    } catch (fetchErr) {
+                        lastErr = fetchErr;
+                        if (fetchErr && /Respons diblokir filter keamanan/.test(fetchErr.message || '')) throw fetchErr;
+                        continue;
                     }
-                    const data = await res.json();
-                    const cand = data && data.candidates && data.candidates[0];
-                    if (cand && cand.finishReason === 'SAFETY') throw new Error('Respons diblokir filter keamanan Gemini.');
-                    const text = cand && cand.content && cand.content.parts ? cand.content.parts.map(p => p.text || '').join('\n') : '';
-                    if (!text) { lastErr = new Error('Model "' + model + '" tidak mengembalikan teks (kemungkinan output token habis — coba lagi).'); continue; }
-                    return normalizeAiText(text); // ✅ v82 FIX — beberapa model Gemini kadang balikin baris baru sebagai teks literal "\n" (2 karakter: backslash+n) alih-alih karakter newline asli, terutama kalau modelnya "kebiasaan" mikir gaya JSON. Kalau ini tidak dinormalisasi, extractAiVerdictTag() & renderLiteMarkdown() (yang keduanya split/cari berdasar newline ASLI) gagal total: seluruh respons ketarik jadi SATU baris raksasa dan tampil sebagai teks "\n" mentah di kotak Kesimpulan Tindakan (persis bug yang dilaporkan pengguna). normalizeAiText() didefinisikan di bawah, dipanggil di SINI (satu titik) supaya semua pemakai aiText (verdict box, markdown, copy, PDF, TTS) otomatis kebagian teks yang sudah bersih.
-                } catch (fetchErr) {
-                    lastErr = fetchErr;
-                    if (fetchErr && /API key Gemini salah/.test(fetchErr.message || '')) throw fetchErr;
-                    continue;
+                    if (keyInvalid) break;
                 }
             }
-            throw lastErr || new Error('Gemini gagal dihubungi — semua model fallback gagal.');
+            throw lastErr || new Error('Gemini gagal dihubungi — semua key & model fallback gagal.');
         }
 
         // Render markdown ringan (**bold**, ## heading, - bullet, garis baru) jadi HTML aman
@@ -14631,6 +14818,119 @@ async function saveIDBTelegramConfig(config) {
             } catch (e) { /* silent — jangan pernah crash alur notifikasi utama */ }
         }
 
+        // ─────────────────────────────────────────────────────────────
+        // ✅ v93 — BANTUAN & PENGADUAN (Akun → Bantuan & Pengaduan)
+        // ─────────────────────────────────────────────────────────────
+        // ⚠️ WAJIB DIGANTI sebelum rilis: 3 nilai di bawah ini masih PLACEHOLDER.
+        // 1) HELP_TELEGRAM_CHANNEL_URL — link publik saluran Telegram resmi (yang
+        //    bisa di-join siapa saja), BUKAN chat ID broadcast privat di atas.
+        //    Contoh: 'https://t.me/sobatinves_official'
+        // 2) HELP_WHATSAPP_GROUP_URL — link invite grup WhatsApp resmi.
+        //    Contoh: 'https://chat.whatsapp.com/ABCDEFGHIJKLMNOPQR'
+        // 3) HELP_CS_WHATSAPP_NUMBER — nomor WA Customer Service, format
+        //    62xxxxxxxxxxx (kode negara 62, TANPA tanda +, spasi, atau strip).
+        const HELP_TELEGRAM_CHANNEL_URL = 'https://t.me/GANTI_DENGAN_USERNAME_SALURAN';
+        const HELP_WHATSAPP_GROUP_URL = 'https://chat.whatsapp.com/GANTI_DENGAN_KODE_INVITE';
+        const HELP_CS_WHATSAPP_NUMBER = '628000000000';
+
+        let helpSelectedCategory = null;
+
+        // Ringkasan OS + browser (bukan info pribadi) — membantu CS mendiagnosis
+        // masalah tanpa perlu tanya-jawab bolak-balik dengan pengguna.
+        function helpDeviceInfo() {
+            try {
+                const ua = navigator.userAgent || '';
+                let os = 'OS lain';
+                if (/Android/i.test(ua)) os = 'Android';
+                else if (/iPhone|iPad|iPod/i.test(ua)) os = 'iOS';
+                else if (/Windows/i.test(ua)) os = 'Windows';
+                else if (/Mac OS/i.test(ua)) os = 'macOS';
+                else if (/Linux/i.test(ua)) os = 'Linux';
+                let browser = 'Browser lain';
+                if (/Edg/i.test(ua)) browser = 'Edge';
+                else if (/OPR|Opera/i.test(ua)) browser = 'Opera';
+                else if (/Chrome/i.test(ua)) browser = 'Chrome';
+                else if (/Firefox/i.test(ua)) browser = 'Firefox';
+                else if (/Safari/i.test(ua)) browser = 'Safari';
+                return os + ' · ' + browser;
+            } catch (e) { return 'Tidak diketahui'; }
+        }
+
+        function helpSelectCategory(cat, el) {
+            helpSelectedCategory = cat;
+            document.querySelectorAll('#helpCatChips .gd-quicklink').forEach(c => c.classList.remove('active'));
+            if (el) el.classList.add('active');
+            playAudioFeedback('click');
+        }
+
+        function helpCategoryLabel(cat) {
+            const labels = { bug: '🐛 Bug / Error', howto: '❓ Cara Penggunaan', saran: '💡 Saran Fitur', lain: '📋 Lainnya' };
+            return labels[cat] || '(belum dipilih)';
+        }
+
+        function helpBuildReportText(desc) {
+            const now = new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
+            return '📋 *LAPORAN PENGGUNA SOBATINVES*\n\n' +
+                'Kategori: ' + helpCategoryLabel(helpSelectedCategory) + '\n' +
+                'Pesan:\n' + desc + '\n\n' +
+                '—\n' +
+                'App: SobatInves (Web PWA)\n' +
+                'Waktu: ' + now + ' WIB\n' +
+                'Perangkat: ' + helpDeviceInfo();
+        }
+
+        function resetHelpReportForm() {
+            helpSelectedCategory = null;
+            document.querySelectorAll('#helpCatChips .gd-quicklink').forEach(c => c.classList.remove('active'));
+            const descEl = document.getElementById('helpReportDesc');
+            if (descEl) descEl.value = '';
+        }
+
+        function helpSubmitReport(mode) {
+            try {
+                if (!helpSelectedCategory) {
+                    showToast('Pilih kategori pengaduan dulu ya 🙏', 'warn');
+                    return;
+                }
+                const descEl = document.getElementById('helpReportDesc');
+                const desc = descEl ? descEl.value.trim() : '';
+                if (!desc) {
+                    showToast('Tulis dulu detail masalah/pertanyaan Anda', 'warn');
+                    if (descEl) descEl.focus();
+                    return;
+                }
+                const fullText = helpBuildReportText(desc);
+                if (mode === 'wa') {
+                    window.open('https://wa.me/' + HELP_CS_WHATSAPP_NUMBER + '?text=' + encodeURIComponent(fullText), '_blank', 'noopener,noreferrer');
+                    showToast('Membuka WhatsApp Customer Service...', 'success');
+                } else if (mode === 'copy') {
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(fullText)
+                            .then(() => showToast('Teks laporan disalin ke clipboard ✓', 'success'))
+                            .catch(() => showToast('Gagal menyalin — coba lagi', 'error'));
+                    } else {
+                        showToast('Clipboard tidak didukung di browser ini.', 'warn');
+                    }
+                }
+            } catch (e) { console.warn('helpSubmitReport error:', e); }
+        }
+
+        function openHelpTelegramChannel() {
+            window.open(HELP_TELEGRAM_CHANNEL_URL, '_blank', 'noopener,noreferrer');
+            playAudioFeedback('click');
+        }
+
+        function openHelpWhatsAppGroup() {
+            window.open(HELP_WHATSAPP_GROUP_URL, '_blank', 'noopener,noreferrer');
+            playAudioFeedback('click');
+        }
+
+        function openHelpCS() {
+            const greet = 'Halo Admin SobatInves, saya butuh bantuan.';
+            window.open('https://wa.me/' + HELP_CS_WHATSAPP_NUMBER + '?text=' + encodeURIComponent(greet), '_blank', 'noopener,noreferrer');
+            playAudioFeedback('click');
+        }
+
         function lsGet(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } }
 
         function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
@@ -14650,6 +14950,19 @@ async function saveIDBTelegramConfig(config) {
         function n2(n) { return (Number(n) || 0).toLocaleString('id-ID'); }
 
         function rp(n) { return 'Rp ' + n2(n); }
+
+        // ✅ v90: Input angka besar (mis. dana Alokasi Portofolio AI) diformat otomatis
+        // pakai pemisah ribuan ala Rupiah ("120.000.000") SELAGI diketik, supaya nominal
+        // besar gampang dibaca & tidak salah hitung digit. parseRibuan() dipakai tiap kali
+        // butuh nilai numerik mentahnya kembali (localStorage, perhitungan, dst).
+        function parseRibuan(val) { return parseInt(String(val == null ? '' : val).replace(/[^\d]/g, ''), 10) || 0; }
+        function formatRibuanInput(el) {
+            if (!el) return 0;
+            const raw = String(el.value || '').replace(/[^\d]/g, '').replace(/^0+(?=\d)/, '');
+            const num = raw ? parseInt(raw, 10) || 0 : 0;
+            el.value = raw ? num.toLocaleString('id-ID') : '';
+            return num;
+        }
 
         function fmtBig(n) { n = Number(n) || 0; if (n >= 1e12) return 'Rp ' + (n / 1e12).toFixed(2) + 'T'; if (n >= 1e9)
                 return 'Rp ' + (n / 1e9).toFixed(1) + 'M'; if (n >= 1e6) return 'Rp ' + (n / 1e6).toFixed(1) + 'Jt'; return rp(
@@ -21109,6 +21422,7 @@ Tulis singkat (maks 200 kata): 1-2 kalimat ringkasan kondisi, poin valuasi, poin
             if (id === 'hw') populateWajarSelect();
             if (id === 'mc') populateMCSelect();
             if (id === 'fx') initFxRisk();
+            if (id === 'stress') initPortfolioStressTest();
             if (navigator.vibrate) navigator.vibrate(15);
         }
 
@@ -21452,6 +21766,235 @@ Tulis singkat (maks 200 kata): 1-2 kalimat ringkasan kondisi, poin valuasi, poin
                 <div style="margin-top:10px;">${sgdCard}</div>
                 <div style="padding:10px 12px;background:var(--card-bg);border:1px dashed var(--border-light);border-radius:var(--radius-md);font-size:9px;color:var(--t-low);font-weight:700;line-height:1.6;margin-top:10px;">
                     ⚠️ "Efek Kurs" dihitung dari selisih Kurs Beli vs kurs saat ini — kosongkan Kurs Beli dan efek kurs otomatis 0% (murni menampilkan efek inflasi). Return Riil pakai rumus Fisher: (1+return)/(1+inflasi)−1. Data IHSG/kurs real-time dari TradingView, inflasi diisi manual berdasar rilis resmi terakhir — bukan nasihat keuangan.
+                </div>`;
+        }
+
+        // ═══════════════════════════════════════
+        // v91 — PORTFOLIO STRESS TESTING: simulasi skenario penurunan/kenaikan
+        // IHSG (kolom input manual, mandiri) dan estimasi dampaknya ke TIAP ASET
+        // di Portofolio (portfolio[]), berdasarkan heuristik "sensitivitas sektor"
+        // (mirip konsep Beta) terhadap pergerakan pasar. 100% dihitung lokal di
+        // perangkat, memakai data portfolio[] (harga beli & lot yang tersimpan)
+        // dikombinasikan dengan allStocks[] (harga & sektor live real-time) —
+        // pola pengambilan data sama persis seperti populateFxRiskFromPortfolio().
+        // ═══════════════════════════════════════
+        const PST_SECTOR_SENSITIVITY = {
+            'Finance': 1.6, 'Mining': 1.6, 'Energy': 1.6, 'Infrastructure': 1.6,
+            'Consumer': 0.6, 'Healthcare': 0.6,
+            'Technology': 1.0
+        };
+        function pstSensitivityOf(sectorRaw) {
+            // Cocokkan substring — field `sector` dari TradingView scanner sering
+            // berupa frasa panjang (mis. "Technology Services"), pola sama seperti
+            // sectorDesc di loadModalProfil() & sectorETFMap di loadModalETF().
+            const sector = String(sectorRaw || '');
+            const key = Object.keys(PST_SECTOR_SENSITIVITY).find(k => sector.includes(k));
+            return key ? PST_SECTOR_SENSITIVITY[key] : 1.0; // default: sensitivitas rata-rata pasar
+        }
+        function pstSensitivityLabel(mult) {
+            if (mult >= 1.6) return { txt: 'Sensitif', color: 'var(--dn)' };
+            if (mult <= 0.6) return { txt: 'Defensif', color: 'var(--up)' };
+            return { txt: 'Netral', color: 'var(--warn)' };
+        }
+        function pstUpdateActiveChip(val) {
+            document.querySelectorAll('.pst-chip').forEach(c => c.classList.toggle('active', +c.dataset.val === val));
+        }
+        function pstSetPreset(val) {
+            const inp = document.getElementById('pst-ihsg-input'), sl = document.getElementById('pst-ihsg-slider');
+            if (inp) inp.value = val;
+            if (sl) sl.value = Math.max(+sl.min, Math.min(+sl.max, val));
+            pstUpdateActiveChip(val);
+            runPortfolioStressTest();
+            if (navigator.vibrate) navigator.vibrate(15);
+        }
+        function pstSyncFromInput() {
+            const inp = document.getElementById('pst-ihsg-input'), sl = document.getElementById('pst-ihsg-slider');
+            const v = parseFloat(inp.value);
+            if (sl && !isNaN(v)) sl.value = Math.max(+sl.min, Math.min(+sl.max, v));
+            pstUpdateActiveChip(v);
+            runPortfolioStressTest();
+        }
+        function pstSyncFromSlider() {
+            const inp = document.getElementById('pst-ihsg-input'), sl = document.getElementById('pst-ihsg-slider');
+            if (inp) inp.value = sl.value;
+            pstUpdateActiveChip(+sl.value);
+            runPortfolioStressTest();
+        }
+        function initPortfolioStressTest() {
+            pstUpdateActiveChip(parseFloat(document.getElementById('pst-ihsg-input')?.value) || 0);
+            pstRenderPortoList();
+            runPortfolioStressTest();
+        }
+        function refreshPortfolioStressTest() {
+            if (!allStocks.length) { showToast('Menunggu data pasar...', 'warn'); return; }
+            pstRenderPortoList();
+            runPortfolioStressTest();
+            showToast('Harga portofolio diperbarui! 🎉', 'success');
+            if (navigator.vibrate) navigator.vibrate([20, 10, 20]);
+        }
+
+        // ─── v92: KELOLA PORTOFOLIO LANGSUNG DI STRESS TESTING ─────────────────
+        // Supaya pengguna tidak perlu pindah halaman ke Beli Cepat cuma untuk bisa
+        // menjalankan simulasi. Menulis ke array `portfolio` global yang sama dengan
+        // yang dipakai Heatmap/Beli Cepat/Risiko Kurs, jadi datanya otomatis konsisten
+        // di semua fitur lain juga.
+        function pstAutofillHarga() {
+            const tI = document.getElementById('pst-add-ticker');
+            const hI = document.getElementById('pst-add-harga');
+            if (!tI || !hI || hI.value) return;
+            const s = getStock(tI.value);
+            if (s && s.price > 0) hI.value = Math.round(s.price);
+        }
+
+        function pstAddToPortfolio() {
+            const tI = document.getElementById('pst-add-ticker');
+            const lI = document.getElementById('pst-add-lot');
+            const hI = document.getElementById('pst-add-harga');
+            const ticker = (tI?.value || '').trim().toUpperCase();
+            const lot = parseInt(lI?.value) || 0;
+            const harga = parseFloat(hI?.value) || 0;
+            if (!ticker) { showToast('Isi kode saham dulu!', 'warn'); return; }
+            if (!lot || lot <= 0) { showToast('Isi jumlah lot!', 'warn'); return; }
+            if (!harga || harga <= 0) { showToast('Isi harga beli!', 'warn'); return; }
+
+            const existing = portfolio.find(p => p.ticker === ticker);
+            if (existing) {
+                const totalLot = existing.lot + lot;
+                const totalModal = existing.harga * existing.lot + harga * lot;
+                existing.lot = totalLot;
+                existing.harga = Math.round(totalModal / totalLot);
+                showToast(`✅ ${ticker} diperbarui — total ${totalLot} lot (rata-rata baru)`, 'success');
+            } else {
+                portfolio.push({ ticker, lot, harga, tanggal: new Date().toLocaleDateString('id-ID') });
+                showToast(`✅ ${lot} lot ${ticker} ditambahkan ke portofolio!`, 'success');
+            }
+            lsSet('si_porto', portfolio);
+            if (tI) tI.value = '';
+            if (lI) lI.value = '';
+            if (hI) hI.value = '';
+            if (typeof renderPortfolio === 'function') renderPortfolio();
+            pstRenderPortoList();
+            runPortfolioStressTest();
+            if (navigator.vibrate) navigator.vibrate([30, 15, 30]);
+        }
+
+        function pstDeleteFromPortfolio(idx) {
+            if (idx < 0 || idx >= portfolio.length) return;
+            const removed = portfolio[idx];
+            if (!confirm(`Hapus ${removed.ticker} dari portofolio?`)) return;
+            portfolio.splice(idx, 1);
+            lsSet('si_porto', portfolio);
+            if (typeof renderPortfolio === 'function') renderPortfolio();
+            pstRenderPortoList();
+            runPortfolioStressTest();
+            showToast((removed ? removed.ticker : 'Saham') + ' dihapus dari portofolio.', 'warn');
+        }
+
+        function pstRenderPortoList() {
+            const wrap = document.getElementById('pst-mgr-list');
+            const countEl = document.getElementById('pst-mgr-count');
+            if (!wrap) return;
+            if (countEl) countEl.textContent = portfolio.length ? portfolio.length + ' aset' : '';
+            if (!portfolio.length) {
+                wrap.innerHTML = '<div style="font-size:10px;color:var(--t-low);font-weight:600;padding:2px 2px 6px;">Belum ada aset. Tambahkan lewat kolom di bawah ⬇️</div>';
+                return;
+            }
+            wrap.innerHTML = portfolio.map((p, i) => {
+                const stock = allStocks.find(s => s.ticker === p.ticker);
+                const hargaNow = stock && stock.price > 0 ? stock.price : null;
+                return `<div class="pst-mgr-item">
+                    <div style="display:flex;flex-direction:column;min-width:0;">
+                        <b style="font-family:'Barlow Condensed',sans-serif;font-size:14px;color:var(--t-hi);">${p.ticker}</b>
+                        <span style="font-size:9px;color:var(--t-low);font-weight:700;">${p.lot} lot @ ${n2(p.harga)}${hargaNow ? ' · now ' + n2(Math.round(hargaNow)) : ''}</span>
+                    </div>
+                    <button type="button" class="porto-del-btn" onclick="pstDeleteFromPortfolio(${i})" title="Hapus dari portofolio">✕</button>
+                </div>`;
+            }).join('');
+        }
+
+        function runPortfolioStressTest() {
+            const sumWrap = document.getElementById('pst-summary-wrap'), tblWrap = document.getElementById('pst-table-wrap');
+            if (!sumWrap || !tblWrap) return;
+            const ihsgPct = parseFloat(document.getElementById('pst-ihsg-input')?.value) || 0;
+
+            if (!portfolio.length) {
+                sumWrap.innerHTML = '';
+                tblWrap.innerHTML = '<div style="text-align:center;padding:20px 16px;color:var(--t-med);font-size:11px;font-weight:600;line-height:1.7;">📭 Portofolio Anda masih kosong.<br>Tambahkan aset lewat kolom <b>📋 Portofolio Anda</b> di atas ⬆️, lalu simulasi akan langsung berjalan di sini.</div>';
+                return;
+            }
+
+            let totalModal = 0, totalPasarNow = 0, totalPasarStress = 0;
+            const rows = portfolio.map(p => {
+                const stock = allStocks.find(s => s.ticker === p.ticker);
+                const hargaNow = (stock && stock.price > 0) ? Number(stock.price) : p.harga;
+                const sector = stock ? (stock.sector || '') : '';
+                const mult = pstSensitivityOf(sector);
+                const sens = pstSensitivityLabel(mult);
+                // Estimasi perubahan harga saham = perubahan IHSG × sensitivitas sektor,
+                // dibatasi -95%..+300% supaya proyeksi harga tidak pernah negatif/absurd.
+                let estChangePct = ihsgPct * mult;
+                estChangePct = Math.max(-95, Math.min(300, estChangePct));
+                const hargaStress = hargaNow * (1 + estChangePct / 100);
+                const modal = p.harga * p.lot * 100;
+                const pasarNow = hargaNow * p.lot * 100;
+                const pasarStress = hargaStress * p.lot * 100;
+                const lossRp = pasarStress - pasarNow;
+                totalModal += modal; totalPasarNow += pasarNow; totalPasarStress += pasarStress;
+                return { ticker: p.ticker, lot: p.lot, hargaNow, hargaStress, sector, mult, sens, estChangePct, pasarNow, pasarStress, lossRp };
+            }).sort((a, b) => a.lossRp - b.lossRp); // paling terdampak (rugi terbesar) ditampilkan di atas
+
+            const totalLossRp = totalPasarStress - totalPasarNow;
+            const totalLossPct = totalPasarNow ? (totalLossRp / totalPasarNow * 100) : 0;
+            const plNowRp = totalPasarNow - totalModal;       // unrealized P&L saat ini (sebelum stress)
+            const plStressRp = totalPasarStress - totalModal; // proyeksi unrealized P&L kalau skenario terjadi
+            const fmtSigned = (n) => (n >= 0 ? '+' : '-') + fmtBig(Math.abs(n));
+
+            sumWrap.innerHTML = `
+                <div class="result-box" style="margin-top:2px;">
+                    <div class="result-title">Estimasi Dampak Portofolio (IHSG ${ihsgPct >= 0 ? '+' : ''}${ihsgPct}%)</div>
+                    <div class="result-val" style="color:${totalLossRp < 0 ? 'var(--dn)' : 'var(--up)'};">${fmtSigned(totalLossRp)}</div>
+                    <div class="result-sub">
+                        <div><div class="rsub-lbl">Persentase</div><div class="rsub-val" style="color:${totalLossPct < 0 ? 'var(--dn)' : 'var(--up)'};">${totalLossPct >= 0 ? '+' : ''}${totalLossPct.toFixed(2)}%</div></div>
+                        <div style="text-align:right;"><div class="rsub-lbl">Nilai Pasar Setelah Stress</div><div class="rsub-val">${fmtBig(Math.max(0, totalPasarStress))}</div></div>
+                    </div>
+                </div>
+                <div style="display:flex;gap:6px;margin-top:8px;">
+                    <div class="strat-card" style="flex:1;text-align:center;padding:9px 4px;margin-bottom:0;">
+                        <div style="font-size:8px;color:var(--t-low);font-weight:800;">NILAI SEKARANG</div>
+                        <div style="font-size:12px;font-weight:900;color:var(--t-hi);margin-top:3px;font-family:'IBM Plex Mono',monospace;">${fmtBig(totalPasarNow)}</div>
+                    </div>
+                    <div class="strat-card" style="flex:1;text-align:center;padding:9px 4px;margin-bottom:0;">
+                        <div style="font-size:8px;color:var(--t-low);font-weight:800;">P&amp;L SAAT INI</div>
+                        <div style="font-size:12px;font-weight:900;margin-top:3px;font-family:'IBM Plex Mono',monospace;color:${plNowRp >= 0 ? 'var(--up)' : 'var(--dn)'};">${fmtSigned(plNowRp)}</div>
+                    </div>
+                    <div class="strat-card" style="flex:1;text-align:center;padding:9px 4px;margin-bottom:0;">
+                        <div style="font-size:8px;color:var(--t-low);font-weight:800;">P&amp;L SETELAH STRESS</div>
+                        <div style="font-size:12px;font-weight:900;margin-top:3px;font-family:'IBM Plex Mono',monospace;color:${plStressRp >= 0 ? 'var(--up)' : 'var(--dn)'};">${fmtSigned(plStressRp)}</div>
+                    </div>
+                </div>`;
+
+            tblWrap.innerHTML = `
+                <div style="font-size:10px;font-weight:800;color:var(--t-hi);margin:16px 0 8px;text-transform:uppercase;letter-spacing:0.5px;">Rincian Per Aset (diurutkan dari dampak terbesar)</div>
+                <div style="display:flex;flex-direction:column;gap:6px;">
+                ${rows.map(r => `
+                    <div class="pst-asset-card">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;gap:8px;">
+                            <div style="display:flex;align-items:center;gap:6px;min-width:0;">
+                                <b style="font-family:'Barlow Condensed',sans-serif;font-size:15px;color:var(--t-hi);flex-shrink:0;">${r.ticker}</b>
+                                <span class="pst-sens-badge" style="background:${r.sens.color};">${r.sens.txt} ×${r.mult.toFixed(1)}</span>
+                            </div>
+                            <div style="font-size:11px;font-weight:900;font-family:'IBM Plex Mono',monospace;color:${r.estChangePct >= 0 ? 'var(--up)' : 'var(--dn)'};white-space:nowrap;">${r.estChangePct >= 0 ? '+' : ''}${r.estChangePct.toFixed(1)}%</div>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--t-low);font-weight:700;margin-bottom:6px;gap:8px;">
+                            <span>${r.lot} lot @ ${n2(Math.round(r.hargaNow))} → <b style="color:var(--t-hi);">${n2(Math.round(r.hargaStress))}</b></span>
+                            <span style="text-align:right;flex-shrink:0;">${r.sector || 'Sektor N/A'}</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                            <div class="pst-bar-track"><div class="pst-bar-fill" style="width:${Math.min(100, Math.abs(r.estChangePct))}%;background:${r.estChangePct >= 0 ? 'var(--up)' : 'var(--dn)'};"></div></div>
+                            <div style="font-size:10.5px;font-weight:900;font-family:'IBM Plex Mono',monospace;color:${r.lossRp >= 0 ? 'var(--up)' : 'var(--dn)'};white-space:nowrap;">${fmtSigned(r.lossRp)}</div>
+                        </div>
+                    </div>
+                `).join('')}
                 </div>`;
         }
 
@@ -23536,6 +24079,10 @@ Tulis singkat (maks 200 kata): 1-2 kalimat ringkasan kondisi, poin valuasi, poin
                     // Refresh ringan agar chart tetap sinkron dgn data terbaru
                     renderPnlChart();
                     renderCashFlowChart();
+                    // ✅ v92: ikut refresh Equity Hero (termasuk mini trend ekuitas) supaya
+                    // titik "hari ini" bergerak mengikuti harga pasar live selama posisi
+                    // masih open — bukan cuma saat pindah tab/hari berganti.
+                    renderEquityHero(calcJournalStats());
                 }
             }, 60000);
         }
@@ -24145,6 +24692,11 @@ Tulis singkat (maks 200 kata): 1-2 kalimat ringkasan kondisi, poin valuasi, poin
                 'all');
                 const scRSI = (document.getElementById('scRSIHub') ? document.getElementById('scRSIHub').value :
                     'all');
+                // ✅ v90: filter Divergensi — pakai mesin detectFlowDivergence() yang sama
+                // dgn yang dipakai di Alert Watchlist & badge modal Akumulasi, supaya
+                // scanning Screener Pro bisa lebih spesifik & tajam: cari saham yang harga
+                // vs proksi arus dananya (bandarmologi) sedang berlawanan arah.
+                const scDiverg = (document.getElementById('scDivergHub') ? document.getElementById('scDivergHub').value : 'all');
                 if (!allStocks.length) {
                     showToast('Data pasar belum tersedia. Tunggu sebentar...', 'warn');
                     return;
@@ -24156,6 +24708,10 @@ Tulis singkat (maks 200 kata): 1-2 kalimat ringkasan kondisi, poin valuasi, poin
                     if (scMACD === 'bull' && !s.macdBull) return false;
                     if (scMA === 'above' && !s.aboveMA20) return false;
                     if (scRSI === 'oversold' && s.rsi >= 40) return false;
+                    if (scDiverg !== 'all') {
+                        const dv = detectFlowDivergence(s);
+                        if (!dv || dv.type !== scDiverg) return false;
+                    }
                     return true;
                 }).sort((a, b) => b.score - a.score);
                 const scc = document.getElementById('scCountHub');
@@ -24173,6 +24729,8 @@ Tulis singkat (maks 200 kata): 1-2 kalimat ringkasan kondisi, poin valuasi, poin
                     const scoreColor = s.score >= 7 ? 'var(--up)' : s.score >= 4 ? 'var(--warn)' :
                         'var(--dn)';
                     const isWL = watchlist.includes(s.ticker);
+                    const dv = detectFlowDivergence(s);
+                    const dvColor = dv ? (dv.type === 'bearish' ? 'var(--dn)' : 'var(--up)') : '';
                     return `<div class="stock-card btn-ripple" onclick="openModal('${s.ticker}')" style="animation-delay:${Math.min(idx*0.04,0.5)}s;">
                 <div class="sc-bar ${barCls}"></div>
                 <div class="sc-row1">
@@ -24191,6 +24749,7 @@ Tulis singkat (maks 200 kata): 1-2 kalimat ringkasan kondisi, poin valuasi, poin
                   <span style="font-family:IBM Plex Mono;font-size:11px;color:${s.rsi<40?'var(--up)':s.rsi>70?'var(--dn)':'var(--t-med)'};">RSI:${s.rsi.toFixed(0)}</span>
                   <span style="font-family:IBM Plex Mono;font-size:11px;color:${s.bandarStatus==='acc'?'var(--up)':s.bandarStatus==='dist'?'var(--dn)':'var(--t-med)'};">${s.bandarStatus==='acc'?'🟢ACC':s.bandarStatus==='dist'?'🔴DIST':'⚪NEU'}</span>
                   ${s.owner?`<span style="font-family:IBM Plex Mono;font-size:9px;background:var(--bg-elevated);color:var(--t-med);padding:1px 5px;border-radius:3px;">${s.owner.split(' ')[0]}</span>`:''}
+                  ${dv?`<span style="font-family:IBM Plex Mono;font-size:9px;font-weight:900;color:${dvColor};background:${dv.type==='bearish'?'var(--dn-bg)':'var(--up-bg)'};padding:1px 6px;border-radius:3px;">${dv.icon} ${dv.type==='bearish'?'BEARISH DIV':'BULLISH DIV'}</span>`:''}
                 </div>
               </div>`;
                 }).join('');
@@ -24236,6 +24795,7 @@ Tulis singkat (maks 200 kata): 1-2 kalimat ringkasan kondisi, poin valuasi, poin
                 if (id === 'subpage-telegram') initTelegramSettingsPage();
                 if (id === 'subpage-aikeys') initAiKeysSettingsPage();
                 if (id === 'subpage-alokasi') initAlokasiAIPage();
+                if (id === 'subpage-bantuan') resetHelpReportForm();
 
                 if (id === 'subpage-keamanan') {
                     const secSyncDot = document.getElementById('secSyncDot');
@@ -24286,14 +24846,23 @@ Tulis singkat (maks 200 kata): 1-2 kalimat ringkasan kondisi, poin valuasi, poin
         function initAlokasiAIPage() {
             try {
                 const danaInp = document.getElementById('alocDanaInput');
-                if (danaInp && !danaInp.dataset.touched) {
-                    const savedDana = lsGet('si_aloc_dana', null);
-                    const fallback = Math.round(journalCapital || lsGet('si_journal_capital', 0)) || '';
-                    danaInp.value = (savedDana != null && savedDana > 0) ? savedDana : fallback;
-                    danaInp.addEventListener('input', () => {
-                        danaInp.dataset.touched = '1';
-                        lsSet('si_aloc_dana', parseFloat(danaInp.value) || 0);
-                    });
+                if (danaInp) {
+                    // ✅ v90 FIX: listener dulunya ke-bind ulang tiap kali halaman ini dibuka
+                    // (selama user belum pernah ngetik), jadi tiap keystroke bisa memicu
+                    // lsSet() berkali-kali. Sekarang listener cuma dipasang SEKALI per elemen.
+                    if (!danaInp.dataset.listenerBound) {
+                        danaInp.addEventListener('input', () => {
+                            danaInp.dataset.touched = '1';
+                            lsSet('si_aloc_dana', formatRibuanInput(danaInp));
+                        });
+                        danaInp.dataset.listenerBound = '1';
+                    }
+                    if (!danaInp.dataset.touched) {
+                        const savedDana = lsGet('si_aloc_dana', null);
+                        const fallback = Math.round(journalCapital || lsGet('si_journal_capital', 0)) || 0;
+                        const initVal = (savedDana != null && savedDana > 0) ? savedDana : fallback;
+                        danaInp.value = initVal ? Number(initVal).toLocaleString('id-ID') : '';
+                    }
                 }
                 alocSelectRisk(lsGet('si_aloc_risk', 'Moderat'), true);
                 const focusInp = document.getElementById('alocFocusInput');
@@ -24440,7 +25009,7 @@ Total seluruh "persen" di array alokasi ditambah "kasSiagaPersen" harus PERSIS 1
             const noKeyBanner = document.getElementById('alocNoKeyBanner');
             try {
                 const danaInp = document.getElementById('alocDanaInput');
-                const dana = parseFloat(danaInp ? danaInp.value : 0) || 0;
+                const dana = parseRibuan(danaInp ? danaInp.value : 0);
                 if (dana <= 0) { showToast('Isi dulu dana yang mau dialokasikan', 'warn'); if (danaInp) danaInp.focus(); return; }
                 const activeChip = document.querySelector('#alocRiskRow .aloc-risk-chip.active');
                 const risk = activeChip ? activeChip.dataset.risk : 'Moderat';
@@ -26352,8 +26921,8 @@ Total seluruh "persen" di array alokasi ditambah "kasSiagaPersen" harus PERSIS 1
         // ═══ JURNAL TRADING — FULL SYSTEM v25 ═══════════════════════
         // ═══════════════════════════════════════════════════════════════
         let tradeJournal = lsGet('si_journal_trades', []);
-        // ✅ v35: Log arus kas independen — tetap akurat walau transaksi BUY yang
-        // sudah ditutup (closed) dihapus dari tradeJournal untuk decluttering.
+        // ✅ v35: Log arus kas independen — tetap tercatat lepas dari status trade
+        // (open/closed) di tradeJournal.
         let cashFlowLog = lsGet('si_cashflow_log', []);
         function logCashFlow(type, amount, date) {
             cashFlowLog.push({ type, amount, date: date || new Date().toISOString().slice(0,10) });
@@ -26377,9 +26946,13 @@ Total seluruh "persen" di array alokasi ditambah "kasSiagaPersen" harus PERSIS 1
         let journalPnlPeriod = '7d';
         let journalActiveTab = 'overview';
         let addTradeFormOpen = true;
-        // ─── AGREGAT TRANSAKSI YANG SUDAH DITUTUP via tombol Tutup/TP ───
-        // Setelah posisi ditutup dgn harga jual custom, transaksinya dihapus dari
-        // daftar (declutter), tapi P&L-nya tetap dibawa ke dashboard via agregat ini.
+        // ─── AGREGAT LEGACY TRANSAKSI YANG SUDAH DITUTUP via tombol Tutup/TP ───
+        // ✅ v92: Sejak perbaikan riwayat Take Profit, trade yang ditutup TIDAK LAGI
+        // dihapus dari tradeJournal (lihat confirmCloseTradeTP), jadi variabel di
+        // bawah ini TIDAK bertambah lagi untuk trade baru. Tetap dipertahankan
+        // apa adanya hanya sebagai arsip P&L dari trade yang SUDAH KADUNG terhapus
+        // sebelum perbaikan ini — supaya total dashboard pengguna lama tidak tiba-tiba
+        // berkurang begitu update ini terpasang.
         let journalSoldCount = lsGet('si_journal_sold_count', 0);
         let journalSoldPL = lsGet('si_journal_sold_pl', 0);
         let journalSoldWinPL = lsGet('si_journal_sold_win_pl', 0);
@@ -26388,6 +26961,63 @@ Total seluruh "persen" di array alokasi ditambah "kasSiagaPersen" harus PERSIS 1
         let journalSoldLosses = lsGet('si_journal_sold_losses', 0);
         let journalSoldBest = lsGet('si_journal_sold_best', null); // {ticker, pl}
         let ctpActiveTradeId = null; // id trade yang sedang diproses di modal Tutup/TP
+
+        // ─── v92: MINI TREND EKUITAS — histori harian nilai portofolio TOTAL (modal +
+        // P&L realized + P&L belum-realisasi posisi open). Titik "hari ini" selalu
+        // di-upsert (bukan ditumpuk) tiap kali dashboard dirender, jadi grafiknya
+        // otomatis naik-turun kalau ada posisi open (mengikuti harga pasar live),
+        // dan tetap datar di hari-hari tanpa posisi open / tanpa transaksi baru.
+        let journalEquityHistory = lsGet('si_journal_equity_hist', []);
+
+        function updateJournalEquityHistory(stats) {
+            const trueEquity = stats.totalEquity + stats.unrealizedPL;
+            const todayStr = new Date().toISOString().slice(0, 10);
+            const idx = journalEquityHistory.findIndex(h => h.date === todayStr);
+            if (idx >= 0) journalEquityHistory[idx].value = trueEquity;
+            else journalEquityHistory.push({ date: todayStr, value: trueEquity });
+            if (journalEquityHistory.length > 60) journalEquityHistory = journalEquityHistory.slice(-60);
+            lsSet('si_journal_equity_hist', journalEquityHistory);
+        }
+
+        function renderJournalEquitySpark() {
+            const wrap = document.getElementById('journalEquitySpark');
+            const pctEl = document.getElementById('journalEquitySparkPct');
+            if (!wrap) return;
+            const points = journalEquityHistory.slice(-14);
+            if (points.length < 2) {
+                wrap.innerHTML = '<div style="font-size:8.5px;color:rgba(255,255,255,0.4);font-weight:700;padding:6px 0 2px;">Grafik trend akan terisi otomatis seiring pemakaian harian.</div>';
+                if (pctEl) pctEl.textContent = '';
+                return;
+            }
+            const values = points.map(p => p.value);
+            const first = values[0], last = values[values.length - 1];
+            const chgPct = first ? ((last - first) / Math.abs(first) * 100) : 0;
+            if (pctEl) {
+                pctEl.textContent = (chgPct >= 0 ? '▲ +' : '▼ ') + Math.abs(chgPct).toFixed(1) + '% · ' + points.length + 'h';
+                pctEl.style.color = chgPct >= 0 ? 'var(--up)' : 'var(--dn)';
+            }
+            const w = 320, h = 46, padX = 4, top = 4, bottom = h - 4;
+            const minV = Math.min(...values), maxV = Math.max(...values);
+            const range = (maxV - minV) || Math.max(1, Math.abs(minV) * 0.05) || 1;
+            const nx = (i) => padX + (i / (points.length - 1)) * (w - padX * 2);
+            const ny = (v) => bottom - ((v - minV) / range) * (bottom - top);
+            let pathD = '';
+            points.forEach((p, i) => { const x = nx(i), y = ny(p.value); pathD += (i === 0 ? `M ${x} ${y}` : ` L ${x} ${y}`); });
+            const areaD = pathD + ` L ${nx(points.length - 1)} ${bottom} L ${nx(0)} ${bottom} Z`;
+            const color = last >= first ? 'var(--up)' : 'var(--dn)';
+            const lastX = nx(points.length - 1), lastY = ny(last);
+            wrap.innerHTML = `<svg viewBox="0 0 ${w} ${h}" style="width:100%;height:${h}px;display:block;overflow:visible;">
+                <defs>
+                    <linearGradient id="jeqSparkGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="${color}" stop-opacity="0.35"/>
+                        <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
+                    </linearGradient>
+                </defs>
+                <path d="${areaD}" fill="url(#jeqSparkGrad)"/>
+                <path d="${pathD}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+                <circle cx="${lastX}" cy="${lastY}" r="3" fill="${color}"/>
+            </svg>`;
+        }
 
         function switchJournalTab(tab, el) {
             journalActiveTab = tab;
@@ -26878,6 +27508,12 @@ Total seluruh "persen" di array alokasi ditambah "kasSiagaPersen" harus PERSIS 1
             const sold = document.getElementById('journalSoldCount');
             const best = document.getElementById('journalBestTrade');
 
+            // ✅ v92: Update & render mini trend ekuitas harian (lihat komentar di deklarasi
+            // journalEquityHistory) — dipanggil tiap renderEquityHero supaya titik "hari ini"
+            // selalu ikut harga pasar live terbaru.
+            updateJournalEquityHistory(stats);
+            renderJournalEquitySpark();
+
             if (eq) eq.textContent = rp(Math.round(stats.totalEquity));
             if (sub) sub.textContent = `${journalCapital ? 'Modal: '+rp(journalCapital)+' · ' : ''}P&L Realized + Aktif`;
             if (initCap) initCap.textContent = journalCapital ? rp(journalCapital) : '—';
@@ -27193,7 +27829,7 @@ Total seluruh "persen" di array alokasi ditambah "kasSiagaPersen" harus PERSIS 1
                 <div class="riwayat-card-top">
                     <span class="riwayat-ticker">${t.ticker||'—'}</span>
                     <span class="riwayat-status-badge ${t.status==='open'?'open':'closed'}">${t.status==='open'?'OPEN':'CLOSED'}</span>
-                    ${t.status==='closed'&&t.sellDate?`<span style="font-size:9px;color:var(--t-low);font-family:'IBM Plex Mono',monospace;">${t.sellDate}</span>`:''}
+                    ${t.status==='closed'&&t.closeDate?`<span style="font-size:9px;color:var(--t-low);font-family:'IBM Plex Mono',monospace;">Ditutup ${t.closeDate}</span>`:''}
                     <span class="riwayat-pl ${plCls}">${plValTxt}${plPctTxt}</span>
                 </div>
                 <div class="riwayat-meta-grid">
@@ -27379,8 +28015,13 @@ Total seluruh "persen" di array alokasi ditambah "kasSiagaPersen" harus PERSIS 1
 
         // ─── TUTUP POSISI / TAKE PROFIT (harga jual custom) ──────────────────
         // Posisi BUY terbuka ditutup langsung dari riwayat jurnal dgn harga jual
-        // custom. P&L dihitung & dibawa ke dashboard (equity hero), lalu transaksi
-        // dihapus dari daftar (declutter) — hanya jumlah & total P&L yang disimpan.
+        // custom. P&L dihitung & dibawa ke dashboard (equity hero). ✅ v92 FIX:
+        // transaksi TIDAK LAGI dihapus dari daftar setelah ditutup — sebelumnya
+        // (s.d. v91) transaksi didelete & hanya jumlah+total P&L agregat yang
+        // disimpan, sehingga riwayat per-transaksi (tanggal, harga jual, ticker)
+        // hilang permanen begitu TP dilakukan. Sekarang trade tetap ada di
+        // tradeJournal dengan status 'closed' (sama seperti alur Catat Trade
+        // Baru → Jual), jadi selalu bisa dilihat lagi lewat tab Riwayat.
         function openCloseTradeModal(id) {
             const t = tradeJournal.find(x => x.id === id);
             if (!t || t.status !== 'open' || t.action !== 'BUY') return;
@@ -27431,27 +28072,23 @@ Total seluruh "persen" di array alokasi ditambah "kasSiagaPersen" harus PERSIS 1
             const buyModal = t.price * t.lot * 100;
             const sellProceeds = sellPrice * t.lot * 100 - sellComm;
             const realizedPL = sellProceeds - buyModal - (t.commission || 0);
+            const todayStr = new Date().toISOString().slice(0, 10);
 
-            // ✅ Simpan P&L ke agregat dashboard (tetap akurat walau transaksi dihapus dari list)
-            journalSoldCount += 1;
-            journalSoldPL += realizedPL;
-            if (realizedPL > 0) { journalSoldWinPL += realizedPL; journalSoldWins += 1; }
-            else { journalSoldLossPL += Math.abs(realizedPL); journalSoldLosses += 1; }
-            if (!journalSoldBest || realizedPL > journalSoldBest.pl) journalSoldBest = { ticker: t.ticker, pl: realizedPL };
-            lsSet('si_journal_sold_count', journalSoldCount);
-            lsSet('si_journal_sold_pl', journalSoldPL);
-            lsSet('si_journal_sold_win_pl', journalSoldWinPL);
-            lsSet('si_journal_sold_loss_pl', journalSoldLossPL);
-            lsSet('si_journal_sold_wins', journalSoldWins);
-            lsSet('si_journal_sold_losses', journalSoldLosses);
-            lsSet('si_journal_sold_best', journalSoldBest);
-
-            // ✅ Hapus transaksi dari daftar jurnal (declutter) — hanya jumlah & P&L yang disimpan
-            tradeJournal = tradeJournal.filter(x => x.id !== t.id);
+            // ✅ v92 FIX: trade DIPERTAHANKAN di tradeJournal sebagai status 'closed' —
+            // tidak dihapus lagi. Riwayat lengkap (tanggal tutup, harga jual, P&L) jadi
+            // selalu bisa dilihat lagi lewat tab Riwayat, persis seperti trade SELL yang
+            // dicatat manual. (journalSoldCount/PL dkk di bawah TETAP dipertahankan
+            // apa adanya sebagai arsip P&L dari trade yang sudah kadung dihapus SEBELUM
+            // perbaikan ini — supaya total dashboard pengguna lama tidak tiba-tiba turun.)
+            t.status = 'closed';
+            t.closeDate = todayStr;
+            t.closePrice = sellPrice;
+            t.closeCommission = sellComm;
+            t.realizedPL = realizedPL;
             lsSet('si_journal_trades', tradeJournal);
 
             // ✅ Catat arus kas: hasil jual (uang masuk)
-            logCashFlow('in', sellProceeds, new Date().toISOString().slice(0,10));
+            logCashFlow('in', sellProceeds, todayStr);
 
             closeCloseTradeModal();
             renderJournal();
@@ -28073,8 +28710,12 @@ Jumlah Emiten: <b>${allStocks ? allStocks.length : 0}</b>
         function initAiKeysSettingsPage() {
             const fmpEl = document.getElementById('fmpApiKeyPage');
             const gmEl = document.getElementById('geminiApiKeyPage');
+            const gmEl2 = document.getElementById('geminiApiKeyPage2');
+            const gmEl3 = document.getElementById('geminiApiKeyPage3');
             if (fmpEl) fmpEl.value = getFmpApiKey();
             if (gmEl) gmEl.value = getGeminiApiKey();
+            if (gmEl2) gmEl2.value = lsGet('si_gemini_key_2', '') || '';
+            if (gmEl3) gmEl3.value = lsGet('si_gemini_key_3', '') || '';
             updateAiKeysStatusPage();
         }
 
@@ -28104,8 +28745,9 @@ Jumlah Emiten: <b>${allStocks ? allStocks.length : 0}</b>
             }
             const gmStatus = document.getElementById('geminiStatusMsgPage');
             if (gmStatus && !gmStatus.dataset.hold) {
+                const gmCount = getGeminiApiKeys().length;
                 gmStatus.className = 'tg-status ' + (gmOn ? 'ok' : '');
-                gmStatus.textContent = gmOn ? '✅ Key Gemini aktif — mode AI canggih nyala.' : '';
+                gmStatus.textContent = gmOn ? ('✅ ' + gmCount + ' key Gemini aktif' + (gmCount > 1 ? ' (auto-failover nyala)' : '') + ' — mode AI canggih nyala.') : '';
             }
         }
 
@@ -28165,15 +28807,24 @@ Jumlah Emiten: <b>${allStocks ? allStocks.length : 0}</b>
 
         function saveGeminiApiKeyPage() {
             const val = ((document.getElementById('geminiApiKeyPage') || {}).value || '').trim();
+            const val2 = ((document.getElementById('geminiApiKeyPage2') || {}).value || '').trim();
+            const val3 = ((document.getElementById('geminiApiKeyPage3') || {}).value || '').trim();
             const statusEl = document.getElementById('geminiStatusMsgPage');
-            if (!val) {
-                if (statusEl) { statusEl.className = 'tg-status err'; statusEl.textContent = '❌ Isi dulu API key-nya, bro.'; }
+            if (!val && !val2 && !val3) {
+                if (statusEl) { statusEl.className = 'tg-status err'; statusEl.textContent = '❌ Isi minimal 1 API key Gemini (utama), bro.'; }
+                return;
+            }
+            if (!val && (val2 || val3)) {
+                if (statusEl) { statusEl.className = 'tg-status err'; statusEl.textContent = '❌ Isi dulu key UTAMA sebelum pasang key cadangan.'; }
                 return;
             }
             lsSet('si_gemini_key', val);
+            lsSet('si_gemini_key_2', val2);
+            lsSet('si_gemini_key_3', val3);
             updateAiKeysStatusPage();
-            if (statusEl) { statusEl.className = 'tg-status ok'; statusEl.textContent = '✅ Key Gemini tersimpan! Mode AI canggih otomatis nyala di tab "SobatInves AI".'; }
-            showToast('Key Gemini tersimpan ✅ — mode AI canggih aktif!', 'success');
+            const n = [val, val2, val3].filter(Boolean).length;
+            if (statusEl) { statusEl.className = 'tg-status ok'; statusEl.textContent = '✅ ' + n + ' key Gemini tersimpan! Mode AI canggih otomatis nyala di tab "SobatInves AI".'; }
+            showToast(n > 1 ? (n + ' key Gemini tersimpan ✅ — auto-failover aktif!') : 'Key Gemini tersimpan ✅ — mode AI canggih aktif!', 'success');
             playAudioFeedback('success');
         }
 
@@ -28183,7 +28834,8 @@ Jumlah Emiten: <b>${allStocks ? allStocks.length : 0}</b>
                 if (statusEl) { statusEl.className = 'tg-status err'; statusEl.textContent = '⚠️ Simpan key dulu sebelum tes.'; }
                 return;
             }
-            if (statusEl) { statusEl.dataset.hold = '1'; statusEl.className = 'tg-status ok'; statusEl.textContent = '⏳ Ngetes koneksi ke Gemini...'; }
+            const nKeys = getGeminiApiKeys().length;
+            if (statusEl) { statusEl.dataset.hold = '1'; statusEl.className = 'tg-status ok'; statusEl.textContent = '⏳ Ngetes koneksi ke Gemini...' + (nKeys > 1 ? (' (' + nKeys + ' key terpasang)') : ''); }
             try {
                 const txt = await callGemini('Balas cuma dengan satu kata: "OK".', { maxTokens: 10, temperature: 0.1 });
                 statusEl.className = 'tg-status ok';
@@ -28191,7 +28843,7 @@ Jumlah Emiten: <b>${allStocks ? allStocks.length : 0}</b>
                 showToast('Gemini terhubung ✅', 'success');
             } catch (err) {
                 statusEl.className = 'tg-status err';
-                statusEl.textContent = '❌ Gagal: ' + ((err && err.message) || 'periksa lagi key-nya.');
+                statusEl.textContent = '❌ Gagal: ' + ((err && err.message) || 'periksa lagi key-nya.') + (nKeys > 1 ? ' (semua ' + nKeys + ' key sudah dicoba)' : '');
                 showToast('Tes Gemini gagal', 'error');
             } finally {
                 delete statusEl.dataset.hold;
@@ -28199,13 +28851,14 @@ Jumlah Emiten: <b>${allStocks ? allStocks.length : 0}</b>
         }
 
         function disconnectGeminiApiKeyPage() {
-            if (!confirm('Hapus API key Gemini dari perangkat ini?')) return;
+            if (!confirm('Hapus SEMUA API key Gemini (utama & cadangan) dari perangkat ini?')) return;
             lsSet('si_gemini_key', '');
-            const el = document.getElementById('geminiApiKeyPage');
-            if (el) el.value = '';
+            lsSet('si_gemini_key_2', '');
+            lsSet('si_gemini_key_3', '');
+            ['geminiApiKeyPage', 'geminiApiKeyPage2', 'geminiApiKeyPage3'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
             updateAiKeysStatusPage();
             const statusEl = document.getElementById('geminiStatusMsgPage');
-            if (statusEl) { statusEl.className = 'tg-status'; statusEl.textContent = 'Key Gemini dihapus. SobatInves AI balik ke mode dasar.'; }
+            if (statusEl) { statusEl.className = 'tg-status'; statusEl.textContent = 'Semua key Gemini dihapus. SobatInves AI balik ke mode dasar.'; }
             showToast('Key Gemini dihapus', 'warn');
         }
 
@@ -28413,6 +29066,18 @@ Jumlah Emiten: <b>${allStocks ? allStocks.length : 0}</b>
         function onTgGeminiKeyInputPage() {
             const inp = document.getElementById('tgGeminiApiKeyPage');
             if (inp) inp.value = inp.value.trim();
+        }
+
+        // ✅ v90: shortcut biar user tidak perlu ketik ulang key Gemini yang sama persis
+        // di 2 halaman berbeda — key di sini SENGAJA disimpan terpisah (dikirim ke server
+        // Google Sheets utk jadwal cron), tapi boleh isinya sama dengan key utama lokal.
+        function copyMainGeminiKeyToBrief() {
+            const mainKey = getGeminiApiKey();
+            const target = document.getElementById('tgGeminiApiKeyPage');
+            if (!mainKey) { showToast('Belum ada key utama di Akun → Bot AI — FMP & Gemini', 'warn'); return; }
+            if (target) target.value = mainKey;
+            showToast('Key utama disalin ke sini ✅ — jangan lupa Simpan', 'success');
+            playAudioFeedback('click');
         }
 
         function onTgAIBriefFocusInputPage() {
