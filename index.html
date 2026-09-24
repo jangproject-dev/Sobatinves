@@ -934,6 +934,20 @@ async function saveIDBTelegramConfig(config) {
                 transform: scale(1);
             }
         }
+        /* ✅ v96 — kedip halus khusus angka harga live di modal Chart (teks, bukan kartu
+           berlatar seperti flashUp/flashDn di atas) saat update per-detik menghasilkan
+           harga baru. Durasi singkat (0.6s) & memakai warna var(--up)/var(--dn) yang
+           sudah dipakai di seluruh app supaya tetap konsisten dgn tema terang/gelap. */
+        @keyframes priceLiveFlashUp {
+            0% { text-shadow: 0 0 16px var(--up-glow); }
+            100% { text-shadow: 0 0 0 transparent; }
+        }
+        @keyframes priceLiveFlashDn {
+            0% { text-shadow: 0 0 16px var(--dn-glow); }
+            100% { text-shadow: 0 0 0 transparent; }
+        }
+        .price-live-flash-up { animation: priceLiveFlashUp 0.6s ease-out; }
+        .price-live-flash-dn { animation: priceLiveFlashDn 0.6s ease-out; }
         @keyframes loaderProgress {
             0% {
                 width: 5%
@@ -3639,7 +3653,7 @@ html[data-theme="light"] body {
             border-radius: var(--radius-md);
             padding: 12px 14px;
             color: var(--t-hi);
-            font-size: 14px;
+            font-size: 16px;
             font-family: 'Plus Jakarta Sans', sans-serif;
             outline: none;
             transition: all 0.3s;
@@ -3779,7 +3793,7 @@ html[data-theme="light"] body {
             padding: 14px;
             color: var(--t-hi);
             font-family: 'IBM Plex Mono', monospace;
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 700;
             outline: none;
             transition: all 0.3s;
@@ -4007,7 +4021,7 @@ html[data-theme="light"] body {
             padding: 11px 13px;
             color: var(--t-hi);
             font-family: 'IBM Plex Mono', monospace;
-            font-size: 14px;
+            font-size: 16px;
             outline: none;
             transition: all 0.3s;
             font-weight: 700;
@@ -4305,7 +4319,7 @@ html[data-theme="light"] body {
             flex: 1; padding: 7px 10px;
             background: var(--input-surface); border: 1px solid var(--border-light);
             border-radius: var(--radius-md); color: var(--t-hi);
-            font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 800;
+            font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 800;
             outline: none; text-transform: uppercase;
         }
         .porto-wl-inp:focus { border-color: var(--primary); }
@@ -4510,7 +4524,7 @@ html[data-theme="light"] body {
             border-radius: 22px;
             padding: 10px 18px;
             color: var(--t-hi);
-            font-size: 14px;
+            font-size: 16px;
             outline: none;
             transition: all 0.3s;
             font-weight: 600;
@@ -4948,7 +4962,7 @@ html[data-theme="light"] body {
             border-radius: var(--radius-md);
             padding: 12px 14px;
             color: var(--t-hi);
-            font-size: 14px;
+            font-size: 16px;
             font-weight: 600;
             outline: none;
             transition: all 0.3s;
@@ -5987,7 +6001,7 @@ html[data-theme="light"] body {
             border-radius: 22px;
             padding: 7px 30px 7px 32px;
             color: var(--t-hi);
-            font-size: 12px;
+            font-size: 16px;
             font-weight: 600;
             outline: none;
             width: clamp(120px, 18vw, 180px);
@@ -6697,7 +6711,7 @@ html[data-theme="light"] body {
         .tg-disconnect-btn:active { transform:scale(0.96); }
         /* ─── TELEGRAM SETTINGS SECTION ─── */
         .tg-field { background:var(--input-surface); border:1px solid var(--border-light); border-radius:var(--radius-sm);
-            padding:9px 12px; font-size:12px; color:var(--t-hi); font-family:'IBM Plex Mono',monospace; font-weight:600;
+            padding:9px 12px; font-size:16px; color:var(--t-hi); font-family:'IBM Plex Mono',monospace; font-weight:600;
             width:100%; outline:none; transition:border-color 0.2s; }
         .tg-field:focus { border-color:var(--primary); }
         .tg-field::placeholder { color:var(--t-low); }
@@ -6771,7 +6785,7 @@ html[data-theme="light"] body {
         .pst-mgr-add-row { display:flex; gap:6px; flex-wrap:wrap; }
         .pst-mgr-inp { flex:1; min-width:70px; padding:9px 10px; background:var(--input-surface);
             border:1px solid var(--border-light); border-radius:var(--radius-sm); color:var(--t-hi);
-            font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:700; outline:none; }
+            font-family:'IBM Plex Mono',monospace; font-size:16px; font-weight:700; outline:none; }
         .pst-mgr-inp:focus { border-color:var(--primary); }
         .pst-mgr-add-btn { padding:9px 14px; border-radius:var(--radius-sm); background:var(--primary);
             color:#fff; border:none; font-family:'Barlow Condensed',sans-serif; font-size:13px;
@@ -6800,7 +6814,7 @@ html[data-theme="light"] body {
         .aloc-risk-chip.active[data-risk="Defensif"] .aloc-risk-label { color:var(--up); }
         .aloc-dana-row { position:relative; margin-top:8px; }
         .aloc-dana-prefix { position:absolute; left:12px; top:50%; transform:translateY(-50%); font-size:13px; font-weight:800; color:var(--t-med); font-family:'IBM Plex Mono',monospace; pointer-events:none; }
-        .aloc-dana-input { width:100%; padding:12px 12px 12px 34px; background:var(--input-surface); border:1px solid var(--border-light); border-radius:var(--radius-sm); color:var(--t-hi); font-size:14px; font-weight:800; font-family:'IBM Plex Mono',monospace; }
+        .aloc-dana-input { width:100%; padding:12px 12px 12px 34px; background:var(--input-surface); border:1px solid var(--border-light); border-radius:var(--radius-sm); color:var(--t-hi); font-size:16px; font-weight:800; font-family:'IBM Plex Mono',monospace; }
         .aloc-dana-hint { font-size:9.5px; color:var(--t-low); font-weight:600; margin-top:5px; }
         .aloc-generate-btn { width:100%; padding:13px; background:linear-gradient(135deg,#9B7BFF,#7B5CFA); color:#fff; border:none; border-radius:var(--radius-md); font-size:13px; font-weight:900; cursor:pointer; letter-spacing:0.3px; margin-top:14px; font-family:'Plus Jakarta Sans',sans-serif; box-shadow:0 6px 18px rgba(155,123,255,0.35); transition:all 0.2s; display:flex; align-items:center; justify-content:center; gap:8px; }
         .aloc-generate-btn:active { transform:scale(0.97); }
@@ -6976,7 +6990,7 @@ html[data-theme="light"] body {
             width:100%; padding:11px 12px;
             background:var(--input-surface); border:1.5px solid var(--border-light);
             border-radius:var(--radius-md); color:var(--t-hi);
-            font-family:'IBM Plex Mono',monospace; font-size:13px; font-weight:600;
+            font-family:'IBM Plex Mono',monospace; font-size:16px; font-weight:600;
             outline:none; transition:all 0.2s;
         }
         .trade-inp:focus { border-color:var(--primary); box-shadow:0 0 0 3px var(--border-focus); background:var(--input-bg); }
@@ -7389,7 +7403,7 @@ select {
         .gd-search-input {
             width: 100%; padding: 11px 14px 11px 38px; border-radius: var(--radius-md);
             border: 1px solid var(--border-light); background: var(--card-bg); color: var(--t-hi);
-            font-size: 13px; font-weight: 600; font-family: inherit;
+            font-size: 16px; font-weight: 600; font-family: inherit;
         }
         .gd-search-input:focus { outline: none; border-color: var(--primary); }
         .gd-search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--t-low); pointer-events: none; }
@@ -8227,7 +8241,7 @@ html[data-theme="dark"] .tampilan-toggle-pill:not(.on):not(#darkModeTogglePill) 
                     <div style="padding:8px 14px;border-bottom:1px solid var(--border-light);display:flex;gap:6px;align-items:center;">
                         <div style="flex:1;position:relative;">
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--t-med)" stroke-width="2.5" style="position:absolute;left:9px;top:50%;transform:translateY(-50%);"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                            <input type="text" id="riwayatSearch" placeholder="Cari ticker, catatan..." oninput="filterRiwayat()" style="width:100%;padding:8px 10px 8px 28px;background:var(--input-surface);border:1px solid var(--border-light);border-radius:var(--radius-md);color:var(--t-hi);font-size:12px;font-weight:600;font-family:'IBM Plex Mono',monospace;outline:none;">
+                            <input type="text" id="riwayatSearch" placeholder="Cari ticker, catatan..." oninput="filterRiwayat()" style="width:100%;padding:8px 10px 8px 28px;background:var(--input-surface);border:1px solid var(--border-light);border-radius:var(--radius-md);color:var(--t-hi);font-size:16px;font-weight:600;font-family:'IBM Plex Mono',monospace;outline:none;">
                         </div>
                         <select id="riwayatSort" onchange="filterRiwayat()" style="padding:8px 10px;background:var(--input-surface);border:1px solid var(--border-light);border-radius:var(--radius-md);color:var(--t-hi);font-size:11px;font-weight:700;font-family:'IBM Plex Mono',monospace;outline:none;cursor:pointer;white-space:nowrap;">
                             <option value="newest">Terbaru</option>
@@ -9249,7 +9263,7 @@ html[data-theme="dark"] .tampilan-toggle-pill:not(.on):not(#darkModeTogglePill) 
             <!-- Search Bar -->
             <div style="background:var(--card-bg);border-radius:var(--radius-lg);border:1px solid var(--border-light);padding:9px 12px;margin-bottom:8px;box-shadow:var(--shadow-sm);display:flex;align-items:center;gap:8px;">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--t-med)" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                <input id="newsSearchInp" type="text" placeholder="Cari berita IHSG, dividen, IPO, emiten..." oninput="newsSearch(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:12px;color:var(--t-hi);font-weight:600;font-family:'IBM Plex Mono',monospace;" autocomplete="off"/>
+                <input id="newsSearchInp" type="text" placeholder="Cari berita IHSG, dividen, IPO, emiten..." oninput="newsSearch(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:16px;color:var(--t-hi);font-weight:600;font-family:'IBM Plex Mono',monospace;" autocomplete="off"/>
                 <button onclick="clearNewsSearch()" style="background:none;border:none;color:var(--t-low);font-size:15px;cursor:pointer;padding:0 2px;" title="Hapus pencarian">✕</button>
                 <button onclick="refreshNews()" style="background:var(--primary-light);border:none;color:var(--primary);font-size:10px;font-weight:900;font-family:IBM Plex Mono;padding:4px 8px;border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:4px;" title="Refresh berita">↺ Refresh</button>
                 <button onclick="openSentimentRadar()" style="background:rgba(255,107,53,0.12);border:none;color:#ff6b35;font-size:10px;font-weight:900;font-family:IBM Plex Mono;padding:4px 8px;border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:4px;" title="Radar sentimen &amp; rumor pasar (AI) dari berita tab yang aktif">🔥 Radar</button>
@@ -16126,6 +16140,117 @@ ${macroTxt || '(tidak ada data makro relevan saat ini)'}`;
             setTimeout(() => { wzScanning = false; if (btn) btn.disabled = false; }, 2300);
         }
 
+        // ─── v96 FIX: HARGA LIVE PER DETIK di modal Chart ──────────────────────────
+        // ROOT CAUSE yang ditemukan: openModal() cuma menulis s.price ke #mBigPrice
+        // SATU KALI saat modal dibuka. Refresh data global (fetchStocks) tetap jalan
+        // di background tiap 30 detik, TAPI hasilnya cuma dipakai me-render ULANG
+        // daftar saham di belakang modal — tidak pernah menyentuh modal yang sedang
+        // terbuka. Efeknya harga di layar Chart terasa "macet"/delay lama sampai modal
+        // ditutup lalu dibuka lagi. FIX: tarik quote KHUSUS 1 ticker (bukan 800
+        // sekaligus) dari endpoint yang sama, tiap 1 detik, HANYA selagi modal ticker
+        // itu terbuka DAN tab sedang aktif — beban jaringan jauh lebih ringan
+        // dibanding refresh 800 ticker/30 detik yang sudah berjalan normal di bagian
+        // lain aplikasi, sehingga aman dijalankan tiap detik tanpa bikin app lemot.
+        let _modalLiveTimer = null;
+        let _modalLiveBusy = false;
+
+        function stopModalLivePrice() {
+            if (_modalLiveTimer) { clearInterval(_modalLiveTimer); _modalLiveTimer = null; }
+            _modalLiveBusy = false;
+        }
+
+        // Ambil quote SATU ticker saja — payload & waktu proses jauh lebih kecil
+        // dibanding fetchStocks() yang menarik 800 emiten sekaligus, jadi aman
+        // dipanggil tiap detik tanpa membebani jaringan/perangkat pengguna.
+        // ✅ Memakai pola `symbols:{tickers:['IDX:'+ticker]}` — pola YANG SAMA dan
+        // SUDAH TERBUKTI jalan di siScan()/fetchIhsgTechnicals() di file ini untuk
+        // menarik 1 simbol spesifik, bukan filter tebakan baru yang belum teruji.
+        async function fetchSingleQuote(ticker) {
+            const payload = JSON.stringify({ symbols: { tickers: ['IDX:' + ticker] }, columns: TV_COLS });
+            const controller = new AbortController();
+            // ✅ Timeout KETAT 4 detik (bukan 15 detik seperti fetchStocks) — ini request
+            // 1 ticker yang jalan tiap detik, kalau dibiarkan menunggu selama fetch 800
+            // ticker, respons yang lambat akan menumpuk dan JUSTRU menimbulkan delay
+            // yang dikeluhkan, bukan menghilangkannya.
+            const timer = setTimeout(() => controller.abort(), 4000);
+            try {
+                const r = await fetch(TV_SCAN_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: payload,
+                    signal: controller.signal
+                });
+                clearTimeout(timer);
+                if (!r.ok) throw new Error('HTTP ' + r.status);
+                const json = await r.json();
+                const d = json && json.data && json.data[0] && json.data[0].d;
+                return d ? parseItem({ d }) : null;
+            } catch (e) {
+                clearTimeout(timer);
+                return null; // gagal 1x tidak apa — otomatis dicoba lagi detik berikutnya
+            }
+        }
+
+        // Terapkan quote segar LANGSUNG ke DOM modal tanpa membangun ulang seluruh
+        // modal (supaya posisi scroll, tab aktif & widget TradingView chart di
+        // dalamnya tidak ikut ke-reset tiap detik — hanya angka harga yang berkedip
+        // ter-update). allStocks & prevPrices juga disinkronkan supaya saat modal
+        // ditutup, daftar saham di baliknya sudah ikut memakai data paling segar.
+        function applyLiveQuoteToModal(ns) {
+            if (!ns || currentModalTicker !== ns.ticker) return; // user sudah pindah/tutup modal saat respons datang
+            const existing = getStock(ns.ticker);
+            const prevPrice = existing ? existing.price : ns.price;
+            const idx = allStocks.findIndex(x => x.ticker === ns.ticker);
+            if (idx > -1) allStocks[idx] = Object.assign({}, allStocks[idx], ns); else allStocks.push(ns);
+            prevPrices[ns.ticker] = ns.price;
+
+            const priceEl = document.getElementById('mBigPrice');
+            if (!priceEl) return; // modal sudah ditutup / pane chart sudah tidak ada di DOM
+            const ohlcEl = document.getElementById('mOhlcRow');
+            const chgEl = document.getElementById('mChgRow');
+            priceEl.textContent = rp(ns.price);
+            priceEl.classList.toggle('c-up', ns.chg >= 0);
+            priceEl.classList.toggle('c-dn', ns.chg < 0);
+            if (ohlcEl) ohlcEl.textContent = 'O:' + n2(ns.open) + ' H:' + n2(ns.high) + ' L:' + n2(ns.low);
+            if (chgEl) {
+                chgEl.textContent = pct(ns.chg) + ' Hari Ini';
+                chgEl.classList.toggle('c-up', ns.chg >= 0);
+                chgEl.classList.toggle('c-dn', ns.chg < 0);
+            }
+            // Kedip halus HANYA saat harga benar-benar berubah — bukti visual "harga
+            // baru saja update" tanpa perlu menunggu lama / buka-tutup modal manual.
+            if (ns.price !== prevPrice) {
+                priceEl.classList.remove('price-live-flash-up', 'price-live-flash-dn');
+                void priceEl.offsetWidth; // paksa reflow supaya animasi bisa diputar ulang tiap kali
+                priceEl.classList.add(ns.price > prevPrice ? 'price-live-flash-up' : 'price-live-flash-dn');
+            }
+        }
+
+        async function modalLiveTick() {
+            if (_modalLiveBusy || !currentModalTicker || document.hidden) return;
+            _modalLiveBusy = true;
+            const ticker = currentModalTicker;
+            const ns = await fetchSingleQuote(ticker);
+            _modalLiveBusy = false;
+            if (ns) applyLiveQuoteToModal(ns); // gagal → diam-diam dicoba lagi detik berikutnya, tidak mengganggu UI
+        }
+
+        function startModalLivePrice(ticker) {
+            stopModalLivePrice();
+            if (!ticker) return;
+            modalLiveTick(); // jalan segera, tidak menunggu 1 detik pertama — terasa instan saat modal dibuka
+            _modalLiveTimer = setInterval(modalLiveTick, 1000);
+        }
+
+        // Jeda polling saat tab/app disembunyikan (hemat baterai & kuota data), lalu
+        // langsung tarik harga terbaru begitu pengguna kembali membuka tab — supaya
+        // tidak ada delay basi menunggu detik berikutnya.
+        document.addEventListener('visibilitychange', function () {
+            if (!currentModalTicker) return;
+            if (document.hidden) { if (_modalLiveTimer) { clearInterval(_modalLiveTimer); _modalLiveTimer = null; } }
+            else if (!_modalLiveTimer) { startModalLivePrice(currentModalTicker); }
+        });
+
         function openModal(ticker) {
             // ✅ v47 FIX: sanitise input — trailing spaces / wrong-case tidak pernah menyebabkan miss
             // ✅ v48 FIX: pakai getStock() terpusat agar lookup selalu konsisten dengan allStocks
@@ -16205,7 +16330,7 @@ ${macroTxt || '(tidak ada data makro relevan saat ini)'}`;
             const bdy = document.getElementById('mBody');
             if (bdy) {
                 bdy.innerHTML =
-                    `<div class="modal-price-block"><div><div class="modal-big-price ${s.chg>=0?'c-up':'c-dn'}">${rp(s.price)}</div><div style="font-family:IBM Plex Mono;font-size:12px;margin-top:6px;color:var(--t-med);font-weight:700;">O:${n2(s.open)} H:${n2(s.high)} L:${n2(s.low)}</div><div style="margin-top:8px;font-weight:900;font-size:15px;" class="${s.chg>=0?'c-up':'c-dn'}">${pct(s.chg)} Hari Ini</div>${s.isHalal?'<div style="margin-top:6px;display:inline-flex;align-items:center;gap:4px;background:rgba(0,179,90,0.12);border:1px solid rgba(0,179,90,0.35);border-radius:6px;padding:3px 8px;font-size:10px;font-weight:800;color:#00b35a;">☪ SAHAM HALAL (ISSI/JII)</div>':''}</div><div class="modal-score-box" style="${s.score>=9?'border-color:var(--primary);box-shadow:0 0 20px var(--primary-glow);animation:dopamineGlow 2s ease-in-out infinite;':''}"><div class="modal-score-lbl" style="${s.score>=9?'color:var(--primary);':''}">AI SCORE</div><div class="modal-score-val" style="color:${s.score>=9?'var(--primary)':s.score>=7?'var(--up)':s.score<=4?'var(--dn)':'var(--warn)'}">${s.score}/10</div></div></div>` +
+                    `<div class="modal-price-block"><div><div class="modal-big-price ${s.chg>=0?'c-up':'c-dn'}" id="mBigPrice">${rp(s.price)}</div><div id="mOhlcRow" style="font-family:IBM Plex Mono;font-size:12px;margin-top:6px;color:var(--t-med);font-weight:700;">O:${n2(s.open)} H:${n2(s.high)} L:${n2(s.low)}</div><div id="mChgRow" style="margin-top:8px;font-weight:900;font-size:15px;" class="${s.chg>=0?'c-up':'c-dn'}">${pct(s.chg)} Hari Ini</div>${s.isHalal?'<div style="margin-top:6px;display:inline-flex;align-items:center;gap:4px;background:rgba(0,179,90,0.12);border:1px solid rgba(0,179,90,0.35);border-radius:6px;padding:3px 8px;font-size:10px;font-weight:800;color:#00b35a;">☪ SAHAM HALAL (ISSI/JII)</div>':''}</div><div class="modal-score-box" style="${s.score>=9?'border-color:var(--primary);box-shadow:0 0 20px var(--primary-glow);animation:dopamineGlow 2s ease-in-out infinite;':''}"><div class="modal-score-lbl" style="${s.score>=9?'color:var(--primary);':''}">AI SCORE</div><div class="modal-score-val" style="color:${s.score>=9?'var(--primary)':s.score>=7?'var(--up)':s.score<=4?'var(--dn)':'var(--warn)'}">${s.score}/10</div></div></div>` +
                     `<div class="signal-banner ${sigCls}"><div><div class="signal-title">${sigTit}</div><div class="signal-sub">${sigSub}</div></div></div>` +
                     `<div class="m-tabs"><div class="m-tab active btn-ripple" onclick="mTab(this,'mt-chart');loadModalChart('${s.ticker}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 17V9M12 17V5M16 17v-4"/></svg>Chart</div><div class="m-tab btn-ripple" onclick="mTab(this,'mt-strategi');loadModalStrategi('${s.ticker}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2l2.4 7.2H22l-6 4.4 2.4 7.2L12 16.4l-6.4 4.4 2.4-7.2-6-4.4h7.6z"/></svg>Multi-Strategi</div><div class="m-tab btn-ripple" onclick="mTab(this,'mt-akumulasi');loadModalAkumulasi('${s.ticker}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 17l5-5 4 4 8-8"/><path d="M15 8h6v6"/></svg>Akumulasi</div><div class="m-tab btn-ripple" onclick="mTab(this,'mt-teknikal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Teknikal</div><div class="m-tab btn-ripple" onclick="mTab(this,'mt-warzone')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><line x1="12" y1="1" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="1" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="23" y2="12"/></svg>Radar Anomali</div><div class="m-tab btn-ripple" onclick="mTab(this,'mt-peramal');loadModalPeramal('${s.ticker}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Peramal</div><div class="m-tab btn-ripple" onclick="mTab(this,'mt-ta');loadModalTAWidget('${s.ticker}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><path d="M12 12l3-3"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2"/></svg>Sinyal TA</div><div class="m-tab btn-ripple" onclick="mTab(this,'mt-proyeksi');loadModalProyeksi('${s.ticker}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="14 7 21 7 21 14"/></svg>Proyeksi</div><div class="m-tab btn-ripple" onclick="mTab(this,'mt-astronacci');loadModalAstronacci('${s.ticker}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 3l1.5 5.5L19 10l-5.5 1.5L12 17l-1.5-5.5L5 10l5.5-1.5z"/><circle cx="12" cy="10" r="8.5" stroke-dasharray="2 2"/></svg>Astronacci</div><div class="m-tab btn-ripple" onclick="mTab(this,'mt-musiman');loadModalMusiman('${s.ticker}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Musiman</div><div class="m-tab btn-ripple" onclick="mTab(this,'mt-fin');loadModalFin('${s.ticker}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Finansial</div><div class="m-tab btn-ripple" onclick="mTab(this,'mt-etf');loadModalETF('${s.sector}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>ETF Sektor</div><div class="m-tab btn-ripple" onclick="mTab(this,'mt-profil');loadModalProfil('${s.ticker}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Profil Perusahaan</div><div class="m-tab btn-ripple" onclick="mTab(this,'mt-berita');loadModalBerita('${s.ticker}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2z"/><path d="M18 22V2M14 6H8M14 10H8M14 14H8"/></svg>Berita &amp; Sentimen</div><div class="m-tab btn-ripple" onclick="mTab(this,'mt-ai');loadModalAIAnalysis('${s.ticker}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2a4 4 0 0 1 4 4v1a4 4 0 0 1-4 4 4 4 0 0 1-4-4V6a4 4 0 0 1 4-4z"/><path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><circle cx="12" cy="11" r="1"/></svg>SobatInves AI</div></div>` +
                     `<div class="m-pane active" id="mt-chart"><div id="modal-tv-chart" style="min-height:560px;width:100%;overflow:visible;"></div></div>` +
@@ -16271,6 +16396,9 @@ ${macroTxt || '(tidak ada data makro relevan saat ini)'}`;
             // (tidak dipanggil di sini) karena panenya tersembunyi by default — memuat
             // TradingView widget di elemen display:none masih menyebabkan render gagal.
             loadModalChart(s.ticker);
+            // ✅ v96 — mulai polling harga live 1x/detik KHUSUS ticker ini selagi modal terbuka
+            // (lihat startModalLivePrice() untuk penjelasan root cause & desain lengkap).
+            startModalLivePrice(s.ticker);
             // Set placeholder loading info untuk pane yang TIDAK auto-dimuat (Finansial):
             setTimeout(() => {
                 const finC = document.getElementById('modal-tv-fin');
@@ -16286,6 +16414,7 @@ ${macroTxt || '(tidak ada data makro relevan saat ini)'}`;
             // Termasuk: modal-tv-chart, modal-tv-fin, modal-profil-content,
             //           modal-ta-widget, modal-proyeksi, modal-musiman, modal-etf
             if (typeof siStopTTS === 'function') siStopTTS(); // v70: hentikan Text-to-Audio kalau modal ditutup
+            stopModalLivePrice(); // ✅ v96: hentikan polling harga per-detik — tidak perlu jalan saat modal tertutup
             currentModalTicker = null;
             const _allModalContainers = [
                 document.getElementById('modal-tv-chart'),
@@ -25327,7 +25456,7 @@ Total seluruh "persen" di array alokasi ditambah "kasSiagaPersen" harus PERSIS 1
                 if (action === 'buy' && ticker) {
                     // Remove param from URL without reload
                     const cleanURL = window.location.origin + window.location.pathname;
-                    history.replaceState(null, '', cleanURL);
+                    history.replaceState(history.state, '', cleanURL); // pertahankan state guard tombol kembali
                     // Wait for stock data to be available
                     const _tryOpen = (attempts) => {
                         const s = allStocks && allStocks.find(x => x.ticker === ticker);
@@ -28067,17 +28196,17 @@ Jumlah Emiten: <b>${allStocks ? allStocks.length : 0}</b>
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════
-     ✅ TOMBOL KEMBALI (BACK BUTTON) — khusus PWA / mobile browser
-     Style dialog konfirmasi keluar. Dibuat berdiri sendiri (nama
-     class unik "si-exit-*") supaya tidak bentrok dengan CSS lain
-     di file ini.
+     ✅ TOMBOL KEMBALI (BACK BUTTON) & KELUAR — khusus PWA / mobile browser
+     Style dialog konfirmasi keluar + layar perpisahan. Dibuat berdiri
+     sendiri (class unik "si-exit-*" / "si-fw-*") supaya tidak bentrok
+     dengan CSS lain di file ini.
      ═══════════════════════════════════════════════════════════════ -->
 <style>
 .si-exit-handle{width:40px;height:4px;background:var(--border-strong,rgba(255,255,255,.18));border-radius:2px;margin:0 auto 14px;}
 .si-exit-overlay{position:fixed;inset:0;z-index:99999;display:none;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.55);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);}
 .si-exit-overlay.open{display:flex;animation:siExitFadeIn .2s ease both;}
 .si-exit-overlay.closing{display:flex;animation:siExitFadeOut .18s ease both;}
-.si-exit-sheet{width:100%;max-width:420px;background:var(--bg-surface,var(--card-bg,#12141c));border:1px solid var(--border-light,rgba(255,255,255,.08));border-radius:20px 20px 0 0;padding:14px 20px calc(20px + env(safe-area-inset-bottom,0px));text-align:center;box-shadow:0 -8px 30px rgba(0,0,0,.4);}
+.si-exit-sheet{width:100%;max-width:420px;background:var(--bg-surface,var(--card-bg,#12141c));border:1px solid var(--border-light,rgba(255,255,255,.08));border-radius:20px 20px 0 0;padding:14px 20px calc(20px + env(safe-area-inset-bottom,0px));text-align:center;box-shadow:0 -8px 30px rgba(0,0,0,.4);will-change:transform,opacity;}
 .si-exit-overlay.open .si-exit-sheet{animation:siExitSlideUp .32s cubic-bezier(.22,.85,.25,1.15) both;}
 .si-exit-overlay.closing .si-exit-sheet{animation:siExitSlideDown .18s cubic-bezier(.4,0,1,1) both;}
 @media (min-width:620px){.si-exit-overlay{align-items:center;}.si-exit-sheet{border-radius:20px;padding-top:20px;}.si-exit-handle{display:none;}}
@@ -28090,60 +28219,101 @@ Jumlah Emiten: <b>${allStocks ? allStocks.length : 0}</b>
 .si-exit-title{font-size:16px;font-weight:900;color:var(--t-hi,#fff);margin-bottom:6px;}
 .si-exit-desc{font-size:12.5px;color:var(--t-med,#9aa3b2);margin-bottom:18px;line-height:1.5;}
 .si-exit-actions{display:flex;gap:10px;}
-.si-exit-btn{flex:1;padding:13px 10px;border-radius:12px;border:none;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;}
+.si-exit-btn{flex:1;padding:13px 10px;border-radius:12px;border:none;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;transition:transform .12s ease,opacity .2s ease;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+.si-exit-btn:active{transform:scale(.97);}
+.si-exit-btn:focus-visible{outline:2px solid var(--primary,#4d85ff);outline-offset:2px;}
 .si-exit-cancel{background:var(--border-light,rgba(255,255,255,.08));color:var(--t-hi,#fff);}
 .si-exit-ok{background:var(--dn,#ff4d5e);color:#fff;box-shadow:0 6px 16px rgba(240,69,59,.35);}
+
+/* ── Layar perpisahan: menyapu halus di atas aplikasi saat keluar ── */
+.si-exit-farewell{position:fixed;inset:0;z-index:100000;display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px calc(24px + env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) calc(24px + env(safe-area-inset-left,0px));text-align:center;background:radial-gradient(120% 90% at 50% 38%,var(--bg-surface,#121a2c) 0%,var(--bg-main,#0c111d) 70%);--si-fw-dur:850ms;}
+.si-exit-farewell.show{display:flex;animation:siFwIn .35s ease both;}
+.si-fw-wave{font-size:56px;line-height:1;margin-bottom:14px;transform-origin:70% 78%;animation:siFwPop .5s cubic-bezier(.2,.9,.3,1.3) both,siFwWave 1.1s ease-in-out .35s 1;}
+.si-fw-title{font-size:20px;font-weight:900;color:var(--t-hi,#fff);margin-bottom:6px;animation:siFwRise .4s ease .12s both;}
+.si-fw-desc{font-size:13px;color:var(--t-med,#9aa3b2);line-height:1.5;max-width:300px;margin-bottom:22px;animation:siFwRise .4s ease .2s both;}
+.si-fw-bar{width:min(220px,60vw);height:4px;border-radius:2px;background:var(--border-light,rgba(255,255,255,.1));overflow:hidden;}
+.si-fw-bar>span{display:block;height:100%;width:100%;border-radius:2px;background:var(--primary,#4d85ff);transform:scaleX(0);transform-origin:left center;animation:siFwBar var(--si-fw-dur) cubic-bezier(.4,0,.2,1) forwards;}
+.si-fw-back{display:none;flex:none;margin-top:22px;padding:13px 22px;background:var(--primary,#4d85ff);color:#fff;}
+.si-exit-farewell.hint .si-fw-bar{display:none;}
+.si-exit-farewell.hint .si-fw-back{display:inline-block;animation:siFwRise .35s ease both;}
+@keyframes siFwIn{from{opacity:0}to{opacity:1}}
+@keyframes siFwPop{0%{transform:scale(.4);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes siFwWave{0%,100%{transform:rotate(0)}15%{transform:rotate(16deg)}30%{transform:rotate(-8deg)}45%{transform:rotate(14deg)}60%{transform:rotate(-4deg)}75%{transform:rotate(10deg)}}
+@keyframes siFwRise{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes siFwBar{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@media (prefers-reduced-motion:reduce){.si-exit-overlay,.si-exit-sheet,.si-exit-icon,.si-exit-farewell,.si-fw-wave,.si-fw-title,.si-fw-desc,.si-fw-bar>span{animation-duration:.01ms!important;animation-delay:0s!important;animation-iteration-count:1!important;}}
 </style>
 
 <script>
 /* ═══════════════════════════════════════════════════════════════════
-   ✅ TOMBOL KEMBALI (BACK BUTTON) — logika untuk PWA / browser mobile
+   ✅ TOMBOL KEMBALI (BACK BUTTON) & KELUAR — logika untuk PWA / browser
    ───────────────────────────────────────────────────────────────────
    Aturan:
-   1) Kalau ada modal/panel/overlay yang sedang terbuka → tombol
-      kembali (hardware/gesture back di Android, atau tombol back
-      browser) MENUTUP modal itu saja, aplikasi tidak ikut keluar.
-   2) Kalau tidak ada modal yang terbuka → tampilkan dialog konfirmasi
-      terlebih dahulu sebelum benar-benar keluar dari halaman/PWA.
-   3) Kalau dialog konfirmasi keluar itu sendiri yang sedang terbuka,
-      tombol kembali berikutnya membatalkannya (persis seperti tombol
-      "Batal") — bukan diam saja / minta konfirmasi dobel.
+   1) Ada modal/panel/overlay terbuka → tombol kembali MENUTUP modal itu.
+   2) Tidak ada modal terbuka → tampilkan dialog konfirmasi keluar.
+   3) Dialog konfirmasi sedang terbuka → tombol kembali membatalkannya.
 
-   Teknik: "history guard state". Begitu halaman siap, kita sisipkan
-   1 entri history kosong (history.pushState). Saat tombol kembali
-   ditekan, browser "memakan" entri itu lebih dulu (memicu event
-   'popstate') SEBELUM benar-benar keluar dari halaman — di titik
-   itulah kita mengintersepsi & memutuskan: tutup modal, batalkan
-   dialog konfirmasi, atau tampilkan dialog konfirmasi. Setiap kali
-   kita selesai menutup modal / dialog, guard dipasang ulang supaya
-   tombol kembali berikutnya tetap tertangkap.
+   Teknik: "history guard". Satu entri history kosong disisipkan di
+   atas halaman; tombol kembali "memakan" entri itu lebih dulu (event
+   'popstate') sehingga kita bisa mencegat & memutuskan aksinya.
 
-   Kalau pengguna menekan "Ya, Keluar": guard dilepas (history.back())
-   lalu window.close() dicoba sebagai upaya tambahan. Di PWA/TWA yang
-   ter-install di Android, history.back() di titik ini akan benar-
-   benar menutup aplikasi. Di tab browser biasa, JS memang tidak bisa
-   memaksa tab menutup sendiri (dibatasi browser demi keamanan) —
-   kalau setelah beberapa saat halaman ternyata masih terlihat/aktif,
-   penjagaan tombol kembali otomatis dipulihkan lagi supaya fitur
-   tutup-modal & konfirmasi keluar tetap berfungsi normal untuk sisa
-   sesi, bukan malah mati permanen.
+   ✅ FIX "Ya, Keluar" tidak keluar (akar masalah lama):
+   • history.back() hanya membuang entri guard dan mendarat di halaman
+     YANG SAMA (entri dasar) → pengguna merasa tidak keluar sama sekali,
+     lalu guard dipasang ulang. Sekarang keluar ditempuh bertahap:
+       PWA terpasang : window.close() → bila gagal, layar perpisahan
+                       + tombol "Kembali ke SobatInves" (iOS/Android
+                       tertentu memang melarang script menutup app).
+       Tab browser   : mundur 2 langkah (melewati guard + halaman ini →
+                       ke halaman sebelumnya) → bila tak ada halaman
+                       sebelumnya: lepas guard, coba window.close(),
+                       lalu tinggalkan situs ke about:blank.
+   • Guard sebelumnya bisa MENUMPUK (Batal / tap luar / Esc memanggil
+     armGuard() lagi padahal guard sudah ada). Kini armGuard() idempoten:
+     tidak menambah entri bila entri teratas sudah guard.
    ═══════════════════════════════════════════════════════════════════ */
 (function () {
     'use strict';
 
     var siExitConfirmOpen = false;
     var siAllowRealExit = false;
+    var siExiting = false;   // urutan keluar sedang berjalan
+    var siLeft = false;      // halaman sudah benar-benar ditinggalkan (pagehide / hidden)
+    var siExitTimers = [];
+    var SI_FAREWELL_MS = 850;
 
     function vibrate(pattern) {
         try { if (navigator.vibrate) navigator.vibrate(pattern); } catch (e) {}
+    }
+
+    function reducedMotion() {
+        try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; }
+    }
+
+    function isStandalone() {
+        try {
+            return window.matchMedia('(display-mode: standalone)').matches ||
+                   window.matchMedia('(display-mode: fullscreen)').matches ||
+                   window.matchMedia('(display-mode: minimal-ui)').matches ||
+                   window.navigator.standalone === true;
+        } catch (e) { return false; }
+    }
+
+    // Timer berantai untuk urutan keluar; otomatis berhenti begitu halaman ditinggalkan.
+    function later(fn, ms) {
+        var id = setTimeout(function () { if (!siLeft) fn(); }, ms);
+        siExitTimers.push(id);
+        return id;
+    }
+    function clearExitTimers() {
+        while (siExitTimers.length) clearTimeout(siExitTimers.pop());
     }
 
     // Daftar modal/panel/overlay resmi aplikasi ini yang perlu ditutup
     // lewat fungsi close masing-masing (supaya semua efek samping —
     // reset state, hentikan TTS, dsb — tetap berjalan seperti biasa).
     // Urutan = prioritas: dicek dari atas ke bawah, yang pertama
-    // ketemu dalam kondisi terbuka itulah yang ditutup. Dialog exit-
-    // confirm ditaruh paling atas karena z-index-nya paling tinggi.
+    // ketemu dalam kondisi terbuka itulah yang ditutup.
     var SI_BACK_TARGETS = [
         { sel: '#siExitConfirmBox',    cls: 'open',   close: function () { dismissExitConfirm(); } },
         { sel: '#modal-quick-buy',     cls: 'active', close: function () { if (typeof closeQuickBuy === 'function') closeQuickBuy(); } },
@@ -28179,9 +28349,8 @@ Jumlah Emiten: <b>${allStocks ? allStocks.length : 0}</b>
         return false;
     }
 
-    // Jaring pengaman generik: kalau ada overlay/modal/panel lain yang
-    // belum terdaftar eksplisit di SI_BACK_TARGETS (fitur baru di masa
-    // depan) tapi masih memakai konvensi class "open", tetap ditutup.
+    // Jaring pengaman generik: overlay/modal/panel lain yang belum
+    // terdaftar eksplisit tapi memakai konvensi class "open" tetap ditutup.
     function closeGenericOverlay() {
         var els = document.querySelectorAll(
             '.open[id*="verlay" i], .open[id*="odal" i], .open[id*="anel" i], .open[id*="heet" i]'
@@ -28202,13 +28371,19 @@ Jumlah Emiten: <b>${allStocks ? allStocks.length : 0}</b>
         return closeGenericOverlay();
     }
 
+    // Idempoten: hanya menyisipkan entri guard bila entri teratas BUKAN guard.
+    // (Sebelumnya guard menumpuk tiap Batal/Esc/tap-luar → "Ya, Keluar" tak
+    // pernah cukup untuk benar-benar keluar dari halaman.)
     function armGuard() {
-        try { history.pushState({ siBackGuard: true }, document.title, location.href); } catch (e) {}
+        if (siAllowRealExit) return;
+        try {
+            var st = history.state;
+            if (st && st.siBackGuard) return;
+            history.pushState({ siBackGuard: true }, document.title, location.href);
+        } catch (e) {}
     }
 
-    // Menutup dialog konfirmasi keluar dengan animasi slide-down/fade-
-    // out yang mulus (dipakai oleh tombol Batal, tap di luar sheet,
-    // Esc, dan saat tombol kembali ditekan lagi ketika dialog terbuka).
+    // Menutup dialog konfirmasi keluar dengan animasi slide-down/fade-out.
     function dismissExitConfirm() {
         var box = document.getElementById('siExitConfirmBox');
         if (!box || !siExitConfirmOpen) return;
@@ -28218,8 +28393,113 @@ Jumlah Emiten: <b>${allStocks ? allStocks.length : 0}</b>
         setTimeout(function () { box.classList.remove('closing'); }, 190);
     }
 
+    // ── Layar perpisahan (dibuat sekali, dipakai ulang) ──
+    function ensureFarewell() {
+        var fw = document.getElementById('siExitFarewell');
+        if (fw) return fw;
+        fw = document.createElement('div');
+        fw.id = 'siExitFarewell';
+        fw.className = 'si-exit-farewell';
+        fw.setAttribute('role', 'alertdialog');
+        fw.setAttribute('aria-live', 'polite');
+        fw.setAttribute('aria-labelledby', 'siFwTitle');
+        fw.innerHTML =
+            '<div class="si-fw-wave" aria-hidden="true">👋</div>' +
+            '<div class="si-fw-title" id="siFwTitle">Sampai jumpa!</div>' +
+            '<div class="si-fw-desc" id="siFwDesc">Menutup SobatInves…</div>' +
+            '<div class="si-fw-bar" aria-hidden="true"><span></span></div>' +
+            '<button type="button" class="si-exit-btn si-fw-back btn-ripple">Kembali ke SobatInves</button>';
+        document.body.appendChild(fw);
+        fw.querySelector('.si-fw-back').addEventListener('click', resetExitState);
+        return fw;
+    }
+
+    function showFarewell(ms) {
+        var fw = ensureFarewell();
+        var desc = document.getElementById('siFwDesc');
+        if (desc) desc.textContent = 'Menutup SobatInves…';
+        fw.classList.remove('show', 'hint');
+        fw.style.setProperty('--si-fw-dur', ms + 'ms');
+        void fw.offsetWidth; // restart animasi bila dipakai ulang
+        fw.classList.add('show');
+    }
+
+    // Semua upaya keluar otomatis gagal (mis. iOS / tab yang tak boleh ditutup script):
+    // beri tahu dengan jujur + beri jalan kembali, jangan biarkan layar menggantung.
+    function showExitHint() {
+        var fw = ensureFarewell();
+        var desc = document.getElementById('siFwDesc');
+        if (desc) desc.textContent = 'Browser tidak mengizinkan aplikasi menutup dirinya sendiri. Tutup lewat tombol Home / daftar aplikasi terbuka, atau kembali ke SobatInves.';
+        fw.classList.add('show', 'hint');
+        var b = fw.querySelector('.si-fw-back');
+        if (b) { try { b.focus({ preventScroll: true }); } catch (e) { try { b.focus(); } catch (e2) {} } }
+    }
+
+    // Kembalikan aplikasi ke kondisi normal (batal keluar / halaman dipulihkan).
+    function resetExitState() {
+        clearExitTimers();
+        siExiting = false;
+        siAllowRealExit = false;
+        siLeft = false;
+        siExitConfirmOpen = false;
+        var fw = document.getElementById('siExitFarewell');
+        if (fw) fw.classList.remove('show', 'hint');
+        var box = document.getElementById('siExitConfirmBox');
+        if (box) box.classList.remove('open', 'closing');
+        armGuard();
+    }
+
+    // Upaya keluar bertahap; tiap tahap dicek: kalau halaman sudah ditinggalkan, berhenti.
+    function performRealExit() {
+        if (siLeft) return;
+
+        // PWA terpasang: tidak ada halaman "sebelumnya" — satu-satunya jalan adalah window.close().
+        if (isStandalone()) {
+            try { window.close(); } catch (e) {}
+            later(showExitHint, 600);
+            return;
+        }
+
+        // Tab browser: mundur 2 langkah = lewati entri guard + entri halaman ini
+        // (history.back() sekali saja cuma mendarat di halaman yang sama!).
+        try { history.go(-2); } catch (e) {}
+        later(function () {
+            // Tak ada halaman sebelumnya. Lepas guard, coba tutup tab, lalu tinggalkan situs.
+            try { history.back(); } catch (e) {}
+            later(function () {
+                try { window.close(); } catch (e) {}
+                later(function () {
+                    try { location.replace('about:blank'); }
+                    catch (e) { showExitHint(); }
+                }, 350);
+            }, 150);
+        }, 700);
+    }
+
+    function startExit() {
+        if (siExiting) return;
+        siExiting = true;
+        siLeft = false;
+        siExitConfirmOpen = false;
+        siAllowRealExit = true;   // popstate berikutnya dibiarkan lewat
+
+        var box = document.getElementById('siExitConfirmBox');
+        var quick = reducedMotion();
+        var fwMs = quick ? 250 : SI_FAREWELL_MS;
+
+        vibrate([10, 30, 10]);
+        if (box) { box.classList.remove('open'); box.classList.add('closing'); }
+
+        // Sheet turun & memudar → layar perpisahan menyapu masuk (sedikit tumpang-tindih agar mulus)
+        later(function () {
+            showFarewell(fwMs);
+            if (box) later(function () { box.classList.remove('closing'); }, 220);
+            later(performRealExit, fwMs + 60);
+        }, quick ? 0 : 120);
+    }
+
     function showExitConfirm() {
-        if (siExitConfirmOpen) return;
+        if (siExitConfirmOpen || siExiting) return;
         siExitConfirmOpen = true;
         var box = document.getElementById('siExitConfirmBox');
         if (!box) {
@@ -28243,47 +28523,21 @@ Jumlah Emiten: <b>${allStocks ? allStocks.length : 0}</b>
                 '</div>';
             document.body.appendChild(box);
 
-            // Tap di area gelap di luar sheet (bukan di sheet-nya sendiri)
-            // diperlakukan sama seperti tombol Batal — konvensi bottom-
-            // sheet yang sudah dipakai di modal-modal lain aplikasi ini.
+            // Tap di area gelap di luar sheet = tombol Batal.
             box.addEventListener('click', function (e) {
-                if (e.target === box) { dismissExitConfirm(); armGuard(); }
+                if (e.target === box && !siExiting) { dismissExitConfirm(); armGuard(); }
             });
-
             box.querySelector('.si-exit-cancel').addEventListener('click', function () {
+                if (siExiting) return;
                 dismissExitConfirm();
-                armGuard(); // tetap terjaga untuk penekanan tombol kembali berikutnya
+                armGuard(); // aman: idempoten, tidak menumpuk entri
             });
-            box.querySelector('.si-exit-ok').addEventListener('click', function () {
-                siExitConfirmOpen = false;
-                siAllowRealExit = true;
-                box.classList.remove('open');
-                box.classList.add('closing');
-                vibrate([10, 30, 10]);
-                setTimeout(function () {
-                    box.classList.remove('closing');
-                    history.back(); // lepas guard yang sedang aktif → benar-benar keluar
-                    setTimeout(function () {
-                        try { window.close(); } catch (e) {}
-                        // Fallback: kalau setelah upaya keluar ternyata halaman masih
-                        // terlihat (tab browser biasa yang tak bisa ditutup via script,
-                        // atau memang tak ada history sebelumnya buat di-back()-in),
-                        // pulihkan lagi penjagaannya supaya app tetap normal dipakai.
-                        setTimeout(function () {
-                            if (document.visibilityState !== 'hidden') {
-                                siAllowRealExit = false;
-                                armGuard();
-                            }
-                        }, 350);
-                    }, 80);
-                }, 160);
-            });
+            box.querySelector('.si-exit-ok').addEventListener('click', startExit);
         }
         box.classList.remove('closing');
         box.classList.add('open');
         vibrate(12);
-        // Fokus default ke tombol "Batal" (pilihan paling aman) — baik
-        // untuk aksesibilitas keyboard maupun jaga-jaga salah tekan.
+        // Fokus default ke "Batal" (pilihan paling aman).
         setTimeout(function () {
             var cancelBtn = box.querySelector('.si-exit-cancel');
             if (!cancelBtn) return;
@@ -28298,15 +28552,23 @@ Jumlah Emiten: <b>${allStocks ? allStocks.length : 0}</b>
         showExitConfirm();
     });
 
-    // Dukungan tombol Esc di desktop: menutup modal/dialog yang lagi
-    // terbuka. Sengaja TIDAK memicu dialog konfirmasi keluar dari
-    // kondisi kosong — itu perilaku khusus tombol/gesture back di
-    // mobile, bukan ekspektasi wajar dari tombol Esc di desktop.
+    // Esc di desktop: menutup modal/dialog yang lagi terbuka (bukan memicu konfirmasi keluar).
     document.addEventListener('keydown', function (e) {
         if (e.key !== 'Escape' && e.keyCode !== 27) return;
+        if (siExiting) return;
         if (siExitConfirmOpen) { dismissExitConfirm(); armGuard(); return; }
         if (closeTopMostOverlay()) armGuard();
     });
+
+    // Deteksi halaman benar-benar ditinggalkan → hentikan urutan keluar.
+    window.addEventListener('pagehide', function () { if (siExiting) siLeft = true; });
+    document.addEventListener('visibilitychange', function () {
+        if (!siExiting) return;
+        if (document.visibilityState === 'hidden') siLeft = true;   // app ditutup / berpindah
+        else resetExitState();                                       // kembali lagi → pulihkan app
+    });
+    // Kembali via bfcache (tombol forward/back browser) → pulihkan app & pasang ulang guard.
+    window.addEventListener('pageshow', function (e) { if (e.persisted) resetExitState(); });
 
     function initBackGuard() { armGuard(); }
     if (document.readyState === 'complete' || document.readyState === 'interactive') initBackGuard();
